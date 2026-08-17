@@ -82,3 +82,23 @@ acquisition:
   source_dir: data/raw/cfpb/source
   manifest_path: data/raw/cfpb/manifests/acquisition_manifest.json
   integrity_report: reports/phase2b_acquisition_report.md
+
+# Phase 3 - raw data quality audit. These are review thresholds for the audit
+# report, not cleaning rules; nothing is dropped or modified as a result of
+# them.
+audit:
+  source_dir: data/raw/cfpb/source
+  # A narrative under this many whitespace-split words is flagged as very
+  # short for review; it is not excluded.
+  short_narrative_words: 10
+  top_n_issues: 15
+  top_n_subproducts: 15
+  # Vocabulary fingerprint (most frequent distinctive words per product) is a
+  # cheap proxy for semantic separation between classes. Sampled per product
+  # to keep the audit fast on a CPU-only machine; it is a diagnostic, not
+  # part of the modeling dataset.
+  vocabulary_sample_per_product: 4000
+  vocabulary_top_n: 20
+  random_seed: 42
+  report_path: reports/phase3_data_audit.md
+  label_decision_path: reports/phase3_label_decision.md

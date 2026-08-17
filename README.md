@@ -45,7 +45,7 @@ documentation does not claim otherwise.
 | 1 | Source / API strategy | Locked |
 | 2A | CFPB count audit | **Complete** |
 | 2B | Raw narrative acquisition | **Complete** |
-| 3 | Raw data quality audit + final label set | Pending |
+| 3 | Raw data quality audit + final label set | **Complete** - labels locked |
 | 4 | Modelling dataset construction | Pending |
 | 5 | LSTM baseline (E0) | Pending |
 | 6 | Controlled LSTM enhancements (E1-E3) | Pending |
@@ -141,6 +141,33 @@ official search CSV export and validated with `--verify` (below) instead. All
 58 planned product-months matched their Phase 2A expected count exactly - zero
 delta everywhere, no duplicate Complaint IDs, no missing narratives. Full
 detail: [`reports/phase2b_acquisition_report.md`](reports/phase2b_acquisition_report.md).
+
+## Final label set
+
+Locked in Phase 3 from the audit evidence: **5 classes, the native CFPB
+`Product` values used verbatim** - no merging, renaming, or exclusion.
+
+| Label | Rows | % |
+|---|---:|---:|
+| Debt collection | 24,007 | 22.23% |
+| Checking or savings account | 21,547 | 19.95% |
+| Money transfer, virtual currency, or money service | 21,437 | 19.85% |
+| Credit card | 20,890 | 19.34% |
+| Student loan | 20,111 | 18.62% |
+
+`Sub-product`, `Issue`, and `Sub-issue` were each evaluated and rejected on
+evidence - Debt collection's most common Sub-product is `I do not know`
+(45.97%), `Issue` needs 17 of 48 values to cover 80% of rows, and `Sub-issue`
+is 100% missing for the entire Money transfer product. `Product` is also the
+field that matches the business problem: routing a complaint to the correct
+product team.
+
+Decision and its limitations: [`reports/phase3_label_decision.md`](reports/phase3_label_decision.md).
+Full audit: [`reports/phase3_data_audit.md`](reports/phase3_data_audit.md).
+
+```bash
+python -m src.data.audit
+```
 
 ## Project structure
 

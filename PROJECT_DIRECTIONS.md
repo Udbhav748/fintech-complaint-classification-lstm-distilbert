@@ -2150,8 +2150,8 @@ Phase 0 — Project Scope             LOCKED
 Phase 1 — Source/API Strategy      LOCKED
 Phase 2A — Count Audit             COMPLETE
 Phase 2B — Raw Acquisition         COMPLETE
-Phase 3 — Data Audit/Labels        NEXT
-Phase 4 — Dataset Construction     PENDING
+Phase 3 — Data Audit/Labels        COMPLETE — labels LOCKED
+Phase 4 — Dataset Construction     NEXT
 Phase 5 — LSTM Baseline            PENDING
 Phase 6 — Enhancements             PENDING
 Phase 7 — DistilBERT               PENDING
@@ -2207,22 +2207,58 @@ request shape.
 
 ---
 
+## Phase 3 findings carried forward
+
+Audited 2026-08-18 over all 107,992 raw rows. Full report:
+`reports/phase3_data_audit.md`. Decision: `reports/phase3_label_decision.md`.
+
+**LABEL SET LOCKED — Option A: the 5 native CFPB `Product` values, used
+verbatim.** No merging, renaming, or exclusion.
+
+1. **The extract is clean.** 107,992 unique Complaint IDs, zero duplicates,
+   zero missing or blank narratives, `Product` 100% populated, no unexpected
+   product values, identical 16-column schema across all five files.
+2. **Alternatives were rejected on evidence.** `Sub-product` is unusable
+   (Debt collection's largest value is literally `I do not know` at 45.97%;
+   Credit card and Student loan have only 2 sub-products each). `Issue` needs
+   17 of its 48 values to cover 80% of rows with 16 values under 500 rows.
+   `Sub-issue` is 100% missing for the whole Money transfer product.
+3. **Class balance in this extract is an acquisition artifact.** 1.19x here
+   against 8.3x in the real population. **E3 (class weights) should therefore
+   be expected to produce a near-zero delta** — state that as a hypothesis
+   before running it, or revisit the Phase 4 sampling strategy to preserve
+   natural imbalance. This is a Phase 4 decision for the project owner.
+4. **7,035 rows share exact narrative text** across 847 distinct texts
+   (largest group 832 rows). These are distinct Complaint IDs with identical
+   text, almost certainly complaint-mill boilerplate. Phase 4 must keep
+   identical narratives on the same side of the train/test split or the
+   evaluation is contaminated (section 27).
+5. **7 duplicate narratives carry conflicting Product labels** — a small but
+   real ceiling on achievable accuracy.
+6. **29.07% of narratives exceed 256 words, 6.24% exceed 512.** These are
+   whitespace word counts; the section 41 max-length fairness analysis must
+   use real tokenizer output, which will truncate more.
+7. **Products span different date ranges by design** (Debt collection 4
+   months, Student loan 27), so a temporal split would not be comparable
+   across classes. The stratified random split of section 26 stands.
+
+---
+
 # 83. Current Immediate Task
 
-## Phase 3 — Raw Data Quality Audit + Final Label Set
+## Phase 4 — Modeling Dataset Construction
 
-Phase 2B is complete. Using the acquired raw extract under
-`data/raw/cfpb/source/`, run the Phase 3 audit exactly as specified in
-sections 22-23:
+Phase 3 is complete and the label set is locked. Build the modeling dataset
+per sections 24, 26 and 27:
 
-1. row-level quality (duplicate/missing Complaint IDs)
-2. label quality (Product, Sub-product, Issue, Sub-issue counts)
-3. narrative quality (missing/empty/whitespace-only, length distribution)
-4. temporal quality (coverage, gaps)
+1. decide the sampling strategy, explicitly resolving the class-balance
+   question raised in Phase 3 finding 3
+2. group identical narratives so they cannot straddle the train/test split
+3. create a reproducible stratified train/validation/test split
+4. record the dataset version and seed
 
-Then lock the final label set (Option A native labels vs Option B derived
-taxonomy) and document the decision per section 23. Do not start Phase 4
-(dataset construction) before this decision is documented.
+Do not begin Phase 5 (LSTM baseline) until the modeling dataset exists and its
+construction is documented.
 
 ---
 
