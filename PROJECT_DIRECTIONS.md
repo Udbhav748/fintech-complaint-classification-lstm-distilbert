@@ -2149,8 +2149,8 @@ and we can show the configuration, dataset version, experiment registry, and cod
 Phase 0 — Project Scope             LOCKED
 Phase 1 — Source/API Strategy      LOCKED
 Phase 2A — Count Audit             COMPLETE
-Phase 2B — Raw Acquisition         NEXT
-Phase 3 — Data Audit/Labels        PENDING
+Phase 2B — Raw Acquisition         COMPLETE
+Phase 3 — Data Audit/Labels        NEXT
 Phase 4 — Dataset Construction     PENDING
 Phase 5 — LSTM Baseline            PENDING
 Phase 6 — Enhancements             PENDING
@@ -2182,25 +2182,47 @@ Verified against the live API on 2026-08-18:
    944). This requires a sampling decision in Phase 4 so one month does not
    dominate that class and distort macro-F1.
 
+## Phase 2B findings carried forward
+
+Retrieved 2026-08-18. The scripted per-month downloader was built and tested
+end to end (see `src/data_acquisition/cfpb_downloader.py`), but the CFPB edge
+(Akamai) began returning HTTP 403 to this client across the whole domain
+before the real acquisition could run. Rather than attempt to work around the
+block, the same five product windows were retrieved manually via the official
+search CSV export (one request per product, covering its full planned range)
+and validated with `--verify`, which runs the identical integrity checks and
+compares coverage against the Phase 2A counts by row content rather than by
+request shape.
+
+1. **107,992 rows acquired**, matching the plan exactly. All 58 planned
+   product-months match their Phase 2A expected count with zero delta.
+2. **No duplicate Complaint IDs, no missing narratives.** 107,992 unique rows.
+3. **`date_received_max` is inclusive.** Confirmed empirically: the final
+   month of every product's window retrieved its full expected count.
+4. **`format=csv` was not capped by `size=60000`** at these window sizes
+   (largest single file: 24,007 rows for Debt collection).
+5. Acquisition manifest with per-file checksums:
+   `data/raw/cfpb/manifests/acquisition_manifest.json`. Full report:
+   `reports/phase2b_acquisition_report.md`.
+
 ---
 
 # 83. Current Immediate Task
 
-## Phase 2B — Raw Narrative Acquisition
+## Phase 3 — Raw Data Quality Audit + Final Label Set
 
-Using the Phase 2A window recommendations:
+Phase 2B is complete. Using the acquired raw extract under
+`data/raw/cfpb/source/`, run the Phase 3 audit exactly as specified in
+sections 22-23:
 
-1. retrieve narrative-bearing records via date-windowed CSV requests
-2. use non-overlapping date ranges
-3. save each response as an immutable raw file under `data/raw/cfpb/source/`
-4. write `data/raw/cfpb/manifests/acquisition_manifest.json`
-5. write `data/raw/cfpb/README.md`
-6. validate coverage against the Phase 2A counts
-7. STOP
+1. row-level quality (duplicate/missing Complaint IDs)
+2. label quality (Product, Sub-product, Issue, Sub-issue counts)
+3. narrative quality (missing/empty/whitespace-only, length distribution)
+4. temporal quality (coverage, gaps)
 
-Do not clean, tokenize, deduplicate, or rebalance during acquisition.
-
-Do not choose the final label set during Phase 2B.
+Then lock the final label set (Option A native labels vs Option B derived
+taxonomy) and document the decision per section 23. Do not start Phase 4
+(dataset construction) before this decision is documented.
 
 ---
 

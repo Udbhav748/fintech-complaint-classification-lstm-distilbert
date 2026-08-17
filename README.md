@@ -44,7 +44,7 @@ documentation does not claim otherwise.
 | 0 | Project definition and scope | Locked |
 | 1 | Source / API strategy | Locked |
 | 2A | CFPB count audit | **Complete** |
-| 2B | Raw narrative acquisition | **In progress** - pipeline complete, extract not yet retrieved |
+| 2B | Raw narrative acquisition | **Complete** |
 | 3 | Raw data quality audit + final label set | Pending |
 | 4 | Modelling dataset construction | Pending |
 | 5 | LSTM baseline (E0) | Pending |
@@ -134,11 +134,13 @@ Each product-month is written as an immutable CSV under
 `data/raw/cfpb/manifests/acquisition_manifest.json` recording the query, the
 expected and retrieved row counts, checksums, and any failed windows.
 
-**Current state:** the pipeline is implemented and tested end to end, but the
-extract has not been retrieved. The CFPB edge is returning HTTP 403 to this
-client across the whole domain, which is a rate-limit rather than a request
-defect - the same request succeeded during Phase 2A. Acquisition resumes when
-access returns.
+**Result:** 107,992 rows acquired. The CFPB edge began returning HTTP 403 to
+this client across the whole domain before the scripted per-month acquisition
+could run, so the same five product windows were retrieved manually via the
+official search CSV export and validated with `--verify` (below) instead. All
+58 planned product-months matched their Phase 2A expected count exactly - zero
+delta everywhere, no duplicate Complaint IDs, no missing narratives. Full
+detail: [`reports/phase2b_acquisition_report.md`](reports/phase2b_acquisition_report.md).
 
 ## Project structure
 
