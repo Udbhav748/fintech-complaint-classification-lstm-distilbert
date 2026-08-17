@@ -1,0 +1,601 @@
+{
+  "phase": "2B - Raw Narrative Acquisition",
+  "source": "CFPB Consumer Complaint Database",
+  "source_url": "https://www.consumerfinance.gov/data-research/consumer-complaints/",
+  "endpoint": "https://www.consumerfinance.gov/data-research/consumer-complaints/search/api/v1/",
+  "retrieved_at": "2026-08-18T01:54:49+05:30",
+  "source_period": {
+    "nominal_start": "2023-08-17",
+    "nominal_end": "2026-08-17",
+    "effective_end_month": "2026-06",
+    "effective_end_reason": "2026-07 is incomplete because the CFPB publishes a narrative only after the company responds (Phase 2A finding)."
+  },
+  "filters": {
+    "products": [
+      "Debt collection",
+      "Credit card",
+      "Checking or savings account",
+      "Money transfer, virtual currency, or money service",
+      "Student loan"
+    ],
+    "has_narrative": "true",
+    "window": "calendar month, non-overlapping"
+  },
+  "query_parameters": {
+    "format": "csv",
+    "no_aggs": "true",
+    "size": 60000,
+    "date_received_min": "window start (inclusive)",
+    "date_received_max": "window end"
+  },
+  "selection_rule": "Per product, months are taken from the most recent complete month backwards until the cumulative Phase 2A count reaches 20,000 rows.",
+  "planned_windows": 58,
+  "successful_windows": 0,
+  "failed_windows": 5,
+  "total_retries": 0,
+  "integrity": {
+    "total_rows": 107992,
+    "rows_per_product": {
+      "Debt collection": 24007,
+      "Checking or savings account": 21547,
+      "Money transfer, virtual currency, or money service": 21437,
+      "Credit card": 20890,
+      "Student loan": 20111
+    },
+    "min_date_received": "2024-04-01",
+    "max_date_received": "2026-06-30",
+    "missing_narrative": 0,
+    "duplicate_complaint_ids": 0,
+    "unique_complaint_ids": 107992
+  },
+  "windows": [
+    {
+      "file_path": "data/raw/cfpb/source/checking_or_savings_account_2025-12_to_2026-06.csv",
+      "request_status": "loaded_from_disk",
+      "file_size_bytes": 36433130,
+      "sha256": "0e96fa84631c944e37e947b667538ca9f187bea9a14ad66c6d37ea0d0de2ec22",
+      "products": [
+        "Checking or savings account"
+      ],
+      "retrieved_rows": 21547,
+      "min_date_received": "2025-12-01",
+      "max_date_received": "2026-06-30",
+      "missing_narrative": 0,
+      "duplicate_complaint_ids": 0,
+      "missing_required_columns": [],
+      "response_truncated": false
+    },
+    {
+      "file_path": "data/raw/cfpb/source/credit_card_2025-12_to_2026-06.csv",
+      "request_status": "loaded_from_disk",
+      "file_size_bytes": 38172585,
+      "sha256": "77c549cd728e41769b60633a742c6ce37ad542047c523a90f0844af4bd3baa04",
+      "products": [
+        "Credit card"
+      ],
+      "retrieved_rows": 20890,
+      "min_date_received": "2025-12-01",
+      "max_date_received": "2026-06-30",
+      "missing_narrative": 0,
+      "duplicate_complaint_ids": 0,
+      "missing_required_columns": [],
+      "response_truncated": false
+    },
+    {
+      "file_path": "data/raw/cfpb/source/debt_collection_2026-03_to_2026-06.csv",
+      "request_status": "loaded_from_disk",
+      "file_size_bytes": 32557206,
+      "sha256": "7a09eafac047ccc5137c05966a6ff48689f5c67c67afc5efebf05d5c7fca1b8f",
+      "products": [
+        "Debt collection"
+      ],
+      "retrieved_rows": 24007,
+      "min_date_received": "2026-03-01",
+      "max_date_received": "2026-06-30",
+      "missing_narrative": 0,
+      "duplicate_complaint_ids": 0,
+      "missing_required_columns": [],
+      "response_truncated": false
+    },
+    {
+      "file_path": "data/raw/cfpb/source/money_transfer_2025-06_to_2026-06.csv",
+      "request_status": "loaded_from_disk",
+      "file_size_bytes": 32445934,
+      "sha256": "d0c606bc788d65636c1b2b14f862d5ef9d9ff80c5f7896474d972c0fca5db830",
+      "products": [
+        "Money transfer, virtual currency, or money service"
+      ],
+      "retrieved_rows": 21437,
+      "min_date_received": "2025-06-01",
+      "max_date_received": "2026-06-30",
+      "missing_narrative": 0,
+      "duplicate_complaint_ids": 0,
+      "missing_required_columns": [],
+      "response_truncated": false
+    },
+    {
+      "file_path": "data/raw/cfpb/source/student_loan_2024-04_to_2026-06.csv",
+      "request_status": "loaded_from_disk",
+      "file_size_bytes": 31950976,
+      "sha256": "594cab36296bdacaaa13ff274a1deb32b16678a924deb111e69bea21a05ba706",
+      "products": [
+        "Student loan"
+      ],
+      "retrieved_rows": 20111,
+      "min_date_received": "2024-04-01",
+      "max_date_received": "2026-06-30",
+      "missing_narrative": 0,
+      "duplicate_complaint_ids": 0,
+      "missing_required_columns": [],
+      "response_truncated": false
+    }
+  ],
+  "acquisition_method": "Files already present on disk; verified rather than requested by this script. Record the actual retrieval route in the notes field.",
+  "notes": "",
+  "coverage": [
+    {
+      "product": "Checking or savings account",
+      "month": "2025-12",
+      "expected_rows": 3215,
+      "retrieved_rows": 3215,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Checking or savings account",
+      "month": "2026-01",
+      "expected_rows": 3792,
+      "retrieved_rows": 3792,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Checking or savings account",
+      "month": "2026-02",
+      "expected_rows": 1978,
+      "retrieved_rows": 1978,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Checking or savings account",
+      "month": "2026-03",
+      "expected_rows": 3448,
+      "retrieved_rows": 3448,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Checking or savings account",
+      "month": "2026-04",
+      "expected_rows": 3774,
+      "retrieved_rows": 3774,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Checking or savings account",
+      "month": "2026-05",
+      "expected_rows": 3004,
+      "retrieved_rows": 3004,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Checking or savings account",
+      "month": "2026-06",
+      "expected_rows": 2336,
+      "retrieved_rows": 2336,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Credit card",
+      "month": "2025-12",
+      "expected_rows": 3183,
+      "retrieved_rows": 3183,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Credit card",
+      "month": "2026-01",
+      "expected_rows": 3788,
+      "retrieved_rows": 3788,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Credit card",
+      "month": "2026-02",
+      "expected_rows": 1983,
+      "retrieved_rows": 1983,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Credit card",
+      "month": "2026-03",
+      "expected_rows": 3357,
+      "retrieved_rows": 3357,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Credit card",
+      "month": "2026-04",
+      "expected_rows": 3599,
+      "retrieved_rows": 3599,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Credit card",
+      "month": "2026-05",
+      "expected_rows": 2958,
+      "retrieved_rows": 2958,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Credit card",
+      "month": "2026-06",
+      "expected_rows": 2022,
+      "retrieved_rows": 2022,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Debt collection",
+      "month": "2026-03",
+      "expected_rows": 8249,
+      "retrieved_rows": 8249,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Debt collection",
+      "month": "2026-04",
+      "expected_rows": 6638,
+      "retrieved_rows": 6638,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Debt collection",
+      "month": "2026-05",
+      "expected_rows": 5520,
+      "retrieved_rows": 5520,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Debt collection",
+      "month": "2026-06",
+      "expected_rows": 3600,
+      "retrieved_rows": 3600,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Money transfer, virtual currency, or money service",
+      "month": "2025-06",
+      "expected_rows": 1670,
+      "retrieved_rows": 1670,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Money transfer, virtual currency, or money service",
+      "month": "2025-07",
+      "expected_rows": 1932,
+      "retrieved_rows": 1932,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Money transfer, virtual currency, or money service",
+      "month": "2025-08",
+      "expected_rows": 1920,
+      "retrieved_rows": 1920,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Money transfer, virtual currency, or money service",
+      "month": "2025-09",
+      "expected_rows": 1634,
+      "retrieved_rows": 1634,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Money transfer, virtual currency, or money service",
+      "month": "2025-10",
+      "expected_rows": 2634,
+      "retrieved_rows": 2634,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Money transfer, virtual currency, or money service",
+      "month": "2025-11",
+      "expected_rows": 1673,
+      "retrieved_rows": 1673,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Money transfer, virtual currency, or money service",
+      "month": "2025-12",
+      "expected_rows": 1497,
+      "retrieved_rows": 1497,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Money transfer, virtual currency, or money service",
+      "month": "2026-01",
+      "expected_rows": 1767,
+      "retrieved_rows": 1767,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Money transfer, virtual currency, or money service",
+      "month": "2026-02",
+      "expected_rows": 981,
+      "retrieved_rows": 981,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Money transfer, virtual currency, or money service",
+      "month": "2026-03",
+      "expected_rows": 1662,
+      "retrieved_rows": 1662,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Money transfer, virtual currency, or money service",
+      "month": "2026-04",
+      "expected_rows": 1842,
+      "retrieved_rows": 1842,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Money transfer, virtual currency, or money service",
+      "month": "2026-05",
+      "expected_rows": 1397,
+      "retrieved_rows": 1397,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Money transfer, virtual currency, or money service",
+      "month": "2026-06",
+      "expected_rows": 828,
+      "retrieved_rows": 828,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2024-04",
+      "expected_rows": 632,
+      "retrieved_rows": 632,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2024-05",
+      "expected_rows": 731,
+      "retrieved_rows": 731,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2024-06",
+      "expected_rows": 584,
+      "retrieved_rows": 584,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2024-07",
+      "expected_rows": 540,
+      "retrieved_rows": 540,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2024-08",
+      "expected_rows": 520,
+      "retrieved_rows": 520,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2024-09",
+      "expected_rows": 758,
+      "retrieved_rows": 758,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2024-10",
+      "expected_rows": 726,
+      "retrieved_rows": 726,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2024-11",
+      "expected_rows": 481,
+      "retrieved_rows": 481,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2024-12",
+      "expected_rows": 746,
+      "retrieved_rows": 746,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2025-01",
+      "expected_rows": 1209,
+      "retrieved_rows": 1209,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2025-02",
+      "expected_rows": 992,
+      "retrieved_rows": 992,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2025-03",
+      "expected_rows": 1828,
+      "retrieved_rows": 1828,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2025-04",
+      "expected_rows": 1148,
+      "retrieved_rows": 1148,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2025-05",
+      "expected_rows": 1054,
+      "retrieved_rows": 1054,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2025-06",
+      "expected_rows": 765,
+      "retrieved_rows": 765,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2025-07",
+      "expected_rows": 848,
+      "retrieved_rows": 848,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2025-08",
+      "expected_rows": 675,
+      "retrieved_rows": 675,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2025-09",
+      "expected_rows": 658,
+      "retrieved_rows": 658,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2025-10",
+      "expected_rows": 556,
+      "retrieved_rows": 556,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2025-11",
+      "expected_rows": 587,
+      "retrieved_rows": 587,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2025-12",
+      "expected_rows": 554,
+      "retrieved_rows": 554,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2026-01",
+      "expected_rows": 764,
+      "retrieved_rows": 764,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2026-02",
+      "expected_rows": 389,
+      "retrieved_rows": 389,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2026-03",
+      "expected_rows": 703,
+      "retrieved_rows": 703,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2026-04",
+      "expected_rows": 764,
+      "retrieved_rows": 764,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2026-05",
+      "expected_rows": 544,
+      "retrieved_rows": 544,
+      "row_delta": 0,
+      "note": ""
+    },
+    {
+      "product": "Student loan",
+      "month": "2026-06",
+      "expected_rows": 355,
+      "retrieved_rows": 355,
+      "row_delta": 0,
+      "note": ""
+    }
+  ]
+}
