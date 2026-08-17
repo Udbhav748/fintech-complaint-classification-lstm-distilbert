@@ -118,7 +118,16 @@ That is a consequence of selecting recent windows, not a removal step.
 ```bash
 python -m src.data_acquisition.cfpb_downloader --dry-run   # show the plan
 python -m src.data_acquisition.cfpb_downloader             # acquire
+python -m src.data_acquisition.cfpb_downloader --verify    # validate files on disk
 ```
+
+`--verify` exists because the extract may be obtained outside this script. It
+runs the same integrity checks over whatever is already under
+`data/raw/cfpb/source/` and compares coverage per product-month against the
+Phase 2A counts, so a manually exported extract is validated exactly as
+strictly as a scripted one. Coverage is checked against the data itself rather
+than against request boundaries, so the file layout does not have to match the
+monthly windows.
 
 Each product-month is written as an immutable CSV under
 `data/raw/cfpb/source/`, with an audit trail in

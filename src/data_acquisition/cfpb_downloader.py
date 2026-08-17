@@ -446,7 +446,7 @@ def build_manifest(
         "planned_windows": int(len(plan)),
         "successful_windows": len(successes),
         "failed_windows": len(failures),
-        "total_retries": sum(entry["retries"] for entry in entries),
+        "total_retries": sum(entry.get("retries", 0) for entry in entries),
         "integrity": integrity,
         "windows": entries,
     }
@@ -543,6 +543,180 @@ def write_integrity_report(
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
+def discover_raw_files(config: AcquisitionConfig, project_root: Path) -> list[Path]:
+    """Find every raw CSV already present under the source directory."""
+    source_dir = project_root / config.source_dir
+    if not source_dir.exists():
+        return []
+    return sorted(source_dir.rglob("*.csv"))
+
+
+def describe_raw_file(path: Path, project_root: Path) -> dict[str, Any]:
+    """Measure a raw file that is already on disk, without re-requesting it."""
+    frame = pd.read_csv(path, dtype=str)
+    entry: dict[str, Any] = {
+        "file_path": path.relative_to(project_root).as_posix(),
+        "request_status": "loaded_from_disk",
+        "file_size_bytes": path.stat().st_size,
+        "sha256": file_checksum(path),
+        "products": (
+            sorted(frame["Product"].dropna().unique().tolist())
+            if "Product" in frame.columns
+            else []
+        ),
+    }
+    entry.update(summarise_window(frame))
+    return entry
+
+
+def compare_coverage_to_plan(
+    complaints: pd.DataFrame, plan: pd.DataFrame
+) -> pd.DataFrame:
+    """Check retrieved rows against the planned Phase 2A count, per product-month.
+
+    Coverage is validated on the data itself rather than on request boundaries,
+    so an extract assembled from wider windows - a manual export, for instance -
+    is checked just as strictly as one assembled month by month.
+    """
+    observed = complaints.copy()
+    observed["month"] = pd.to_datetime(
+        observed["Date received"], errors="coerce"
+    ).dt.strftime("%Y-%m")
+
+    retrieved = (
+        observed.groupby(["Product", "month"])
+        .size()
+        .rename("retrieved_rows")
+        .reset_index()
+        .rename(columns={"Product": "product"})
+    )
+
+    coverage = plan[["product", "month", "expected_rows"]].merge(
+        retrieved, on=["product", "month"], how="outer", indicator=True
+    )
+    coverage["retrieved_rows"] = coverage["retrieved_rows"].fillna(0).astype(int)
+    coverage["expected_rows"] = coverage["expected_rows"].fillna(0).astype(int)
+    coverage["row_delta"] = coverage["retrieved_rows"] - coverage["expected_rows"]
+    coverage["note"] = coverage["_merge"].map(
+        {
+            "both": "",
+            "left_only": "planned but missing",
+            "right_only": "outside the planned windows",
+        }
+    )
+    return coverage.drop(columns="_merge").sort_values(["product", "month"])
+
+
+def write_verification_report(
+    path: Path,
+    integrity: dict[str, Any],
+    entries: list[dict[str, Any]],
+    coverage: pd.DataFrame,
+    checked_at: str,
+) -> None:
+    """Write the integrity report for an extract that was already on disk."""
+    rows_per_product = pd.Series(
+        integrity["rows_per_product"], name="rows"
+    ).sort_values(ascending=False)
+    rows_per_product.index.name = "product"
+
+    missing = coverage[coverage["note"] == "planned but missing"]
+    unplanned = coverage[coverage["note"] == "outside the planned windows"]
+
+    lines = [
+        "# Phase 2B - Raw Extract Verification",
+        "",
+        f"- Checked: {checked_at}",
+        f"- Files inspected: {len(entries)}",
+        "",
+        "## Integrity checks",
+        "",
+        f"- Total rows: {integrity['total_rows']:,}",
+        f"- Date received range: {integrity['min_date_received']} to "
+        f"{integrity['max_date_received']}",
+        f"- Missing narratives: {integrity['missing_narrative']:,}",
+        f"- Duplicate Complaint IDs: {integrity['duplicate_complaint_ids']:,}",
+        f"- Unique Complaint IDs: {integrity['unique_complaint_ids']:,}",
+        "",
+        "### Rows per Product",
+        "",
+        rows_per_product.to_frame().to_markdown(),
+        "",
+        "## Files",
+        "",
+        pd.DataFrame(
+            [
+                {
+                    "file": entry["file_path"].rsplit("/", 1)[-1],
+                    "rows": entry["retrieved_rows"],
+                    "size_bytes": entry["file_size_bytes"],
+                    "sha256": entry["sha256"][:16] + "...",
+                }
+                for entry in entries
+            ]
+        ).to_markdown(index=False),
+        "",
+        "## Coverage against the Phase 2A counts",
+        "",
+        f"- Product-months planned: {int((coverage['expected_rows'] > 0).sum())}",
+        f"- Product-months missing: {len(missing)}",
+        f"- Product-months outside the plan: {len(unplanned)}",
+        "",
+        coverage.to_markdown(index=False),
+        "",
+    ]
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
+def run_verification(config_path: Path, project_root: Path) -> None:
+    """Validate raw files already on disk and write the manifest and report.
+
+    Used when the extract was obtained outside this script - for example a
+    manual export - so that it passes exactly the same integrity checks and
+    lands in the same audit trail.
+    """
+    config = load_config(config_path)
+    counts = pd.read_csv(project_root / config.counts_csv)
+    plan = plan_windows(counts, config)
+
+    files = discover_raw_files(config, project_root)
+    if not files:
+        raise SystemExit(
+            f"No CSV files found under {config.source_dir}. "
+            "Place the raw exports there first."
+        )
+
+    logger.info("Inspecting %d raw file(s)", len(files))
+    entries = [describe_raw_file(path, project_root) for path in files]
+    complaints = pd.concat(
+        [pd.read_csv(path, dtype=str) for path in files], ignore_index=True
+    )
+
+    integrity = run_integrity_checks(complaints)
+    coverage = compare_coverage_to_plan(complaints, plan)
+    checked_at = datetime.now().astimezone().isoformat(timespec="seconds")
+
+    manifest = build_manifest(config, plan, entries, integrity, checked_at)
+    manifest["acquisition_method"] = (
+        "Files already present on disk; verified rather than requested by this "
+        "script. Record the actual retrieval route in the notes field."
+    )
+    manifest["notes"] = ""
+    manifest["coverage"] = coverage.to_dict(orient="records")
+
+    manifest_path = project_root / config.manifest_path
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+    report_path = project_root / config.integrity_report
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    write_verification_report(report_path, integrity, entries, coverage, checked_at)
+
+    logger.info("Total rows: %s", f"{integrity['total_rows']:,}")
+    logger.info("Saved manifest: %s", manifest_path)
+    logger.info("Saved report: %s", report_path)
+
+
 def run_acquisition(config_path: Path, project_root: Path, dry_run: bool) -> None:
     """Execute the Phase 2B raw acquisition end to end."""
     config = load_config(config_path)
@@ -608,6 +782,14 @@ def main() -> None:
         action="store_true",
         help="Print the planned windows without contacting the API.",
     )
+    parser.add_argument(
+        "--verify",
+        action="store_true",
+        help=(
+            "Skip acquisition and run the integrity checks, coverage comparison, "
+            "and manifest over the raw files already under the source directory."
+        ),
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -619,7 +801,10 @@ def main() -> None:
     if not config_path.is_absolute():
         config_path = project_root / config_path
 
-    run_acquisition(config_path, project_root, args.dry_run)
+    if args.verify:
+        run_verification(config_path, project_root)
+    else:
+        run_acquisition(config_path, project_root, args.dry_run)
 
 
 if __name__ == "__main__":
