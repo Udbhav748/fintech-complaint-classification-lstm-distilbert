@@ -53,3 +53,32 @@ output:
   raw_response: reports/phase2a_trends_raw.json
   counts_csv: reports/phase2a_product_month_counts.csv
   audit_report: reports/phase2a_count_audit.md
+
+# Phase 2B - raw narrative acquisition.
+acquisition:
+  # Phase 2A showed volume collapsing across every product in 2026-07 because
+  # the CFPB only publishes a narrative once the company has responded. That
+  # month is still filling in, so the acquisition stops at the end of 2026-06
+  # rather than at the nominal source end of 2026-08-17.
+  effective_end_month: "2026-06"
+
+  # Per-product row target. Acquisition walks backwards month by month from
+  # effective_end_month and stops once a product's cumulative Phase 2A count
+  # reaches this figure, which is what makes the windows "most recent".
+  # 5 products x 20,000 lands the total inside the 80,000-120,000 goal without
+  # downloading the 552,157-row source population.
+  target_rows_per_product: 20000
+
+  # Monthly windows, per PROJECT_DIRECTIONS section 15. Phase 2A recommended
+  # wider windows, but those were sized only to keep a single request under the
+  # 80,000-row threshold. Monthly windows are well inside that limit and let
+  # every retrieved window be validated against its own Phase 2A count.
+  window: month
+
+  # Requests are spaced out because the CFPB edge (Akamai) rate-limits bursts
+  # and answers with HTTP 403 for a period afterwards.
+  request_delay_seconds: 3
+
+  source_dir: data/raw/cfpb/source
+  manifest_path: data/raw/cfpb/manifests/acquisition_manifest.json
+  integrity_report: reports/phase2b_acquisition_report.md

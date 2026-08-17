@@ -1,10 +1,23 @@
 # Source data stays local. The raw CFPB extract is reproducible from the
 # acquisition manifest and must not be committed.
-data/raw/
+#
+# Each level is re-included before its contents are excluded, because git will
+# not descend into an ignored directory - a bare `data/raw/` would make the
+# negations below unreachable and silently drop the README and the manifest.
 data/interim/
 data/processed/
+
+data/raw/*
+!data/raw/cfpb/
+
+data/raw/cfpb/*
 !data/raw/cfpb/README.md
 !data/raw/cfpb/manifests/
+
+# Documentation and audit trail are tracked; the extract itself is not.
+data/raw/cfpb/manifests/*
+!data/raw/cfpb/manifests/*.json
+
 !data/**/.gitkeep
 
 # Pretrained vectors and model caches

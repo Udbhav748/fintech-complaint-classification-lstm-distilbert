@@ -44,7 +44,7 @@ documentation does not claim otherwise.
 | 0 | Project definition and scope | Locked |
 | 1 | Source / API strategy | Locked |
 | 2A | CFPB count audit | **Complete** |
-| 2B | Raw narrative acquisition | Pending |
+| 2B | Raw narrative acquisition | **In progress** - pipeline complete, extract not yet retrieved |
 | 3 | Raw data quality audit + final label set | Pending |
 | 4 | Modelling dataset construction | Pending |
 | 5 | LSTM baseline (E0) | Pending |
@@ -91,6 +91,45 @@ Outputs land in `reports/`:
 - `phase2a_product_month_counts.csv` - one row per product-month
 - `phase2a_count_audit.md` - audit report with review flags
 - `phase2a_trends_raw.json` - unmodified API response
+
+## Phase 2B plan
+
+The extract targets a working dataset of roughly 80,000-120,000 rows rather than
+the full 552,157-row population. The selection rule is deterministic: for each
+product, take the most recent complete month and walk backwards, adding whole
+calendar months until that product's Phase 2A count reaches 20,000 rows.
+
+| Product | Windows | Months | Expected rows |
+|---|---:|---|---:|
+| Debt collection | 4 | 2026-03 → 2026-06 | 24,007 |
+| Checking or savings account | 7 | 2025-12 → 2026-06 | 21,547 |
+| Money transfer, virtual currency, or money service | 13 | 2025-06 → 2026-06 | 21,437 |
+| Credit card | 7 | 2025-12 → 2026-06 | 20,890 |
+| Student loan | 27 | 2024-04 → 2026-06 | 20,111 |
+| **Total** | **58** | | **107,992** |
+
+Windows are monthly and non-overlapping. Acquisition ends at **2026-06**, not
+the nominal 2026-08-17, because Phase 2A showed 2026-07 is still filling in.
+
+The recency rule also happens to exclude both volume spikes Phase 2A flagged
+(Money transfer 2025-01 at 44x its median, Checking or savings 2025-01 at 5.1x).
+That is a consequence of selecting recent windows, not a removal step.
+
+```bash
+python -m src.data_acquisition.cfpb_downloader --dry-run   # show the plan
+python -m src.data_acquisition.cfpb_downloader             # acquire
+```
+
+Each product-month is written as an immutable CSV under
+`data/raw/cfpb/source/`, with an audit trail in
+`data/raw/cfpb/manifests/acquisition_manifest.json` recording the query, the
+expected and retrieved row counts, checksums, and any failed windows.
+
+**Current state:** the pipeline is implemented and tested end to end, but the
+extract has not been retrieved. The CFPB edge is returning HTTP 403 to this
+client across the whole domain, which is a rate-limit rather than a request
+defect - the same request succeeded during Phase 2A. Acquisition resumes when
+access returns.
 
 ## Project structure
 
