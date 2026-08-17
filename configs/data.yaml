@@ -1,0 +1,55 @@
+# Data acquisition configuration.
+#
+# This file defines the source population for the project. Values here are
+# project design decisions, not requirements imposed by the CFPB API.
+
+source:
+  name: CFPB Consumer Complaint Database
+  base_url: https://www.consumerfinance.gov/data-research/consumer-complaints/search/api/v1/
+  trends_endpoint: trends
+  search_endpoint: ""
+
+# Three-year source population. Chosen to capture meaningful temporal and
+# linguistic variation without mixing substantially different complaint eras.
+date_range:
+  start: "2023-08-17"
+  end: "2026-08-17"
+
+# Provisional acquisition scope. These are candidate acquisition categories,
+# NOT the final ML label set. The label set is locked in Phase 3 after the
+# raw data quality audit.
+products:
+  - "Debt collection"
+  - "Credit card"
+  - "Checking or savings account"
+  - "Money transfer, virtual currency, or money service"
+  - "Student loan"
+
+# Only complaints carrying a consumer narrative are usable for text
+# classification, so the count audit measures the narrative-bearing population.
+#
+# NOTE: the published swagger spec documents has_narrative values as "yes"/"no".
+# That is incorrect against the live API - "yes" returns HTTP 424
+# (OpenSearch error). The working value is the string "true". Verified
+# 2026-08-18 against the live endpoint.
+has_narrative: "true"
+
+# Phase 2A review thresholds. These are project heuristics used to flag
+# product-months for human review; they are not CFPB rules and nothing is
+# deleted automatically on the basis of them.
+thresholds:
+  sparse_product_month: 500
+  oversized_product_month: 80000
+  very_sparse_product_total: 5000
+
+http:
+  timeout_seconds: 180
+  max_retries: 4
+  retry_backoff_seconds: 5
+  # A custom User-Agent triggers the CDN WAF (HTTP 403), so the default
+  # client User-Agent is deliberately left in place.
+
+output:
+  raw_response: reports/phase2a_trends_raw.json
+  counts_csv: reports/phase2a_product_month_counts.csv
+  audit_report: reports/phase2a_count_audit.md

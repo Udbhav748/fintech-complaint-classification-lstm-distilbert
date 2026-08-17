@@ -1,0 +1,42 @@
+# Source data stays local. The raw CFPB extract is reproducible from the
+# acquisition manifest and must not be committed.
+data/raw/
+data/interim/
+data/processed/
+!data/raw/cfpb/README.md
+!data/raw/cfpb/manifests/
+!data/**/.gitkeep
+
+# Pretrained vectors and model caches
+embeddings/
+*.txt.gz
+glove*/
+models/
+checkpoints/
+*.h5
+*.keras
+*.pt
+*.pth
+*.safetensors
+.cache/
+transformers_cache/
+hf_cache/
+
+# Environments
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# Secrets
+.env
+*.key
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

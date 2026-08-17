@@ -1,0 +1,181 @@
+product,month,complaint_count,is_sparse,is_oversized
+Checking or savings account,2023-08,1116,False,False
+Checking or savings account,2023-09,2180,False,False
+Checking or savings account,2023-10,2157,False,False
+Checking or savings account,2023-11,2171,False,False
+Checking or savings account,2023-12,2187,False,False
+Checking or savings account,2024-01,2203,False,False
+Checking or savings account,2024-02,2080,False,False
+Checking or savings account,2024-03,2341,False,False
+Checking or savings account,2024-04,2351,False,False
+Checking or savings account,2024-05,2617,False,False
+Checking or savings account,2024-06,2215,False,False
+Checking or savings account,2024-07,2460,False,False
+Checking or savings account,2024-08,2593,False,False
+Checking or savings account,2024-09,2355,False,False
+Checking or savings account,2024-10,2621,False,False
+Checking or savings account,2024-11,2878,False,False
+Checking or savings account,2024-12,2770,False,False
+Checking or savings account,2025-01,13696,False,False
+Checking or savings account,2025-02,3374,False,False
+Checking or savings account,2025-03,2938,False,False
+Checking or savings account,2025-04,3105,False,False
+Checking or savings account,2025-05,3260,False,False
+Checking or savings account,2025-06,3362,False,False
+Checking or savings account,2025-07,3982,False,False
+Checking or savings account,2025-08,3960,False,False
+Checking or savings account,2025-09,3508,False,False
+Checking or savings account,2025-10,3434,False,False
+Checking or savings account,2025-11,3614,False,False
+Checking or savings account,2025-12,3215,False,False
+Checking or savings account,2026-01,3792,False,False
+Checking or savings account,2026-02,1978,False,False
+Checking or savings account,2026-03,3448,False,False
+Checking or savings account,2026-04,3774,False,False
+Checking or savings account,2026-05,3004,False,False
+Checking or savings account,2026-06,2336,False,False
+Checking or savings account,2026-07,705,False,False
+Credit card,2023-08,788,False,False
+Credit card,2023-09,3175,False,False
+Credit card,2023-10,3423,False,False
+Credit card,2023-11,2813,False,False
+Credit card,2023-12,2706,False,False
+Credit card,2024-01,2917,False,False
+Credit card,2024-02,2891,False,False
+Credit card,2024-03,3484,False,False
+Credit card,2024-04,3793,False,False
+Credit card,2024-05,3580,False,False
+Credit card,2024-06,2484,False,False
+Credit card,2024-07,2542,False,False
+Credit card,2024-08,2784,False,False
+Credit card,2024-09,2681,False,False
+Credit card,2024-10,2768,False,False
+Credit card,2024-11,2630,False,False
+Credit card,2024-12,2897,False,False
+Credit card,2025-01,3992,False,False
+Credit card,2025-02,2966,False,False
+Credit card,2025-03,2971,False,False
+Credit card,2025-04,2986,False,False
+Credit card,2025-05,3342,False,False
+Credit card,2025-06,3419,False,False
+Credit card,2025-07,3757,False,False
+Credit card,2025-08,3801,False,False
+Credit card,2025-09,4065,False,False
+Credit card,2025-10,3381,False,False
+Credit card,2025-11,3654,False,False
+Credit card,2025-12,3183,False,False
+Credit card,2026-01,3788,False,False
+Credit card,2026-02,1983,False,False
+Credit card,2026-03,3357,False,False
+Credit card,2026-04,3599,False,False
+Credit card,2026-05,2958,False,False
+Credit card,2026-06,2022,False,False
+Credit card,2026-07,624,False,False
+Debt collection,2023-08,1426,False,False
+Debt collection,2023-09,2679,False,False
+Debt collection,2023-10,2774,False,False
+Debt collection,2023-11,3023,False,False
+Debt collection,2023-12,3304,False,False
+Debt collection,2024-01,3986,False,False
+Debt collection,2024-02,4301,False,False
+Debt collection,2024-03,6829,False,False
+Debt collection,2024-04,7476,False,False
+Debt collection,2024-05,6540,False,False
+Debt collection,2024-06,5581,False,False
+Debt collection,2024-07,5450,False,False
+Debt collection,2024-08,6026,False,False
+Debt collection,2024-09,5725,False,False
+Debt collection,2024-10,6671,False,False
+Debt collection,2024-11,5516,False,False
+Debt collection,2024-12,6190,False,False
+Debt collection,2025-01,8738,False,False
+Debt collection,2025-02,6550,False,False
+Debt collection,2025-03,7671,False,False
+Debt collection,2025-04,8729,False,False
+Debt collection,2025-05,9294,False,False
+Debt collection,2025-06,8825,False,False
+Debt collection,2025-07,9628,False,False
+Debt collection,2025-08,10611,False,False
+Debt collection,2025-09,9864,False,False
+Debt collection,2025-10,7201,False,False
+Debt collection,2025-11,7473,False,False
+Debt collection,2025-12,6026,False,False
+Debt collection,2026-01,7365,False,False
+Debt collection,2026-02,4374,False,False
+Debt collection,2026-03,8249,False,False
+Debt collection,2026-04,6638,False,False
+Debt collection,2026-05,5520,False,False
+Debt collection,2026-06,3600,False,False
+Debt collection,2026-07,798,False,False
+"Money transfer, virtual currency, or money service",2023-08,323,True,False
+"Money transfer, virtual currency, or money service",2023-09,695,False,False
+"Money transfer, virtual currency, or money service",2023-10,800,False,False
+"Money transfer, virtual currency, or money service",2023-11,710,False,False
+"Money transfer, virtual currency, or money service",2023-12,766,False,False
+"Money transfer, virtual currency, or money service",2024-01,806,False,False
+"Money transfer, virtual currency, or money service",2024-02,816,False,False
+"Money transfer, virtual currency, or money service",2024-03,874,False,False
+"Money transfer, virtual currency, or money service",2024-04,750,False,False
+"Money transfer, virtual currency, or money service",2024-05,788,False,False
+"Money transfer, virtual currency, or money service",2024-06,771,False,False
+"Money transfer, virtual currency, or money service",2024-07,796,False,False
+"Money transfer, virtual currency, or money service",2024-08,907,False,False
+"Money transfer, virtual currency, or money service",2024-09,786,False,False
+"Money transfer, virtual currency, or money service",2024-10,904,False,False
+"Money transfer, virtual currency, or money service",2024-11,892,False,False
+"Money transfer, virtual currency, or money service",2024-12,1149,False,False
+"Money transfer, virtual currency, or money service",2025-01,41618,False,False
+"Money transfer, virtual currency, or money service",2025-02,4640,False,False
+"Money transfer, virtual currency, or money service",2025-03,2075,False,False
+"Money transfer, virtual currency, or money service",2025-04,1715,False,False
+"Money transfer, virtual currency, or money service",2025-05,1854,False,False
+"Money transfer, virtual currency, or money service",2025-06,1670,False,False
+"Money transfer, virtual currency, or money service",2025-07,1932,False,False
+"Money transfer, virtual currency, or money service",2025-08,1920,False,False
+"Money transfer, virtual currency, or money service",2025-09,1634,False,False
+"Money transfer, virtual currency, or money service",2025-10,2634,False,False
+"Money transfer, virtual currency, or money service",2025-11,1673,False,False
+"Money transfer, virtual currency, or money service",2025-12,1497,False,False
+"Money transfer, virtual currency, or money service",2026-01,1767,False,False
+"Money transfer, virtual currency, or money service",2026-02,981,False,False
+"Money transfer, virtual currency, or money service",2026-03,1662,False,False
+"Money transfer, virtual currency, or money service",2026-04,1842,False,False
+"Money transfer, virtual currency, or money service",2026-05,1397,False,False
+"Money transfer, virtual currency, or money service",2026-06,828,False,False
+"Money transfer, virtual currency, or money service",2026-07,116,True,False
+Student loan,2023-08,244,True,False
+Student loan,2023-09,833,False,False
+Student loan,2023-10,1273,False,False
+Student loan,2023-11,990,False,False
+Student loan,2023-12,759,False,False
+Student loan,2024-01,873,False,False
+Student loan,2024-02,704,False,False
+Student loan,2024-03,730,False,False
+Student loan,2024-04,632,False,False
+Student loan,2024-05,731,False,False
+Student loan,2024-06,584,False,False
+Student loan,2024-07,540,False,False
+Student loan,2024-08,520,False,False
+Student loan,2024-09,758,False,False
+Student loan,2024-10,726,False,False
+Student loan,2024-11,481,True,False
+Student loan,2024-12,746,False,False
+Student loan,2025-01,1209,False,False
+Student loan,2025-02,992,False,False
+Student loan,2025-03,1828,False,False
+Student loan,2025-04,1148,False,False
+Student loan,2025-05,1054,False,False
+Student loan,2025-06,765,False,False
+Student loan,2025-07,848,False,False
+Student loan,2025-08,675,False,False
+Student loan,2025-09,658,False,False
+Student loan,2025-10,556,False,False
+Student loan,2025-11,587,False,False
+Student loan,2025-12,554,False,False
+Student loan,2026-01,764,False,False
+Student loan,2026-02,389,True,False
+Student loan,2026-03,703,False,False
+Student loan,2026-04,764,False,False
+Student loan,2026-05,544,False,False
+Student loan,2026-06,355,True,False
+Student loan,2026-07,17,True,False

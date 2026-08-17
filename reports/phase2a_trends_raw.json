@@ -1,0 +1,2948 @@
+{
+ "took": 530,
+ "timed_out": false,
+ "_shards": {
+  "total": 5,
+  "successful": 5,
+  "skipped": 0,
+  "failed": 0
+ },
+ "hits": {
+  "total": {
+   "value": 17142190,
+   "relation": "eq"
+  },
+  "max_score": null,
+  "hits": []
+ },
+ "aggregations": {
+  "dateRangeBrush": {
+   "doc_count": 939150,
+   "dateRangeBrush": {
+    "buckets": [
+     {
+      "key_as_string": "2015-03-01T00:00:00.000Z",
+      "key": 1425168000000,
+      "doc_count": 1101
+     },
+     {
+      "key_as_string": "2015-04-01T00:00:00.000Z",
+      "key": 1427846400000,
+      "doc_count": 2353
+     },
+     {
+      "key_as_string": "2015-05-01T00:00:00.000Z",
+      "key": 1430438400000,
+      "doc_count": 2480
+     },
+     {
+      "key_as_string": "2015-06-01T00:00:00.000Z",
+      "key": 1433116800000,
+      "doc_count": 2504
+     },
+     {
+      "key_as_string": "2015-07-01T00:00:00.000Z",
+      "key": 1435708800000,
+      "doc_count": 2703
+     },
+     {
+      "key_as_string": "2015-08-01T00:00:00.000Z",
+      "key": 1438387200000,
+      "doc_count": 2587
+     },
+     {
+      "key_as_string": "2015-09-01T00:00:00.000Z",
+      "key": 1441065600000,
+      "doc_count": 2347
+     },
+     {
+      "key_as_string": "2015-10-01T00:00:00.000Z",
+      "key": 1443657600000,
+      "doc_count": 2284
+     },
+     {
+      "key_as_string": "2015-11-01T00:00:00.000Z",
+      "key": 1446336000000,
+      "doc_count": 2020
+     },
+     {
+      "key_as_string": "2015-12-01T00:00:00.000Z",
+      "key": 1448928000000,
+      "doc_count": 2215
+     },
+     {
+      "key_as_string": "2016-01-01T00:00:00.000Z",
+      "key": 1451606400000,
+      "doc_count": 2334
+     },
+     {
+      "key_as_string": "2016-02-01T00:00:00.000Z",
+      "key": 1454284800000,
+      "doc_count": 2351
+     },
+     {
+      "key_as_string": "2016-03-01T00:00:00.000Z",
+      "key": 1456790400000,
+      "doc_count": 2798
+     },
+     {
+      "key_as_string": "2016-04-01T00:00:00.000Z",
+      "key": 1459468800000,
+      "doc_count": 2696
+     },
+     {
+      "key_as_string": "2016-05-01T00:00:00.000Z",
+      "key": 1462060800000,
+      "doc_count": 2566
+     },
+     {
+      "key_as_string": "2016-06-01T00:00:00.000Z",
+      "key": 1464739200000,
+      "doc_count": 2569
+     },
+     {
+      "key_as_string": "2016-07-01T00:00:00.000Z",
+      "key": 1467331200000,
+      "doc_count": 2560
+     },
+     {
+      "key_as_string": "2016-08-01T00:00:00.000Z",
+      "key": 1470009600000,
+      "doc_count": 3050
+     },
+     {
+      "key_as_string": "2016-09-01T00:00:00.000Z",
+      "key": 1472688000000,
+      "doc_count": 3055
+     },
+     {
+      "key_as_string": "2016-10-01T00:00:00.000Z",
+      "key": 1475280000000,
+      "doc_count": 2937
+     },
+     {
+      "key_as_string": "2016-11-01T00:00:00.000Z",
+      "key": 1477958400000,
+      "doc_count": 2542
+     },
+     {
+      "key_as_string": "2016-12-01T00:00:00.000Z",
+      "key": 1480550400000,
+      "doc_count": 2829
+     },
+     {
+      "key_as_string": "2017-01-01T00:00:00.000Z",
+      "key": 1483228800000,
+      "doc_count": 5144
+     },
+     {
+      "key_as_string": "2017-02-01T00:00:00.000Z",
+      "key": 1485907200000,
+      "doc_count": 3610
+     },
+     {
+      "key_as_string": "2017-03-01T00:00:00.000Z",
+      "key": 1488326400000,
+      "doc_count": 3950
+     },
+     {
+      "key_as_string": "2017-04-01T00:00:00.000Z",
+      "key": 1491004800000,
+      "doc_count": 3603
+     },
+     {
+      "key_as_string": "2017-05-01T00:00:00.000Z",
+      "key": 1493596800000,
+      "doc_count": 3520
+     },
+     {
+      "key_as_string": "2017-06-01T00:00:00.000Z",
+      "key": 1496275200000,
+      "doc_count": 3367
+     },
+     {
+      "key_as_string": "2017-07-01T00:00:00.000Z",
+      "key": 1498867200000,
+      "doc_count": 3570
+     },
+     {
+      "key_as_string": "2017-08-01T00:00:00.000Z",
+      "key": 1501545600000,
+      "doc_count": 3573
+     },
+     {
+      "key_as_string": "2017-09-01T00:00:00.000Z",
+      "key": 1504224000000,
+      "doc_count": 3077
+     },
+     {
+      "key_as_string": "2017-10-01T00:00:00.000Z",
+      "key": 1506816000000,
+      "doc_count": 3301
+     },
+     {
+      "key_as_string": "2017-11-01T00:00:00.000Z",
+      "key": 1509494400000,
+      "doc_count": 2960
+     },
+     {
+      "key_as_string": "2017-12-01T00:00:00.000Z",
+      "key": 1512086400000,
+      "doc_count": 3319
+     },
+     {
+      "key_as_string": "2018-01-01T00:00:00.000Z",
+      "key": 1514764800000,
+      "doc_count": 4453
+     },
+     {
+      "key_as_string": "2018-02-01T00:00:00.000Z",
+      "key": 1517443200000,
+      "doc_count": 3626
+     },
+     {
+      "key_as_string": "2018-03-01T00:00:00.000Z",
+      "key": 1519862400000,
+      "doc_count": 4019
+     },
+     {
+      "key_as_string": "2018-04-01T00:00:00.000Z",
+      "key": 1522540800000,
+      "doc_count": 3763
+     },
+     {
+      "key_as_string": "2018-05-01T00:00:00.000Z",
+      "key": 1525132800000,
+      "doc_count": 3804
+     },
+     {
+      "key_as_string": "2018-06-01T00:00:00.000Z",
+      "key": 1527811200000,
+      "doc_count": 3323
+     },
+     {
+      "key_as_string": "2018-07-01T00:00:00.000Z",
+      "key": 1530403200000,
+      "doc_count": 3356
+     },
+     {
+      "key_as_string": "2018-08-01T00:00:00.000Z",
+      "key": 1533081600000,
+      "doc_count": 3411
+     },
+     {
+      "key_as_string": "2018-09-01T00:00:00.000Z",
+      "key": 1535760000000,
+      "doc_count": 2943
+     },
+     {
+      "key_as_string": "2018-10-01T00:00:00.000Z",
+      "key": 1538352000000,
+      "doc_count": 3309
+     },
+     {
+      "key_as_string": "2018-11-01T00:00:00.000Z",
+      "key": 1541030400000,
+      "doc_count": 2780
+     },
+     {
+      "key_as_string": "2018-12-01T00:00:00.000Z",
+      "key": 1543622400000,
+      "doc_count": 2848
+     },
+     {
+      "key_as_string": "2019-01-01T00:00:00.000Z",
+      "key": 1546300800000,
+      "doc_count": 2764
+     },
+     {
+      "key_as_string": "2019-02-01T00:00:00.000Z",
+      "key": 1548979200000,
+      "doc_count": 3231
+     },
+     {
+      "key_as_string": "2019-03-01T00:00:00.000Z",
+      "key": 1551398400000,
+      "doc_count": 3357
+     },
+     {
+      "key_as_string": "2019-04-01T00:00:00.000Z",
+      "key": 1554076800000,
+      "doc_count": 3194
+     },
+     {
+      "key_as_string": "2019-05-01T00:00:00.000Z",
+      "key": 1556668800000,
+      "doc_count": 3318
+     },
+     {
+      "key_as_string": "2019-06-01T00:00:00.000Z",
+      "key": 1559347200000,
+      "doc_count": 3198
+     },
+     {
+      "key_as_string": "2019-07-01T00:00:00.000Z",
+      "key": 1561939200000,
+      "doc_count": 3218
+     },
+     {
+      "key_as_string": "2019-08-01T00:00:00.000Z",
+      "key": 1564617600000,
+      "doc_count": 3415
+     },
+     {
+      "key_as_string": "2019-09-01T00:00:00.000Z",
+      "key": 1567296000000,
+      "doc_count": 3308
+     },
+     {
+      "key_as_string": "2019-10-01T00:00:00.000Z",
+      "key": 1569888000000,
+      "doc_count": 3526
+     },
+     {
+      "key_as_string": "2019-11-01T00:00:00.000Z",
+      "key": 1572566400000,
+      "doc_count": 3033
+     },
+     {
+      "key_as_string": "2019-12-01T00:00:00.000Z",
+      "key": 1575158400000,
+      "doc_count": 2850
+     },
+     {
+      "key_as_string": "2020-01-01T00:00:00.000Z",
+      "key": 1577836800000,
+      "doc_count": 3167
+     },
+     {
+      "key_as_string": "2020-02-01T00:00:00.000Z",
+      "key": 1580515200000,
+      "doc_count": 3053
+     },
+     {
+      "key_as_string": "2020-03-01T00:00:00.000Z",
+      "key": 1583020800000,
+      "doc_count": 3195
+     },
+     {
+      "key_as_string": "2020-04-01T00:00:00.000Z",
+      "key": 1585699200000,
+      "doc_count": 3704
+     },
+     {
+      "key_as_string": "2020-05-01T00:00:00.000Z",
+      "key": 1588291200000,
+      "doc_count": 3580
+     },
+     {
+      "key_as_string": "2020-06-01T00:00:00.000Z",
+      "key": 1590969600000,
+      "doc_count": 3918
+     },
+     {
+      "key_as_string": "2020-07-01T00:00:00.000Z",
+      "key": 1593561600000,
+      "doc_count": 4188
+     },
+     {
+      "key_as_string": "2020-08-01T00:00:00.000Z",
+      "key": 1596240000000,
+      "doc_count": 3829
+     },
+     {
+      "key_as_string": "2020-09-01T00:00:00.000Z",
+      "key": 1598918400000,
+      "doc_count": 3436
+     },
+     {
+      "key_as_string": "2020-10-01T00:00:00.000Z",
+      "key": 1601510400000,
+      "doc_count": 3616
+     },
+     {
+      "key_as_string": "2020-11-01T00:00:00.000Z",
+      "key": 1604188800000,
+      "doc_count": 3256
+     },
+     {
+      "key_as_string": "2020-12-01T00:00:00.000Z",
+      "key": 1606780800000,
+      "doc_count": 3711
+     },
+     {
+      "key_as_string": "2021-01-01T00:00:00.000Z",
+      "key": 1609459200000,
+      "doc_count": 4199
+     },
+     {
+      "key_as_string": "2021-02-01T00:00:00.000Z",
+      "key": 1612137600000,
+      "doc_count": 4372
+     },
+     {
+      "key_as_string": "2021-03-01T00:00:00.000Z",
+      "key": 1614556800000,
+      "doc_count": 5709
+     },
+     {
+      "key_as_string": "2021-04-01T00:00:00.000Z",
+      "key": 1617235200000,
+      "doc_count": 4945
+     },
+     {
+      "key_as_string": "2021-05-01T00:00:00.000Z",
+      "key": 1619827200000,
+      "doc_count": 4839
+     },
+     {
+      "key_as_string": "2021-06-01T00:00:00.000Z",
+      "key": 1622505600000,
+      "doc_count": 4714
+     },
+     {
+      "key_as_string": "2021-07-01T00:00:00.000Z",
+      "key": 1625097600000,
+      "doc_count": 5208
+     },
+     {
+      "key_as_string": "2021-08-01T00:00:00.000Z",
+      "key": 1627776000000,
+      "doc_count": 4646
+     },
+     {
+      "key_as_string": "2021-09-01T00:00:00.000Z",
+      "key": 1630454400000,
+      "doc_count": 4577
+     },
+     {
+      "key_as_string": "2021-10-01T00:00:00.000Z",
+      "key": 1633046400000,
+      "doc_count": 4623
+     },
+     {
+      "key_as_string": "2021-11-01T00:00:00.000Z",
+      "key": 1635724800000,
+      "doc_count": 4679
+     },
+     {
+      "key_as_string": "2021-12-01T00:00:00.000Z",
+      "key": 1638316800000,
+      "doc_count": 4505
+     },
+     {
+      "key_as_string": "2022-01-01T00:00:00.000Z",
+      "key": 1640995200000,
+      "doc_count": 4843
+     },
+     {
+      "key_as_string": "2022-02-01T00:00:00.000Z",
+      "key": 1643673600000,
+      "doc_count": 5017
+     },
+     {
+      "key_as_string": "2022-03-01T00:00:00.000Z",
+      "key": 1646092800000,
+      "doc_count": 5532
+     },
+     {
+      "key_as_string": "2022-04-01T00:00:00.000Z",
+      "key": 1648771200000,
+      "doc_count": 5771
+     },
+     {
+      "key_as_string": "2022-05-01T00:00:00.000Z",
+      "key": 1651363200000,
+      "doc_count": 4235
+     },
+     {
+      "key_as_string": "2022-06-01T00:00:00.000Z",
+      "key": 1654041600000,
+      "doc_count": 4428
+     },
+     {
+      "key_as_string": "2022-07-01T00:00:00.000Z",
+      "key": 1656633600000,
+      "doc_count": 4826
+     },
+     {
+      "key_as_string": "2022-08-01T00:00:00.000Z",
+      "key": 1659312000000,
+      "doc_count": 5630
+     },
+     {
+      "key_as_string": "2022-09-01T00:00:00.000Z",
+      "key": 1661990400000,
+      "doc_count": 5345
+     },
+     {
+      "key_as_string": "2022-10-01T00:00:00.000Z",
+      "key": 1664582400000,
+      "doc_count": 5554
+     },
+     {
+      "key_as_string": "2022-11-01T00:00:00.000Z",
+      "key": 1667260800000,
+      "doc_count": 4938
+     },
+     {
+      "key_as_string": "2022-12-01T00:00:00.000Z",
+      "key": 1669852800000,
+      "doc_count": 5447
+     },
+     {
+      "key_as_string": "2023-01-01T00:00:00.000Z",
+      "key": 1672531200000,
+      "doc_count": 7901
+     },
+     {
+      "key_as_string": "2023-02-01T00:00:00.000Z",
+      "key": 1675209600000,
+      "doc_count": 5916
+     },
+     {
+      "key_as_string": "2023-03-01T00:00:00.000Z",
+      "key": 1677628800000,
+      "doc_count": 6508
+     },
+     {
+      "key_as_string": "2023-04-01T00:00:00.000Z",
+      "key": 1680307200000,
+      "doc_count": 5591
+     },
+     {
+      "key_as_string": "2023-05-01T00:00:00.000Z",
+      "key": 1682899200000,
+      "doc_count": 6265
+     },
+     {
+      "key_as_string": "2023-06-01T00:00:00.000Z",
+      "key": 1685577600000,
+      "doc_count": 6020
+     },
+     {
+      "key_as_string": "2023-07-01T00:00:00.000Z",
+      "key": 1688169600000,
+      "doc_count": 6139
+     },
+     {
+      "key_as_string": "2023-08-01T00:00:00.000Z",
+      "key": 1690848000000,
+      "doc_count": 7393
+     },
+     {
+      "key_as_string": "2023-09-01T00:00:00.000Z",
+      "key": 1693526400000,
+      "doc_count": 9562
+     },
+     {
+      "key_as_string": "2023-10-01T00:00:00.000Z",
+      "key": 1696118400000,
+      "doc_count": 10427
+     },
+     {
+      "key_as_string": "2023-11-01T00:00:00.000Z",
+      "key": 1698796800000,
+      "doc_count": 9707
+     },
+     {
+      "key_as_string": "2023-12-01T00:00:00.000Z",
+      "key": 1701388800000,
+      "doc_count": 9722
+     },
+     {
+      "key_as_string": "2024-01-01T00:00:00.000Z",
+      "key": 1704067200000,
+      "doc_count": 10785
+     },
+     {
+      "key_as_string": "2024-02-01T00:00:00.000Z",
+      "key": 1706745600000,
+      "doc_count": 10792
+     },
+     {
+      "key_as_string": "2024-03-01T00:00:00.000Z",
+      "key": 1709251200000,
+      "doc_count": 14258
+     },
+     {
+      "key_as_string": "2024-04-01T00:00:00.000Z",
+      "key": 1711929600000,
+      "doc_count": 15002
+     },
+     {
+      "key_as_string": "2024-05-01T00:00:00.000Z",
+      "key": 1714521600000,
+      "doc_count": 14256
+     },
+     {
+      "key_as_string": "2024-06-01T00:00:00.000Z",
+      "key": 1717200000000,
+      "doc_count": 11635
+     },
+     {
+      "key_as_string": "2024-07-01T00:00:00.000Z",
+      "key": 1719792000000,
+      "doc_count": 11788
+     },
+     {
+      "key_as_string": "2024-08-01T00:00:00.000Z",
+      "key": 1722470400000,
+      "doc_count": 12830
+     },
+     {
+      "key_as_string": "2024-09-01T00:00:00.000Z",
+      "key": 1725148800000,
+      "doc_count": 12305
+     },
+     {
+      "key_as_string": "2024-10-01T00:00:00.000Z",
+      "key": 1727740800000,
+      "doc_count": 13690
+     },
+     {
+      "key_as_string": "2024-11-01T00:00:00.000Z",
+      "key": 1730419200000,
+      "doc_count": 12397
+     },
+     {
+      "key_as_string": "2024-12-01T00:00:00.000Z",
+      "key": 1733011200000,
+      "doc_count": 13752
+     },
+     {
+      "key_as_string": "2025-01-01T00:00:00.000Z",
+      "key": 1735689600000,
+      "doc_count": 69253
+     },
+     {
+      "key_as_string": "2025-02-01T00:00:00.000Z",
+      "key": 1738368000000,
+      "doc_count": 18522
+     },
+     {
+      "key_as_string": "2025-03-01T00:00:00.000Z",
+      "key": 1740787200000,
+      "doc_count": 17483
+     },
+     {
+      "key_as_string": "2025-04-01T00:00:00.000Z",
+      "key": 1743465600000,
+      "doc_count": 17683
+     },
+     {
+      "key_as_string": "2025-05-01T00:00:00.000Z",
+      "key": 1746057600000,
+      "doc_count": 18804
+     },
+     {
+      "key_as_string": "2025-06-01T00:00:00.000Z",
+      "key": 1748736000000,
+      "doc_count": 18041
+     },
+     {
+      "key_as_string": "2025-07-01T00:00:00.000Z",
+      "key": 1751328000000,
+      "doc_count": 20147
+     },
+     {
+      "key_as_string": "2025-08-01T00:00:00.000Z",
+      "key": 1754006400000,
+      "doc_count": 20967
+     },
+     {
+      "key_as_string": "2025-09-01T00:00:00.000Z",
+      "key": 1756684800000,
+      "doc_count": 19729
+     },
+     {
+      "key_as_string": "2025-10-01T00:00:00.000Z",
+      "key": 1759276800000,
+      "doc_count": 17206
+     },
+     {
+      "key_as_string": "2025-11-01T00:00:00.000Z",
+      "key": 1761955200000,
+      "doc_count": 17001
+     },
+     {
+      "key_as_string": "2025-12-01T00:00:00.000Z",
+      "key": 1764547200000,
+      "doc_count": 14475
+     },
+     {
+      "key_as_string": "2026-01-01T00:00:00.000Z",
+      "key": 1767225600000,
+      "doc_count": 17476
+     },
+     {
+      "key_as_string": "2026-02-01T00:00:00.000Z",
+      "key": 1769904000000,
+      "doc_count": 9705
+     },
+     {
+      "key_as_string": "2026-03-01T00:00:00.000Z",
+      "key": 1772323200000,
+      "doc_count": 17419
+     },
+     {
+      "key_as_string": "2026-04-01T00:00:00.000Z",
+      "key": 1775001600000,
+      "doc_count": 16617
+     },
+     {
+      "key_as_string": "2026-05-01T00:00:00.000Z",
+      "key": 1777593600000,
+      "doc_count": 13423
+     },
+     {
+      "key_as_string": "2026-06-01T00:00:00.000Z",
+      "key": 1780272000000,
+      "doc_count": 9141
+     },
+     {
+      "key_as_string": "2026-07-01T00:00:00.000Z",
+      "key": 1782864000000,
+      "doc_count": 2260
+     }
+    ]
+   }
+  },
+  "max_date": {
+   "value": 1786939080000.0,
+   "value_as_string": "2026-08-17T12:00:00-05:00"
+  },
+  "product": {
+   "doc_count": 552157,
+   "product": {
+    "doc_count_error_upper_bound": 0,
+    "sum_other_doc_count": 0,
+    "buckets": [
+     {
+      "key": "Debt collection",
+      "doc_count": 220651,
+      "product": {
+       "doc_count_error_upper_bound": 0,
+       "sum_other_doc_count": 26751,
+       "buckets": [
+        {
+         "key": "I do not know",
+         "doc_count": 94084,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 1717,
+            "interval_diff": {
+             "value": -672.0
+            }
+           }
+          ]
+         }
+        },
+        {
+         "key": "Credit card debt",
+         "doc_count": 40130,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 570,
+            "interval_diff": {
+             "value": -423.0
+            }
+           }
+          ]
+         }
+        },
+        {
+         "key": "Other debt",
+         "doc_count": 32233,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 498,
+            "interval_diff": {
+             "value": -301.0
+            }
+           }
+          ]
+         }
+        },
+        {
+         "key": "Telecommunications debt",
+         "doc_count": 13775,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 251,
+            "interval_diff": {
+             "value": -107.0
+            }
+           }
+          ]
+         }
+        },
+        {
+         "key": "Rental debt",
+         "doc_count": 13678,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 230,
+            "interval_diff": {
+             "value": -181.0
+            }
+           }
+          ]
+         }
+        }
+       ]
+      },
+      "trend_period": {
+       "buckets": [
+        {
+         "key_as_string": "2026-07-01T00:00:00.000Z",
+         "key": 1782864000000,
+         "doc_count": 798,
+         "interval_diff": {
+          "value": -2802.0
+         }
+        },
+        {
+         "key_as_string": "2026-06-01T00:00:00.000Z",
+         "key": 1780272000000,
+         "doc_count": 3600,
+         "interval_diff": {
+          "value": -1920.0
+         }
+        },
+        {
+         "key_as_string": "2026-05-01T00:00:00.000Z",
+         "key": 1777593600000,
+         "doc_count": 5520,
+         "interval_diff": {
+          "value": -1118.0
+         }
+        },
+        {
+         "key_as_string": "2026-04-01T00:00:00.000Z",
+         "key": 1775001600000,
+         "doc_count": 6638,
+         "interval_diff": {
+          "value": -1611.0
+         }
+        },
+        {
+         "key_as_string": "2026-03-01T00:00:00.000Z",
+         "key": 1772323200000,
+         "doc_count": 8249,
+         "interval_diff": {
+          "value": 3875.0
+         }
+        },
+        {
+         "key_as_string": "2026-02-01T00:00:00.000Z",
+         "key": 1769904000000,
+         "doc_count": 4374,
+         "interval_diff": {
+          "value": -2991.0
+         }
+        },
+        {
+         "key_as_string": "2026-01-01T00:00:00.000Z",
+         "key": 1767225600000,
+         "doc_count": 7365,
+         "interval_diff": {
+          "value": 1339.0
+         }
+        },
+        {
+         "key_as_string": "2025-12-01T00:00:00.000Z",
+         "key": 1764547200000,
+         "doc_count": 6026,
+         "interval_diff": {
+          "value": -1447.0
+         }
+        },
+        {
+         "key_as_string": "2025-11-01T00:00:00.000Z",
+         "key": 1761955200000,
+         "doc_count": 7473,
+         "interval_diff": {
+          "value": 272.0
+         }
+        },
+        {
+         "key_as_string": "2025-10-01T00:00:00.000Z",
+         "key": 1759276800000,
+         "doc_count": 7201,
+         "interval_diff": {
+          "value": -2663.0
+         }
+        },
+        {
+         "key_as_string": "2025-09-01T00:00:00.000Z",
+         "key": 1756684800000,
+         "doc_count": 9864,
+         "interval_diff": {
+          "value": -747.0
+         }
+        },
+        {
+         "key_as_string": "2025-08-01T00:00:00.000Z",
+         "key": 1754006400000,
+         "doc_count": 10611,
+         "interval_diff": {
+          "value": 983.0
+         }
+        },
+        {
+         "key_as_string": "2025-07-01T00:00:00.000Z",
+         "key": 1751328000000,
+         "doc_count": 9628,
+         "interval_diff": {
+          "value": 803.0
+         }
+        },
+        {
+         "key_as_string": "2025-06-01T00:00:00.000Z",
+         "key": 1748736000000,
+         "doc_count": 8825,
+         "interval_diff": {
+          "value": -469.0
+         }
+        },
+        {
+         "key_as_string": "2025-05-01T00:00:00.000Z",
+         "key": 1746057600000,
+         "doc_count": 9294,
+         "interval_diff": {
+          "value": 565.0
+         }
+        },
+        {
+         "key_as_string": "2025-04-01T00:00:00.000Z",
+         "key": 1743465600000,
+         "doc_count": 8729,
+         "interval_diff": {
+          "value": 1058.0
+         }
+        },
+        {
+         "key_as_string": "2025-03-01T00:00:00.000Z",
+         "key": 1740787200000,
+         "doc_count": 7671,
+         "interval_diff": {
+          "value": 1121.0
+         }
+        },
+        {
+         "key_as_string": "2025-02-01T00:00:00.000Z",
+         "key": 1738368000000,
+         "doc_count": 6550,
+         "interval_diff": {
+          "value": -2188.0
+         }
+        },
+        {
+         "key_as_string": "2025-01-01T00:00:00.000Z",
+         "key": 1735689600000,
+         "doc_count": 8738,
+         "interval_diff": {
+          "value": 2548.0
+         }
+        },
+        {
+         "key_as_string": "2024-12-01T00:00:00.000Z",
+         "key": 1733011200000,
+         "doc_count": 6190,
+         "interval_diff": {
+          "value": 674.0
+         }
+        },
+        {
+         "key_as_string": "2024-11-01T00:00:00.000Z",
+         "key": 1730419200000,
+         "doc_count": 5516,
+         "interval_diff": {
+          "value": -1155.0
+         }
+        },
+        {
+         "key_as_string": "2024-10-01T00:00:00.000Z",
+         "key": 1727740800000,
+         "doc_count": 6671,
+         "interval_diff": {
+          "value": 946.0
+         }
+        },
+        {
+         "key_as_string": "2024-09-01T00:00:00.000Z",
+         "key": 1725148800000,
+         "doc_count": 5725,
+         "interval_diff": {
+          "value": -301.0
+         }
+        },
+        {
+         "key_as_string": "2024-08-01T00:00:00.000Z",
+         "key": 1722470400000,
+         "doc_count": 6026,
+         "interval_diff": {
+          "value": 576.0
+         }
+        },
+        {
+         "key_as_string": "2024-07-01T00:00:00.000Z",
+         "key": 1719792000000,
+         "doc_count": 5450,
+         "interval_diff": {
+          "value": -131.0
+         }
+        },
+        {
+         "key_as_string": "2024-06-01T00:00:00.000Z",
+         "key": 1717200000000,
+         "doc_count": 5581,
+         "interval_diff": {
+          "value": -959.0
+         }
+        },
+        {
+         "key_as_string": "2024-05-01T00:00:00.000Z",
+         "key": 1714521600000,
+         "doc_count": 6540,
+         "interval_diff": {
+          "value": -936.0
+         }
+        },
+        {
+         "key_as_string": "2024-04-01T00:00:00.000Z",
+         "key": 1711929600000,
+         "doc_count": 7476,
+         "interval_diff": {
+          "value": 647.0
+         }
+        },
+        {
+         "key_as_string": "2024-03-01T00:00:00.000Z",
+         "key": 1709251200000,
+         "doc_count": 6829,
+         "interval_diff": {
+          "value": 2528.0
+         }
+        },
+        {
+         "key_as_string": "2024-02-01T00:00:00.000Z",
+         "key": 1706745600000,
+         "doc_count": 4301,
+         "interval_diff": {
+          "value": 315.0
+         }
+        },
+        {
+         "key_as_string": "2024-01-01T00:00:00.000Z",
+         "key": 1704067200000,
+         "doc_count": 3986,
+         "interval_diff": {
+          "value": 682.0
+         }
+        },
+        {
+         "key_as_string": "2023-12-01T00:00:00.000Z",
+         "key": 1701388800000,
+         "doc_count": 3304,
+         "interval_diff": {
+          "value": 281.0
+         }
+        },
+        {
+         "key_as_string": "2023-11-01T00:00:00.000Z",
+         "key": 1698796800000,
+         "doc_count": 3023,
+         "interval_diff": {
+          "value": 249.0
+         }
+        },
+        {
+         "key_as_string": "2023-10-01T00:00:00.000Z",
+         "key": 1696118400000,
+         "doc_count": 2774,
+         "interval_diff": {
+          "value": 95.0
+         }
+        },
+        {
+         "key_as_string": "2023-09-01T00:00:00.000Z",
+         "key": 1693526400000,
+         "doc_count": 2679,
+         "interval_diff": {
+          "value": 1253.0
+         }
+        },
+        {
+         "key_as_string": "2023-08-01T00:00:00.000Z",
+         "key": 1690848000000,
+         "doc_count": 1426
+        }
+       ]
+      }
+     },
+     {
+      "key": "Checking or savings account",
+      "doc_count": 109780,
+      "product": {
+       "doc_count_error_upper_bound": 0,
+       "sum_other_doc_count": 0,
+       "buckets": [
+        {
+         "key": "Checking account",
+         "doc_count": 90627,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 1954,
+            "interval_diff": {
+             "value": -525.0
+            }
+           }
+          ]
+         }
+        },
+        {
+         "key": "Other banking product or service",
+         "doc_count": 9145,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 195,
+            "interval_diff": {
+             "value": -85.0
+            }
+           }
+          ]
+         }
+        },
+        {
+         "key": "Savings account",
+         "doc_count": 8257,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 158,
+            "interval_diff": {
+             "value": -61.0
+            }
+           }
+          ]
+         }
+        },
+        {
+         "key": "CD (Certificate of Deposit)",
+         "doc_count": 1751,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 29,
+            "interval_diff": {
+             "value": 3.0
+            }
+           }
+          ]
+         }
+        }
+       ]
+      },
+      "trend_period": {
+       "buckets": [
+        {
+         "key_as_string": "2026-07-01T00:00:00.000Z",
+         "key": 1782864000000,
+         "doc_count": 705,
+         "interval_diff": {
+          "value": -1631.0
+         }
+        },
+        {
+         "key_as_string": "2026-06-01T00:00:00.000Z",
+         "key": 1780272000000,
+         "doc_count": 2336,
+         "interval_diff": {
+          "value": -668.0
+         }
+        },
+        {
+         "key_as_string": "2026-05-01T00:00:00.000Z",
+         "key": 1777593600000,
+         "doc_count": 3004,
+         "interval_diff": {
+          "value": -770.0
+         }
+        },
+        {
+         "key_as_string": "2026-04-01T00:00:00.000Z",
+         "key": 1775001600000,
+         "doc_count": 3774,
+         "interval_diff": {
+          "value": 326.0
+         }
+        },
+        {
+         "key_as_string": "2026-03-01T00:00:00.000Z",
+         "key": 1772323200000,
+         "doc_count": 3448,
+         "interval_diff": {
+          "value": 1470.0
+         }
+        },
+        {
+         "key_as_string": "2026-02-01T00:00:00.000Z",
+         "key": 1769904000000,
+         "doc_count": 1978,
+         "interval_diff": {
+          "value": -1814.0
+         }
+        },
+        {
+         "key_as_string": "2026-01-01T00:00:00.000Z",
+         "key": 1767225600000,
+         "doc_count": 3792,
+         "interval_diff": {
+          "value": 577.0
+         }
+        },
+        {
+         "key_as_string": "2025-12-01T00:00:00.000Z",
+         "key": 1764547200000,
+         "doc_count": 3215,
+         "interval_diff": {
+          "value": -399.0
+         }
+        },
+        {
+         "key_as_string": "2025-11-01T00:00:00.000Z",
+         "key": 1761955200000,
+         "doc_count": 3614,
+         "interval_diff": {
+          "value": 180.0
+         }
+        },
+        {
+         "key_as_string": "2025-10-01T00:00:00.000Z",
+         "key": 1759276800000,
+         "doc_count": 3434,
+         "interval_diff": {
+          "value": -74.0
+         }
+        },
+        {
+         "key_as_string": "2025-09-01T00:00:00.000Z",
+         "key": 1756684800000,
+         "doc_count": 3508,
+         "interval_diff": {
+          "value": -452.0
+         }
+        },
+        {
+         "key_as_string": "2025-08-01T00:00:00.000Z",
+         "key": 1754006400000,
+         "doc_count": 3960,
+         "interval_diff": {
+          "value": -22.0
+         }
+        },
+        {
+         "key_as_string": "2025-07-01T00:00:00.000Z",
+         "key": 1751328000000,
+         "doc_count": 3982,
+         "interval_diff": {
+          "value": 620.0
+         }
+        },
+        {
+         "key_as_string": "2025-06-01T00:00:00.000Z",
+         "key": 1748736000000,
+         "doc_count": 3362,
+         "interval_diff": {
+          "value": 102.0
+         }
+        },
+        {
+         "key_as_string": "2025-05-01T00:00:00.000Z",
+         "key": 1746057600000,
+         "doc_count": 3260,
+         "interval_diff": {
+          "value": 155.0
+         }
+        },
+        {
+         "key_as_string": "2025-04-01T00:00:00.000Z",
+         "key": 1743465600000,
+         "doc_count": 3105,
+         "interval_diff": {
+          "value": 167.0
+         }
+        },
+        {
+         "key_as_string": "2025-03-01T00:00:00.000Z",
+         "key": 1740787200000,
+         "doc_count": 2938,
+         "interval_diff": {
+          "value": -436.0
+         }
+        },
+        {
+         "key_as_string": "2025-02-01T00:00:00.000Z",
+         "key": 1738368000000,
+         "doc_count": 3374,
+         "interval_diff": {
+          "value": -10322.0
+         }
+        },
+        {
+         "key_as_string": "2025-01-01T00:00:00.000Z",
+         "key": 1735689600000,
+         "doc_count": 13696,
+         "interval_diff": {
+          "value": 10926.0
+         }
+        },
+        {
+         "key_as_string": "2024-12-01T00:00:00.000Z",
+         "key": 1733011200000,
+         "doc_count": 2770,
+         "interval_diff": {
+          "value": -108.0
+         }
+        },
+        {
+         "key_as_string": "2024-11-01T00:00:00.000Z",
+         "key": 1730419200000,
+         "doc_count": 2878,
+         "interval_diff": {
+          "value": 257.0
+         }
+        },
+        {
+         "key_as_string": "2024-10-01T00:00:00.000Z",
+         "key": 1727740800000,
+         "doc_count": 2621,
+         "interval_diff": {
+          "value": 266.0
+         }
+        },
+        {
+         "key_as_string": "2024-09-01T00:00:00.000Z",
+         "key": 1725148800000,
+         "doc_count": 2355,
+         "interval_diff": {
+          "value": -238.0
+         }
+        },
+        {
+         "key_as_string": "2024-08-01T00:00:00.000Z",
+         "key": 1722470400000,
+         "doc_count": 2593,
+         "interval_diff": {
+          "value": 133.0
+         }
+        },
+        {
+         "key_as_string": "2024-07-01T00:00:00.000Z",
+         "key": 1719792000000,
+         "doc_count": 2460,
+         "interval_diff": {
+          "value": 245.0
+         }
+        },
+        {
+         "key_as_string": "2024-06-01T00:00:00.000Z",
+         "key": 1717200000000,
+         "doc_count": 2215,
+         "interval_diff": {
+          "value": -402.0
+         }
+        },
+        {
+         "key_as_string": "2024-05-01T00:00:00.000Z",
+         "key": 1714521600000,
+         "doc_count": 2617,
+         "interval_diff": {
+          "value": 266.0
+         }
+        },
+        {
+         "key_as_string": "2024-04-01T00:00:00.000Z",
+         "key": 1711929600000,
+         "doc_count": 2351,
+         "interval_diff": {
+          "value": 10.0
+         }
+        },
+        {
+         "key_as_string": "2024-03-01T00:00:00.000Z",
+         "key": 1709251200000,
+         "doc_count": 2341,
+         "interval_diff": {
+          "value": 261.0
+         }
+        },
+        {
+         "key_as_string": "2024-02-01T00:00:00.000Z",
+         "key": 1706745600000,
+         "doc_count": 2080,
+         "interval_diff": {
+          "value": -123.0
+         }
+        },
+        {
+         "key_as_string": "2024-01-01T00:00:00.000Z",
+         "key": 1704067200000,
+         "doc_count": 2203,
+         "interval_diff": {
+          "value": 16.0
+         }
+        },
+        {
+         "key_as_string": "2023-12-01T00:00:00.000Z",
+         "key": 1701388800000,
+         "doc_count": 2187,
+         "interval_diff": {
+          "value": 16.0
+         }
+        },
+        {
+         "key_as_string": "2023-11-01T00:00:00.000Z",
+         "key": 1698796800000,
+         "doc_count": 2171,
+         "interval_diff": {
+          "value": 14.0
+         }
+        },
+        {
+         "key_as_string": "2023-10-01T00:00:00.000Z",
+         "key": 1696118400000,
+         "doc_count": 2157,
+         "interval_diff": {
+          "value": -23.0
+         }
+        },
+        {
+         "key_as_string": "2023-09-01T00:00:00.000Z",
+         "key": 1693526400000,
+         "doc_count": 2180,
+         "interval_diff": {
+          "value": 1064.0
+         }
+        },
+        {
+         "key_as_string": "2023-08-01T00:00:00.000Z",
+         "key": 1690848000000,
+         "doc_count": 1116
+        }
+       ]
+      }
+     },
+     {
+      "key": "Credit card",
+      "doc_count": 108204,
+      "product": {
+       "doc_count_error_upper_bound": 0,
+       "sum_other_doc_count": 0,
+       "buckets": [
+        {
+         "key": "General-purpose credit card or charge card",
+         "doc_count": 94033,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 1783,
+            "interval_diff": {
+             "value": -784.0
+            }
+           }
+          ]
+         }
+        },
+        {
+         "key": "Store credit card",
+         "doc_count": 14171,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 239,
+            "interval_diff": {
+             "value": -152.0
+            }
+           }
+          ]
+         }
+        }
+       ]
+      },
+      "trend_period": {
+       "buckets": [
+        {
+         "key_as_string": "2026-07-01T00:00:00.000Z",
+         "key": 1782864000000,
+         "doc_count": 624,
+         "interval_diff": {
+          "value": -1398.0
+         }
+        },
+        {
+         "key_as_string": "2026-06-01T00:00:00.000Z",
+         "key": 1780272000000,
+         "doc_count": 2022,
+         "interval_diff": {
+          "value": -936.0
+         }
+        },
+        {
+         "key_as_string": "2026-05-01T00:00:00.000Z",
+         "key": 1777593600000,
+         "doc_count": 2958,
+         "interval_diff": {
+          "value": -641.0
+         }
+        },
+        {
+         "key_as_string": "2026-04-01T00:00:00.000Z",
+         "key": 1775001600000,
+         "doc_count": 3599,
+         "interval_diff": {
+          "value": 242.0
+         }
+        },
+        {
+         "key_as_string": "2026-03-01T00:00:00.000Z",
+         "key": 1772323200000,
+         "doc_count": 3357,
+         "interval_diff": {
+          "value": 1374.0
+         }
+        },
+        {
+         "key_as_string": "2026-02-01T00:00:00.000Z",
+         "key": 1769904000000,
+         "doc_count": 1983,
+         "interval_diff": {
+          "value": -1805.0
+         }
+        },
+        {
+         "key_as_string": "2026-01-01T00:00:00.000Z",
+         "key": 1767225600000,
+         "doc_count": 3788,
+         "interval_diff": {
+          "value": 605.0
+         }
+        },
+        {
+         "key_as_string": "2025-12-01T00:00:00.000Z",
+         "key": 1764547200000,
+         "doc_count": 3183,
+         "interval_diff": {
+          "value": -471.0
+         }
+        },
+        {
+         "key_as_string": "2025-11-01T00:00:00.000Z",
+         "key": 1761955200000,
+         "doc_count": 3654,
+         "interval_diff": {
+          "value": 273.0
+         }
+        },
+        {
+         "key_as_string": "2025-10-01T00:00:00.000Z",
+         "key": 1759276800000,
+         "doc_count": 3381,
+         "interval_diff": {
+          "value": -684.0
+         }
+        },
+        {
+         "key_as_string": "2025-09-01T00:00:00.000Z",
+         "key": 1756684800000,
+         "doc_count": 4065,
+         "interval_diff": {
+          "value": 264.0
+         }
+        },
+        {
+         "key_as_string": "2025-08-01T00:00:00.000Z",
+         "key": 1754006400000,
+         "doc_count": 3801,
+         "interval_diff": {
+          "value": 44.0
+         }
+        },
+        {
+         "key_as_string": "2025-07-01T00:00:00.000Z",
+         "key": 1751328000000,
+         "doc_count": 3757,
+         "interval_diff": {
+          "value": 338.0
+         }
+        },
+        {
+         "key_as_string": "2025-06-01T00:00:00.000Z",
+         "key": 1748736000000,
+         "doc_count": 3419,
+         "interval_diff": {
+          "value": 77.0
+         }
+        },
+        {
+         "key_as_string": "2025-05-01T00:00:00.000Z",
+         "key": 1746057600000,
+         "doc_count": 3342,
+         "interval_diff": {
+          "value": 356.0
+         }
+        },
+        {
+         "key_as_string": "2025-04-01T00:00:00.000Z",
+         "key": 1743465600000,
+         "doc_count": 2986,
+         "interval_diff": {
+          "value": 15.0
+         }
+        },
+        {
+         "key_as_string": "2025-03-01T00:00:00.000Z",
+         "key": 1740787200000,
+         "doc_count": 2971,
+         "interval_diff": {
+          "value": 5.0
+         }
+        },
+        {
+         "key_as_string": "2025-02-01T00:00:00.000Z",
+         "key": 1738368000000,
+         "doc_count": 2966,
+         "interval_diff": {
+          "value": -1026.0
+         }
+        },
+        {
+         "key_as_string": "2025-01-01T00:00:00.000Z",
+         "key": 1735689600000,
+         "doc_count": 3992,
+         "interval_diff": {
+          "value": 1095.0
+         }
+        },
+        {
+         "key_as_string": "2024-12-01T00:00:00.000Z",
+         "key": 1733011200000,
+         "doc_count": 2897,
+         "interval_diff": {
+          "value": 267.0
+         }
+        },
+        {
+         "key_as_string": "2024-11-01T00:00:00.000Z",
+         "key": 1730419200000,
+         "doc_count": 2630,
+         "interval_diff": {
+          "value": -138.0
+         }
+        },
+        {
+         "key_as_string": "2024-10-01T00:00:00.000Z",
+         "key": 1727740800000,
+         "doc_count": 2768,
+         "interval_diff": {
+          "value": 87.0
+         }
+        },
+        {
+         "key_as_string": "2024-09-01T00:00:00.000Z",
+         "key": 1725148800000,
+         "doc_count": 2681,
+         "interval_diff": {
+          "value": -103.0
+         }
+        },
+        {
+         "key_as_string": "2024-08-01T00:00:00.000Z",
+         "key": 1722470400000,
+         "doc_count": 2784,
+         "interval_diff": {
+          "value": 242.0
+         }
+        },
+        {
+         "key_as_string": "2024-07-01T00:00:00.000Z",
+         "key": 1719792000000,
+         "doc_count": 2542,
+         "interval_diff": {
+          "value": 58.0
+         }
+        },
+        {
+         "key_as_string": "2024-06-01T00:00:00.000Z",
+         "key": 1717200000000,
+         "doc_count": 2484,
+         "interval_diff": {
+          "value": -1096.0
+         }
+        },
+        {
+         "key_as_string": "2024-05-01T00:00:00.000Z",
+         "key": 1714521600000,
+         "doc_count": 3580,
+         "interval_diff": {
+          "value": -213.0
+         }
+        },
+        {
+         "key_as_string": "2024-04-01T00:00:00.000Z",
+         "key": 1711929600000,
+         "doc_count": 3793,
+         "interval_diff": {
+          "value": 309.0
+         }
+        },
+        {
+         "key_as_string": "2024-03-01T00:00:00.000Z",
+         "key": 1709251200000,
+         "doc_count": 3484,
+         "interval_diff": {
+          "value": 593.0
+         }
+        },
+        {
+         "key_as_string": "2024-02-01T00:00:00.000Z",
+         "key": 1706745600000,
+         "doc_count": 2891,
+         "interval_diff": {
+          "value": -26.0
+         }
+        },
+        {
+         "key_as_string": "2024-01-01T00:00:00.000Z",
+         "key": 1704067200000,
+         "doc_count": 2917,
+         "interval_diff": {
+          "value": 211.0
+         }
+        },
+        {
+         "key_as_string": "2023-12-01T00:00:00.000Z",
+         "key": 1701388800000,
+         "doc_count": 2706,
+         "interval_diff": {
+          "value": -107.0
+         }
+        },
+        {
+         "key_as_string": "2023-11-01T00:00:00.000Z",
+         "key": 1698796800000,
+         "doc_count": 2813,
+         "interval_diff": {
+          "value": -610.0
+         }
+        },
+        {
+         "key_as_string": "2023-10-01T00:00:00.000Z",
+         "key": 1696118400000,
+         "doc_count": 3423,
+         "interval_diff": {
+          "value": 248.0
+         }
+        },
+        {
+         "key_as_string": "2023-09-01T00:00:00.000Z",
+         "key": 1693526400000,
+         "doc_count": 3175,
+         "interval_diff": {
+          "value": 2387.0
+         }
+        },
+        {
+         "key_as_string": "2023-08-01T00:00:00.000Z",
+         "key": 1690848000000,
+         "doc_count": 788
+        }
+       ]
+      }
+     },
+     {
+      "key": "Money transfer, virtual currency, or money service",
+      "doc_count": 86988,
+      "product": {
+       "doc_count_error_upper_bound": 0,
+       "sum_other_doc_count": 1286,
+       "buckets": [
+        {
+         "key": "Domestic (US) money transfer",
+         "doc_count": 53465,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 184,
+            "interval_diff": {
+             "value": -103.0
+            }
+           }
+          ]
+         }
+        },
+        {
+         "key": "Mobile or digital wallet",
+         "doc_count": 20110,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 415,
+            "interval_diff": {
+             "value": -311.0
+            }
+           }
+          ]
+         }
+        },
+        {
+         "key": "Virtual currency",
+         "doc_count": 7271,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 110,
+            "interval_diff": {
+             "value": -84.0
+            }
+           }
+          ]
+         }
+        },
+        {
+         "key": "International money transfer",
+         "doc_count": 3561,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 67,
+            "interval_diff": {
+             "value": -52.0
+            }
+           }
+          ]
+         }
+        },
+        {
+         "key": "Money order, traveler's check or cashier's check",
+         "doc_count": 1295,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 25,
+            "interval_diff": {
+             "value": -23.0
+            }
+           }
+          ]
+         }
+        }
+       ]
+      },
+      "trend_period": {
+       "buckets": [
+        {
+         "key_as_string": "2026-07-01T00:00:00.000Z",
+         "key": 1782864000000,
+         "doc_count": 116,
+         "interval_diff": {
+          "value": -712.0
+         }
+        },
+        {
+         "key_as_string": "2026-06-01T00:00:00.000Z",
+         "key": 1780272000000,
+         "doc_count": 828,
+         "interval_diff": {
+          "value": -569.0
+         }
+        },
+        {
+         "key_as_string": "2026-05-01T00:00:00.000Z",
+         "key": 1777593600000,
+         "doc_count": 1397,
+         "interval_diff": {
+          "value": -445.0
+         }
+        },
+        {
+         "key_as_string": "2026-04-01T00:00:00.000Z",
+         "key": 1775001600000,
+         "doc_count": 1842,
+         "interval_diff": {
+          "value": 180.0
+         }
+        },
+        {
+         "key_as_string": "2026-03-01T00:00:00.000Z",
+         "key": 1772323200000,
+         "doc_count": 1662,
+         "interval_diff": {
+          "value": 681.0
+         }
+        },
+        {
+         "key_as_string": "2026-02-01T00:00:00.000Z",
+         "key": 1769904000000,
+         "doc_count": 981,
+         "interval_diff": {
+          "value": -786.0
+         }
+        },
+        {
+         "key_as_string": "2026-01-01T00:00:00.000Z",
+         "key": 1767225600000,
+         "doc_count": 1767,
+         "interval_diff": {
+          "value": 270.0
+         }
+        },
+        {
+         "key_as_string": "2025-12-01T00:00:00.000Z",
+         "key": 1764547200000,
+         "doc_count": 1497,
+         "interval_diff": {
+          "value": -176.0
+         }
+        },
+        {
+         "key_as_string": "2025-11-01T00:00:00.000Z",
+         "key": 1761955200000,
+         "doc_count": 1673,
+         "interval_diff": {
+          "value": -961.0
+         }
+        },
+        {
+         "key_as_string": "2025-10-01T00:00:00.000Z",
+         "key": 1759276800000,
+         "doc_count": 2634,
+         "interval_diff": {
+          "value": 1000.0
+         }
+        },
+        {
+         "key_as_string": "2025-09-01T00:00:00.000Z",
+         "key": 1756684800000,
+         "doc_count": 1634,
+         "interval_diff": {
+          "value": -286.0
+         }
+        },
+        {
+         "key_as_string": "2025-08-01T00:00:00.000Z",
+         "key": 1754006400000,
+         "doc_count": 1920,
+         "interval_diff": {
+          "value": -12.0
+         }
+        },
+        {
+         "key_as_string": "2025-07-01T00:00:00.000Z",
+         "key": 1751328000000,
+         "doc_count": 1932,
+         "interval_diff": {
+          "value": 262.0
+         }
+        },
+        {
+         "key_as_string": "2025-06-01T00:00:00.000Z",
+         "key": 1748736000000,
+         "doc_count": 1670,
+         "interval_diff": {
+          "value": -184.0
+         }
+        },
+        {
+         "key_as_string": "2025-05-01T00:00:00.000Z",
+         "key": 1746057600000,
+         "doc_count": 1854,
+         "interval_diff": {
+          "value": 139.0
+         }
+        },
+        {
+         "key_as_string": "2025-04-01T00:00:00.000Z",
+         "key": 1743465600000,
+         "doc_count": 1715,
+         "interval_diff": {
+          "value": -360.0
+         }
+        },
+        {
+         "key_as_string": "2025-03-01T00:00:00.000Z",
+         "key": 1740787200000,
+         "doc_count": 2075,
+         "interval_diff": {
+          "value": -2565.0
+         }
+        },
+        {
+         "key_as_string": "2025-02-01T00:00:00.000Z",
+         "key": 1738368000000,
+         "doc_count": 4640,
+         "interval_diff": {
+          "value": -36978.0
+         }
+        },
+        {
+         "key_as_string": "2025-01-01T00:00:00.000Z",
+         "key": 1735689600000,
+         "doc_count": 41618,
+         "interval_diff": {
+          "value": 40469.0
+         }
+        },
+        {
+         "key_as_string": "2024-12-01T00:00:00.000Z",
+         "key": 1733011200000,
+         "doc_count": 1149,
+         "interval_diff": {
+          "value": 257.0
+         }
+        },
+        {
+         "key_as_string": "2024-11-01T00:00:00.000Z",
+         "key": 1730419200000,
+         "doc_count": 892,
+         "interval_diff": {
+          "value": -12.0
+         }
+        },
+        {
+         "key_as_string": "2024-10-01T00:00:00.000Z",
+         "key": 1727740800000,
+         "doc_count": 904,
+         "interval_diff": {
+          "value": 118.0
+         }
+        },
+        {
+         "key_as_string": "2024-09-01T00:00:00.000Z",
+         "key": 1725148800000,
+         "doc_count": 786,
+         "interval_diff": {
+          "value": -121.0
+         }
+        },
+        {
+         "key_as_string": "2024-08-01T00:00:00.000Z",
+         "key": 1722470400000,
+         "doc_count": 907,
+         "interval_diff": {
+          "value": 111.0
+         }
+        },
+        {
+         "key_as_string": "2024-07-01T00:00:00.000Z",
+         "key": 1719792000000,
+         "doc_count": 796,
+         "interval_diff": {
+          "value": 25.0
+         }
+        },
+        {
+         "key_as_string": "2024-06-01T00:00:00.000Z",
+         "key": 1717200000000,
+         "doc_count": 771,
+         "interval_diff": {
+          "value": -17.0
+         }
+        },
+        {
+         "key_as_string": "2024-05-01T00:00:00.000Z",
+         "key": 1714521600000,
+         "doc_count": 788,
+         "interval_diff": {
+          "value": 38.0
+         }
+        },
+        {
+         "key_as_string": "2024-04-01T00:00:00.000Z",
+         "key": 1711929600000,
+         "doc_count": 750,
+         "interval_diff": {
+          "value": -124.0
+         }
+        },
+        {
+         "key_as_string": "2024-03-01T00:00:00.000Z",
+         "key": 1709251200000,
+         "doc_count": 874,
+         "interval_diff": {
+          "value": 58.0
+         }
+        },
+        {
+         "key_as_string": "2024-02-01T00:00:00.000Z",
+         "key": 1706745600000,
+         "doc_count": 816,
+         "interval_diff": {
+          "value": 10.0
+         }
+        },
+        {
+         "key_as_string": "2024-01-01T00:00:00.000Z",
+         "key": 1704067200000,
+         "doc_count": 806,
+         "interval_diff": {
+          "value": 40.0
+         }
+        },
+        {
+         "key_as_string": "2023-12-01T00:00:00.000Z",
+         "key": 1701388800000,
+         "doc_count": 766,
+         "interval_diff": {
+          "value": 56.0
+         }
+        },
+        {
+         "key_as_string": "2023-11-01T00:00:00.000Z",
+         "key": 1698796800000,
+         "doc_count": 710,
+         "interval_diff": {
+          "value": -90.0
+         }
+        },
+        {
+         "key_as_string": "2023-10-01T00:00:00.000Z",
+         "key": 1696118400000,
+         "doc_count": 800,
+         "interval_diff": {
+          "value": 105.0
+         }
+        },
+        {
+         "key_as_string": "2023-09-01T00:00:00.000Z",
+         "key": 1693526400000,
+         "doc_count": 695,
+         "interval_diff": {
+          "value": 372.0
+         }
+        },
+        {
+         "key_as_string": "2023-08-01T00:00:00.000Z",
+         "key": 1690848000000,
+         "doc_count": 323
+        }
+       ]
+      }
+     },
+     {
+      "key": "Student loan",
+      "doc_count": 26534,
+      "product": {
+       "doc_count_error_upper_bound": 0,
+       "sum_other_doc_count": 0,
+       "buckets": [
+        {
+         "key": "Federal student loan servicing",
+         "doc_count": 21288,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 280,
+            "interval_diff": {
+             "value": -166.0
+            }
+           }
+          ]
+         }
+        },
+        {
+         "key": "Private student loan",
+         "doc_count": 5246,
+         "trend_period": {
+          "buckets": [
+           {
+            "key_as_string": "2026-06-01T00:00:00.000Z",
+            "key": 1780272000000,
+            "doc_count": 75,
+            "interval_diff": {
+             "value": -23.0
+            }
+           }
+          ]
+         }
+        }
+       ]
+      },
+      "trend_period": {
+       "buckets": [
+        {
+         "key_as_string": "2026-07-01T00:00:00.000Z",
+         "key": 1782864000000,
+         "doc_count": 17,
+         "interval_diff": {
+          "value": -338.0
+         }
+        },
+        {
+         "key_as_string": "2026-06-01T00:00:00.000Z",
+         "key": 1780272000000,
+         "doc_count": 355,
+         "interval_diff": {
+          "value": -189.0
+         }
+        },
+        {
+         "key_as_string": "2026-05-01T00:00:00.000Z",
+         "key": 1777593600000,
+         "doc_count": 544,
+         "interval_diff": {
+          "value": -220.0
+         }
+        },
+        {
+         "key_as_string": "2026-04-01T00:00:00.000Z",
+         "key": 1775001600000,
+         "doc_count": 764,
+         "interval_diff": {
+          "value": 61.0
+         }
+        },
+        {
+         "key_as_string": "2026-03-01T00:00:00.000Z",
+         "key": 1772323200000,
+         "doc_count": 703,
+         "interval_diff": {
+          "value": 314.0
+         }
+        },
+        {
+         "key_as_string": "2026-02-01T00:00:00.000Z",
+         "key": 1769904000000,
+         "doc_count": 389,
+         "interval_diff": {
+          "value": -375.0
+         }
+        },
+        {
+         "key_as_string": "2026-01-01T00:00:00.000Z",
+         "key": 1767225600000,
+         "doc_count": 764,
+         "interval_diff": {
+          "value": 210.0
+         }
+        },
+        {
+         "key_as_string": "2025-12-01T00:00:00.000Z",
+         "key": 1764547200000,
+         "doc_count": 554,
+         "interval_diff": {
+          "value": -33.0
+         }
+        },
+        {
+         "key_as_string": "2025-11-01T00:00:00.000Z",
+         "key": 1761955200000,
+         "doc_count": 587,
+         "interval_diff": {
+          "value": 31.0
+         }
+        },
+        {
+         "key_as_string": "2025-10-01T00:00:00.000Z",
+         "key": 1759276800000,
+         "doc_count": 556,
+         "interval_diff": {
+          "value": -102.0
+         }
+        },
+        {
+         "key_as_string": "2025-09-01T00:00:00.000Z",
+         "key": 1756684800000,
+         "doc_count": 658,
+         "interval_diff": {
+          "value": -17.0
+         }
+        },
+        {
+         "key_as_string": "2025-08-01T00:00:00.000Z",
+         "key": 1754006400000,
+         "doc_count": 675,
+         "interval_diff": {
+          "value": -173.0
+         }
+        },
+        {
+         "key_as_string": "2025-07-01T00:00:00.000Z",
+         "key": 1751328000000,
+         "doc_count": 848,
+         "interval_diff": {
+          "value": 83.0
+         }
+        },
+        {
+         "key_as_string": "2025-06-01T00:00:00.000Z",
+         "key": 1748736000000,
+         "doc_count": 765,
+         "interval_diff": {
+          "value": -289.0
+         }
+        },
+        {
+         "key_as_string": "2025-05-01T00:00:00.000Z",
+         "key": 1746057600000,
+         "doc_count": 1054,
+         "interval_diff": {
+          "value": -94.0
+         }
+        },
+        {
+         "key_as_string": "2025-04-01T00:00:00.000Z",
+         "key": 1743465600000,
+         "doc_count": 1148,
+         "interval_diff": {
+          "value": -680.0
+         }
+        },
+        {
+         "key_as_string": "2025-03-01T00:00:00.000Z",
+         "key": 1740787200000,
+         "doc_count": 1828,
+         "interval_diff": {
+          "value": 836.0
+         }
+        },
+        {
+         "key_as_string": "2025-02-01T00:00:00.000Z",
+         "key": 1738368000000,
+         "doc_count": 992,
+         "interval_diff": {
+          "value": -217.0
+         }
+        },
+        {
+         "key_as_string": "2025-01-01T00:00:00.000Z",
+         "key": 1735689600000,
+         "doc_count": 1209,
+         "interval_diff": {
+          "value": 463.0
+         }
+        },
+        {
+         "key_as_string": "2024-12-01T00:00:00.000Z",
+         "key": 1733011200000,
+         "doc_count": 746,
+         "interval_diff": {
+          "value": 265.0
+         }
+        },
+        {
+         "key_as_string": "2024-11-01T00:00:00.000Z",
+         "key": 1730419200000,
+         "doc_count": 481,
+         "interval_diff": {
+          "value": -245.0
+         }
+        },
+        {
+         "key_as_string": "2024-10-01T00:00:00.000Z",
+         "key": 1727740800000,
+         "doc_count": 726,
+         "interval_diff": {
+          "value": -32.0
+         }
+        },
+        {
+         "key_as_string": "2024-09-01T00:00:00.000Z",
+         "key": 1725148800000,
+         "doc_count": 758,
+         "interval_diff": {
+          "value": 238.0
+         }
+        },
+        {
+         "key_as_string": "2024-08-01T00:00:00.000Z",
+         "key": 1722470400000,
+         "doc_count": 520,
+         "interval_diff": {
+          "value": -20.0
+         }
+        },
+        {
+         "key_as_string": "2024-07-01T00:00:00.000Z",
+         "key": 1719792000000,
+         "doc_count": 540,
+         "interval_diff": {
+          "value": -44.0
+         }
+        },
+        {
+         "key_as_string": "2024-06-01T00:00:00.000Z",
+         "key": 1717200000000,
+         "doc_count": 584,
+         "interval_diff": {
+          "value": -147.0
+         }
+        },
+        {
+         "key_as_string": "2024-05-01T00:00:00.000Z",
+         "key": 1714521600000,
+         "doc_count": 731,
+         "interval_diff": {
+          "value": 99.0
+         }
+        },
+        {
+         "key_as_string": "2024-04-01T00:00:00.000Z",
+         "key": 1711929600000,
+         "doc_count": 632,
+         "interval_diff": {
+          "value": -98.0
+         }
+        },
+        {
+         "key_as_string": "2024-03-01T00:00:00.000Z",
+         "key": 1709251200000,
+         "doc_count": 730,
+         "interval_diff": {
+          "value": 26.0
+         }
+        },
+        {
+         "key_as_string": "2024-02-01T00:00:00.000Z",
+         "key": 1706745600000,
+         "doc_count": 704,
+         "interval_diff": {
+          "value": -169.0
+         }
+        },
+        {
+         "key_as_string": "2024-01-01T00:00:00.000Z",
+         "key": 1704067200000,
+         "doc_count": 873,
+         "interval_diff": {
+          "value": 114.0
+         }
+        },
+        {
+         "key_as_string": "2023-12-01T00:00:00.000Z",
+         "key": 1701388800000,
+         "doc_count": 759,
+         "interval_diff": {
+          "value": -231.0
+         }
+        },
+        {
+         "key_as_string": "2023-11-01T00:00:00.000Z",
+         "key": 1698796800000,
+         "doc_count": 990,
+         "interval_diff": {
+          "value": -283.0
+         }
+        },
+        {
+         "key_as_string": "2023-10-01T00:00:00.000Z",
+         "key": 1696118400000,
+         "doc_count": 1273,
+         "interval_diff": {
+          "value": 440.0
+         }
+        },
+        {
+         "key_as_string": "2023-09-01T00:00:00.000Z",
+         "key": 1693526400000,
+         "doc_count": 833,
+         "interval_diff": {
+          "value": 589.0
+         }
+        },
+        {
+         "key_as_string": "2023-08-01T00:00:00.000Z",
+         "key": 1690848000000,
+         "doc_count": 244
+        }
+       ]
+      }
+     }
+    ]
+   }
+  },
+  "min_date": {
+   "value": 1322717276000.0,
+   "value_as_string": "2011-12-01T12:00:00-05:00"
+  },
+  "dateRangeArea": {
+   "doc_count": 552157,
+   "dateRangeArea": {
+    "buckets": [
+     {
+      "key_as_string": "2023-08-01T00:00:00.000Z",
+      "key": 1690848000000,
+      "doc_count": 3897
+     },
+     {
+      "key_as_string": "2023-09-01T00:00:00.000Z",
+      "key": 1693526400000,
+      "doc_count": 9562
+     },
+     {
+      "key_as_string": "2023-10-01T00:00:00.000Z",
+      "key": 1696118400000,
+      "doc_count": 10427
+     },
+     {
+      "key_as_string": "2023-11-01T00:00:00.000Z",
+      "key": 1698796800000,
+      "doc_count": 9707
+     },
+     {
+      "key_as_string": "2023-12-01T00:00:00.000Z",
+      "key": 1701388800000,
+      "doc_count": 9722
+     },
+     {
+      "key_as_string": "2024-01-01T00:00:00.000Z",
+      "key": 1704067200000,
+      "doc_count": 10785
+     },
+     {
+      "key_as_string": "2024-02-01T00:00:00.000Z",
+      "key": 1706745600000,
+      "doc_count": 10792
+     },
+     {
+      "key_as_string": "2024-03-01T00:00:00.000Z",
+      "key": 1709251200000,
+      "doc_count": 14258
+     },
+     {
+      "key_as_string": "2024-04-01T00:00:00.000Z",
+      "key": 1711929600000,
+      "doc_count": 15002
+     },
+     {
+      "key_as_string": "2024-05-01T00:00:00.000Z",
+      "key": 1714521600000,
+      "doc_count": 14256
+     },
+     {
+      "key_as_string": "2024-06-01T00:00:00.000Z",
+      "key": 1717200000000,
+      "doc_count": 11635
+     },
+     {
+      "key_as_string": "2024-07-01T00:00:00.000Z",
+      "key": 1719792000000,
+      "doc_count": 11788
+     },
+     {
+      "key_as_string": "2024-08-01T00:00:00.000Z",
+      "key": 1722470400000,
+      "doc_count": 12830
+     },
+     {
+      "key_as_string": "2024-09-01T00:00:00.000Z",
+      "key": 1725148800000,
+      "doc_count": 12305
+     },
+     {
+      "key_as_string": "2024-10-01T00:00:00.000Z",
+      "key": 1727740800000,
+      "doc_count": 13690
+     },
+     {
+      "key_as_string": "2024-11-01T00:00:00.000Z",
+      "key": 1730419200000,
+      "doc_count": 12397
+     },
+     {
+      "key_as_string": "2024-12-01T00:00:00.000Z",
+      "key": 1733011200000,
+      "doc_count": 13752
+     },
+     {
+      "key_as_string": "2025-01-01T00:00:00.000Z",
+      "key": 1735689600000,
+      "doc_count": 69253
+     },
+     {
+      "key_as_string": "2025-02-01T00:00:00.000Z",
+      "key": 1738368000000,
+      "doc_count": 18522
+     },
+     {
+      "key_as_string": "2025-03-01T00:00:00.000Z",
+      "key": 1740787200000,
+      "doc_count": 17483
+     },
+     {
+      "key_as_string": "2025-04-01T00:00:00.000Z",
+      "key": 1743465600000,
+      "doc_count": 17683
+     },
+     {
+      "key_as_string": "2025-05-01T00:00:00.000Z",
+      "key": 1746057600000,
+      "doc_count": 18804
+     },
+     {
+      "key_as_string": "2025-06-01T00:00:00.000Z",
+      "key": 1748736000000,
+      "doc_count": 18041
+     },
+     {
+      "key_as_string": "2025-07-01T00:00:00.000Z",
+      "key": 1751328000000,
+      "doc_count": 20147
+     },
+     {
+      "key_as_string": "2025-08-01T00:00:00.000Z",
+      "key": 1754006400000,
+      "doc_count": 20967
+     },
+     {
+      "key_as_string": "2025-09-01T00:00:00.000Z",
+      "key": 1756684800000,
+      "doc_count": 19729
+     },
+     {
+      "key_as_string": "2025-10-01T00:00:00.000Z",
+      "key": 1759276800000,
+      "doc_count": 17206
+     },
+     {
+      "key_as_string": "2025-11-01T00:00:00.000Z",
+      "key": 1761955200000,
+      "doc_count": 17001
+     },
+     {
+      "key_as_string": "2025-12-01T00:00:00.000Z",
+      "key": 1764547200000,
+      "doc_count": 14475
+     },
+     {
+      "key_as_string": "2026-01-01T00:00:00.000Z",
+      "key": 1767225600000,
+      "doc_count": 17476
+     },
+     {
+      "key_as_string": "2026-02-01T00:00:00.000Z",
+      "key": 1769904000000,
+      "doc_count": 9705
+     },
+     {
+      "key_as_string": "2026-03-01T00:00:00.000Z",
+      "key": 1772323200000,
+      "doc_count": 17419
+     },
+     {
+      "key_as_string": "2026-04-01T00:00:00.000Z",
+      "key": 1775001600000,
+      "doc_count": 16617
+     },
+     {
+      "key_as_string": "2026-05-01T00:00:00.000Z",
+      "key": 1777593600000,
+      "doc_count": 13423
+     },
+     {
+      "key_as_string": "2026-06-01T00:00:00.000Z",
+      "key": 1780272000000,
+      "doc_count": 9141
+     },
+     {
+      "key_as_string": "2026-07-01T00:00:00.000Z",
+      "key": 1782864000000,
+      "doc_count": 2260
+     }
+    ]
+   }
+  },
+  "dateRangeBuckets": {
+   "doc_count": 13160352,
+   "dateRangeBuckets": {
+    "buckets": [
+     {
+      "key_as_string": "2023-08-01T00:00:00.000Z",
+      "key": 1690848000000,
+      "doc_count": 56578
+     },
+     {
+      "key_as_string": "2023-09-01T00:00:00.000Z",
+      "key": 1693526400000,
+      "doc_count": 112887
+     },
+     {
+      "key_as_string": "2023-10-01T00:00:00.000Z",
+      "key": 1696118400000,
+      "doc_count": 117420
+     },
+     {
+      "key_as_string": "2023-11-01T00:00:00.000Z",
+      "key": 1698796800000,
+      "doc_count": 113365
+     },
+     {
+      "key_as_string": "2023-12-01T00:00:00.000Z",
+      "key": 1701388800000,
+      "doc_count": 123066
+     },
+     {
+      "key_as_string": "2024-01-01T00:00:00.000Z",
+      "key": 1704067200000,
+      "doc_count": 143365
+     },
+     {
+      "key_as_string": "2024-02-01T00:00:00.000Z",
+      "key": 1706745600000,
+      "doc_count": 157614
+     },
+     {
+      "key_as_string": "2024-03-01T00:00:00.000Z",
+      "key": 1709251200000,
+      "doc_count": 177815
+     },
+     {
+      "key_as_string": "2024-04-01T00:00:00.000Z",
+      "key": 1711929600000,
+      "doc_count": 191120
+     },
+     {
+      "key_as_string": "2024-05-01T00:00:00.000Z",
+      "key": 1714521600000,
+      "doc_count": 211961
+     },
+     {
+      "key_as_string": "2024-06-01T00:00:00.000Z",
+      "key": 1717200000000,
+      "doc_count": 204168
+     },
+     {
+      "key_as_string": "2024-07-01T00:00:00.000Z",
+      "key": 1719792000000,
+      "doc_count": 232654
+     },
+     {
+      "key_as_string": "2024-08-01T00:00:00.000Z",
+      "key": 1722470400000,
+      "doc_count": 263815
+     },
+     {
+      "key_as_string": "2024-09-01T00:00:00.000Z",
+      "key": 1725148800000,
+      "doc_count": 264821
+     },
+     {
+      "key_as_string": "2024-10-01T00:00:00.000Z",
+      "key": 1727740800000,
+      "doc_count": 295878
+     },
+     {
+      "key_as_string": "2024-11-01T00:00:00.000Z",
+      "key": 1730419200000,
+      "doc_count": 287077
+     },
+     {
+      "key_as_string": "2024-12-01T00:00:00.000Z",
+      "key": 1733011200000,
+      "doc_count": 303981
+     },
+     {
+      "key_as_string": "2025-01-01T00:00:00.000Z",
+      "key": 1735689600000,
+      "doc_count": 475783
+     },
+     {
+      "key_as_string": "2025-02-01T00:00:00.000Z",
+      "key": 1738368000000,
+      "doc_count": 335236
+     },
+     {
+      "key_as_string": "2025-03-01T00:00:00.000Z",
+      "key": 1740787200000,
+      "doc_count": 396973
+     },
+     {
+      "key_as_string": "2025-04-01T00:00:00.000Z",
+      "key": 1743465600000,
+      "doc_count": 406100
+     },
+     {
+      "key_as_string": "2025-05-01T00:00:00.000Z",
+      "key": 1746057600000,
+      "doc_count": 415182
+     },
+     {
+      "key_as_string": "2025-06-01T00:00:00.000Z",
+      "key": 1748736000000,
+      "doc_count": 412161
+     },
+     {
+      "key_as_string": "2025-07-01T00:00:00.000Z",
+      "key": 1751328000000,
+      "doc_count": 473195
+     },
+     {
+      "key_as_string": "2025-08-01T00:00:00.000Z",
+      "key": 1754006400000,
+      "doc_count": 495575
+     },
+     {
+      "key_as_string": "2025-09-01T00:00:00.000Z",
+      "key": 1756684800000,
+      "doc_count": 503850
+     },
+     {
+      "key_as_string": "2025-10-01T00:00:00.000Z",
+      "key": 1759276800000,
+      "doc_count": 519787
+     },
+     {
+      "key_as_string": "2025-11-01T00:00:00.000Z",
+      "key": 1761955200000,
+      "doc_count": 496658
+     },
+     {
+      "key_as_string": "2025-12-01T00:00:00.000Z",
+      "key": 1764547200000,
+      "doc_count": 512476
+     },
+     {
+      "key_as_string": "2026-01-01T00:00:00.000Z",
+      "key": 1767225600000,
+      "doc_count": 541266
+     },
+     {
+      "key_as_string": "2026-02-01T00:00:00.000Z",
+      "key": 1769904000000,
+      "doc_count": 497103
+     },
+     {
+      "key_as_string": "2026-03-01T00:00:00.000Z",
+      "key": 1772323200000,
+      "doc_count": 614913
+     },
+     {
+      "key_as_string": "2026-04-01T00:00:00.000Z",
+      "key": 1775001600000,
+      "doc_count": 618226
+     },
+     {
+      "key_as_string": "2026-05-01T00:00:00.000Z",
+      "key": 1777593600000,
+      "doc_count": 619754
+     },
+     {
+      "key_as_string": "2026-06-01T00:00:00.000Z",
+      "key": 1780272000000,
+      "doc_count": 622723
+     },
+     {
+      "key_as_string": "2026-07-01T00:00:00.000Z",
+      "key": 1782864000000,
+      "doc_count": 699727
+     },
+     {
+      "key_as_string": "2026-08-01T00:00:00.000Z",
+      "key": 1785542400000,
+      "doc_count": 246079
+     }
+    ]
+   },
+   "body": {
+    "size": 0,
+    "_source": [
+     "company",
+     "company_public_response",
+     "company_response",
+     "complaint_id",
+     "complaint_what_happened",
+     "date_received",
+     "date_sent_to_company",
+     "has_narrative",
+     "issue",
+     "product",
+     "state",
+     "submitted_via",
+     "sub_issue",
+     "sub_product",
+     "tags",
+     "timely",
+     "zip_code"
+    ],
+    "aggs": {
+     "dateRangeBuckets": {
+      "aggs": {
+       "dateRangeBuckets": {
+        "date_histogram": {
+         "field": "date_received",
+         "calendar_interval": "month"
+        }
+       }
+      },
+      "filter": {
+       "bool": {
+        "must": [
+         {
+          "range": {
+           "date_received": {
+            "from": "2023-08-17",
+            "to": "2026-08-17"
+           }
+          }
+         }
+        ],
+        "must_not": []
+       }
+      }
+     }
+    },
+    "track_total_hits": true,
+    "query": {
+     "match_all": {}
+    }
+   }
+  }
+ },
+ "_meta": {
+  "date_min": "2011-12-01T12:00:00-05:00",
+  "date_max": "2026-08-17T12:00:00-05:00"
+ }
+}
