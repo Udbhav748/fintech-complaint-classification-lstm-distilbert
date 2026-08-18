@@ -681,6 +681,67 @@ Do not pretend DistilBERT was fine-tuned on the entire dataset if it was not.
 
 ---
 
+# 25A. Compute Environment Strategy
+
+> **Compute Environment Strategy:** Recurrent experiments are executed locally
+> on CPU for consistency and practical iteration. DistilBERT fine-tuning may be
+> executed on a GPU-enabled cloud environment such as Kaggle when required by
+> compute constraints. The dataset version, label mapping, tokenizer
+> configuration, evaluation protocol, and experiment configuration must remain
+> identical across environments. **Environment changes are considered
+> infrastructure differences, not methodological changes.**
+
+## Division of work
+
+```text
+                PROJECT
+                   |
+       +-----------+-----------+
+       |                       |
+ Local CPU                  Kaggle GPU
+       |                       |
+ E0 Simple LSTM             E7 DistilBERT
+ E1 BiLSTM
+ E2 Stacked BiLSTM
+ E3 GloVe
+ E4 Regularization
+ E5 Sequence length
+ E6 Class weights
+       |                       |
+       +-----------+-----------+
+                   |
+          Same evaluation pipeline
+                   |
+          Macro-F1 + delta + reasoning
+```
+
+## What must remain identical across environments
+
+* dataset version (`cfpb_phase4_v1`)
+* train / validation / test split and the seed that produced it
+* label mapping
+* tokenizer configuration
+* evaluation protocol and metric definitions
+* experiment registry schema
+
+## Viva answer this supports
+
+> *"Why did you train the LSTM family locally but DistilBERT on Kaggle?"*
+
+> "The recurrent models were computationally manageable on the local CPU, while
+> DistilBERT fine-tuning was moved to a GPU environment to avoid unnecessary CPU
+> bottlenecks. The data, configuration, evaluation protocol, and experiment
+> definition remained controlled."
+
+## Local development machine notes (not methodology)
+
+Machine management steps — stopping unused containers to free RAM, clearing
+caches, relocating cold data — are **development-environment optimizations**.
+They are deliberately **not** recorded as experiments and must not appear in the
+experiment registry or the comparison table.
+
+---
+
 # 26. Train / Validation / Test Strategy
 
 Create a reproducible split.
@@ -770,6 +831,50 @@ It establishes the baseline.
 
 ---
 
+## Verified E0 result (COMPLETE — do not modify retroactively)
+
+Recorded in `reports/experiment_results.csv` and
+`reports/phase5_e0_baseline_report.md`:
+
+| Metric | Verified value |
+| --- | ---: |
+| **Macro-F1 (primary)** | **0.8435** |
+| Accuracy | **84.45%** |
+| Macro Precision | **0.8440** |
+| Macro Recall | **0.8438** |
+| Training time | 4576.32 s |
+| Total / trainable parameters | 3,249,989 |
+
+Baseline configuration: `cfpb_phase4_v1`, vocabulary 25,000, embedding dim 128,
+LSTM units 64, `max_length` 128, batch size 64, learning rate 0.001, 10 epochs,
+seed 42, random trainable embeddings, no dropout, no class weights.
+
+Baseline architecture:
+
+```text
+Complaint text
+    ↓
+training-only vocabulary
+    ↓
+padding / truncation
+    ↓
+random trainable embedding
+    ↓
+single-layer unidirectional LSTM
+    ↓
+5-class classifier
+```
+
+> **All E1+ experiments must reference E0.**
+> **Do not modify E0 retroactively.** If the baseline is ever re-run under
+> changed conditions, it becomes a new experiment ID, not a revised E0.
+
+Observed E0 training behavior carried forward as evidence for E4: validation
+loss minimum at epoch 4 (0.4175), validation Macro-F1 peak at epoch 6 (0.8513),
+divergence thereafter.
+
+---
+
 # 30. Baseline Metric
 
 Primary metric:
@@ -846,9 +951,106 @@ Do not report only the final score.
 
 ---
 
+# 32A. Core Experimental Philosophy
+
+This project is **not** simply a sequence of increasingly complex models.
+
+Its purpose is to demonstrate a disciplined NLP experimentation process:
+
+```text
+Baseline
+    ↓
+identify weaknesses
+    ↓
+form a hypothesis
+    ↓
+change one meaningful factor
+    ↓
+measure the new result
+    ↓
+calculate the metric delta
+    ↓
+analyze per-class effects
+    ↓
+inspect computational cost
+    ↓
+explain why the result changed
+    ↓
+decide whether to retain or reject the change
+    ↓
+continue to the next experiment
+```
+
+The central Test-6 rule remains unchanged:
+
+> **Baseline first → record metric → enhance → show delta.**
+
+The FWC material explicitly states that the examiner values the **comparison
+table and the reasoning**, not simply the final score.
+
+## How the enhancement menu is interpreted
+
+The enhancement list in the FWC material is a **menu of valid enhancement
+techniques**. It is *not* interpreted as a requirement that every technique
+must become a separate experiment.
+
+However, because this is a graded assessment and the goal is to demonstrate
+strong engineering effort, this project deliberately performs a **broader and
+more visible experimental study than the strict minimum**.
+
+---
+
+# 32B. Full Experimental Strategy
+
+The intended experimental ladder is:
+
+```text
+E0 — Simple LSTM Baseline
+E1 — Bidirectional LSTM
+E2 — Stacked Bidirectional LSTM
+E3 — GloVe Embedding Experiment
+E4 — Dropout / Recurrent Dropout / Regularization Experiment
+E5 — Sequence-Length Experiment
+E6 — Class-Weight Experiment
+E7 — DistilBERT Fine-Tuning
+```
+
+**The exact implementation of E4 and E5 must be evidence-driven.**
+
+Do not force an enhancement simply to create another row in the table.
+
+* dropout / recurrent_dropout must be justified by observed overfitting or
+  generalization behavior
+* early stopping may be folded into the regularization/training study
+* learning-rate scheduling may be tested only if optimization behavior
+  justifies it
+* longer `max_length` must be evaluated against the actual
+  tokenizer/sequence-length analysis
+* class weights must be tested honestly **even though the expected delta is
+  small**, because the acquired dataset is nearly balanced
+
+## Three categories in the final presentation
+
+The final write-up must clearly distinguish:
+
+1. **required / core experiments** — E0, E1, E7 and the enhancements that
+   directly answer the Test-6 requirement
+2. **evidence-driven supporting experiments** — enhancements run because the
+   measured behavior of an earlier experiment justified them
+3. **optional experiments considered but not run** — with the reason they were
+   judged unnecessary
+
+Category 3 is not a gap. Documenting a technique that was considered and
+rationally declined is itself evidence of engineering judgement.
+
+---
+
 # 33. Experiment E1 — Bidirectional LSTM
 
-Change:
+**Question:** Does bidirectional context improve classification over the
+unidirectional LSTM?
+
+Controlled change:
 
 ```text
 LSTM
@@ -856,31 +1058,87 @@ LSTM
 BiLSTM
 ```
 
+All other relevant settings remain fixed.
+
 Hypothesis:
 
-> Bidirectional processing may improve classification because the representation can use information from both directions of the sequence.
+> Bidirectional processing may improve classification because the
+> representation can use information from both directions of the sequence.
 
 The FWC material explicitly demonstrates a Bidirectional wrapper around an LSTM.
 
-Measure:
+Analyze:
 
 * Macro-F1
-* delta
-* per-class impact
+* Δ Macro-F1 against E0
+* accuracy
+* macro precision
+* macro recall
+* per-class F1
+* confusion matrix
 * training time
-* confusion changes
+* parameter count
+* inference cost
+
+**Pay particular attention to the `Checking or savings account` ↔
+`Money transfer, virtual currency, or money service` confusion observed in
+E0.** If bidirectional context helps anywhere, it should help there.
+
+Status: **PENDING — TO BE MEASURED**
 
 ---
 
-# 34. Experiment E2 — GloVe
+# 33A. Experiment E2 — Stacked Bidirectional LSTM
 
-Compare:
+**Question:** Does additional recurrent depth improve representation quality
+beyond a single BiLSTM?
+
+Conceptual structure:
 
 ```text
-Random trainable embedding
-vs
-Pretrained GloVe initialization
+Embedding
+    ↓
+BiLSTM
+    ↓
+second recurrent layer
+    ↓
+classifier
 ```
+
+Do not change unrelated hyperparameters.
+
+Analyze whether the additional capacity:
+
+* improves Macro-F1
+* causes overfitting
+* increases training time
+* increases parameter count
+* improves the difficult classes specifically
+* produces diminishing returns
+
+**If the stacked model performs worse, keep the negative result and explain
+it.** Depth that does not pay for itself is a legitimate and reportable
+finding.
+
+Status: **PENDING — TO BE MEASURED**
+
+---
+
+# 34. Experiment E3 — GloVe Embedding Experiment
+
+**Question:** Does pretrained GloVe initialization improve classification
+relative to random initialization?
+
+Controlled comparison:
+
+```text
+Random trainable embeddings
+vs
+Trainable GloVe-initialized embeddings
+```
+
+The primary comparison must isolate **initialization source** as far as
+reasonably possible.
 
 The FWC material explicitly covers GloVe and pretrained word vectors.
 
@@ -896,75 +1154,193 @@ versus
 
 so the primary controlled change is the initialization source.
 
-Do not freeze GloVe unless that is a separate documented experiment.
+**Do not freeze GloVe unless freezing is intentionally introduced as a
+separate documented experiment.**
+
+## Existing Phase 4 evidence (verified — do not restate generically)
+
+Measured in `reports/phase4_modeling_dataset_report.md` against the training
+vocabulary, using **GloVe 6B 100d**:
+
+| Measure | Verified value |
+| --- | ---: |
+| Unique word coverage | **81.11%** (20,277 matched words) |
+| Token-frequency coverage | **99.11%** |
+
+Interpretation to carry into the hypothesis: although roughly one in five
+*unique* vocabulary words has no GloVe vector, those misses are overwhelmingly
+rare words — **99.11% of actual token instances are covered**. The unmatched
+tail is therefore low-frequency, which tempers how much gain should be expected
+from GloVe initialization.
 
 Record:
 
-* embedding dimension
+* GloVe dimension
 * vocabulary coverage
-* OOV behavior
+* token-frequency coverage
+* OOV rate
 * trainable/frozen state
 * Macro-F1
-* delta
+* Δ Macro-F1
+* per-class effects
+* training behavior
+
+Status: **PENDING — TO BE MEASURED**
 
 ---
 
-# 35. Experiment E3 — Class Weights
+# 34A. Experiment E4 — Regularization / Generalization Study
 
-Use class weights only after inspecting actual class imbalance.
+**Question:** Does regularization improve generalization, rather than merely
+reducing training accuracy?
 
-Purpose:
+## Evidence that motivates this experiment (verified)
 
-> determine whether minority-class performance improves.
+This experiment is **not speculative**. The E0 baseline learning curves in
+`reports/phase5_e0_baseline_report.md` already record mild overfitting:
+
+* validation loss reached its global minimum at **Epoch 4 (0.4175)**
+* validation Macro-F1 peaked at **Epoch 6 (0.8513)**
+* beyond Epoch 6 training loss kept falling (0.2924 to 0.1610, train accuracy
+  94.65%) while validation loss rose (0.4221 to 0.5361)
+* the recorded E0 test Macro-F1 is **0.8435**
+
+The gap between the epoch-6 validation peak and the final recorded score is the
+concrete, measured symptom this experiment exists to address.
+
+Potential components, tested deliberately rather than randomly:
+
+```text
+Baseline recurrent architecture
+    ↓
+dropout
+    ↓
+dropout + recurrent_dropout
+    ↓
+early stopping if appropriate
+```
 
 Measure:
 
+* training loss
+* validation loss
+* the training/validation metric gap
 * Macro-F1
-* minority-class recall
-* minority-class F1
-* confusion matrix
-* accuracy
+* Δ Macro-F1
+* **epoch at best validation performance**
+* training time
 
-Do not assume class weights will improve the overall score.
+**If one configuration is sufficient to answer the question, do not create
+unnecessary additional rows.**
+
+Status: **PENDING — TO BE MEASURED**
 
 ---
 
-# 36. Optional Enhancement Experiments
+# 34B. Experiment E5 — Sequence-Length Study
 
-Test-6 provides additional enhancement options:
+**Question:** Does preserving more sequence context improve complaint
+classification enough to justify the additional computational cost?
 
-* stacked layers
-* dropout
-* recurrent dropout
-* learning-rate scheduling
-* early stopping
-* longer `max_length`
+## Existing Phase 4 evidence (verified — use these, do not invent)
 
-These are **available experiments**, not mandatory individual rows.
+Measured against real tokenizer output in
+`reports/phase4_modeling_dataset_report.md`. Sub-word tokenization produces
+approximately **1.28x** more tokens than whitespace words.
 
-The project should only run them when there is a meaningful hypothesis or observed training behavior that justifies them.
+| `max_length` | % Truncated | % Retained Intact | Compute note |
+| ---: | ---: | ---: | --- |
+| 64 | 90.18% | 9.82% | Discards detail in >90% of complaints |
+| **128** | **72.45%** | **27.55%** | Current baseline for E0/E1 |
+| 256 | 41.46% | 58.54% | ~4x attention cost of L=128, O(L^2) |
+| 512 | 11.80% | 88.20% | Prohibitive for CPU fine-tuning |
 
-Examples:
+Candidate comparison:
 
-### Stacked layers
+```text
+max_length = 128
+vs
+max_length = 256
+```
 
-Test whether additional representational capacity improves performance.
+Optionally include another justified value if the evidence supports it.
 
-### Dropout / recurrent dropout
+For every candidate, record:
 
-Test whether regularization reduces overfitting.
+* percentage of sequences truncated
+* Macro-F1
+* Δ Macro-F1
+* training time
+* memory / compute implication
+
+The final interpretation **must discuss the quality/compute trade-off**.
+
+> **Do NOT select a longer sequence purely because it produces a larger
+> number.** A gain that costs 4x compute must be argued, not assumed.
+
+Status: **PENDING — TO BE MEASURED**
+
+---
+
+# 35. Experiment E6 — Class Weights
+
+**Question:** Does class weighting improve minority-class performance?
+
+Use **training-only** class weights. Do not calculate weights from validation
+or test data.
+
+## Important project fact (verified in Phase 3)
+
+The Phase 2B acquisition intentionally produced an approximately balanced
+modeling population: **1.19x imbalance in this extract, against 8.3x in the
+real CFPB population.** The class-weight values are therefore close to 1.
+
+**Expected result: a small or negligible delta.**
+
+This is **NOT** a failed experiment. A near-zero effect must be documented
+honestly and explained as a direct consequence of the acquired class
+distribution.
+
+> **Do not rebalance the dataset simply to force class weights to produce an
+> improvement.** Doing so would invalidate the comparison against every other
+> experiment in the ladder.
+
+Analyze:
+
+* Macro-F1
+* Δ Macro-F1
+* macro recall
+* per-class recall
+* per-class F1
+* confusion matrix
+
+Status: **PENDING — TO BE MEASURED**
+
+---
+
+# 36. Optional Enhancement Experiments (Considered, Not Automatically Run)
+
+Test-6 provides a menu of enhancement options. Several have been **promoted
+into the numbered ladder** because there is measured evidence justifying them:
+
+| Technique | Disposition |
+| --- | --- |
+| stacked layers | promoted to **E2** |
+| dropout / recurrent dropout | promoted to **E4** |
+| early stopping | folded into **E4** |
+| longer `max_length` | promoted to **E5** |
+| class weights | promoted to **E6** |
+| learning-rate scheduling | **remains optional** |
+
+The remaining optional technique should only be run when there is a meaningful
+hypothesis or observed training behavior that justifies it:
 
 ### Learning-rate scheduling
 
-Test whether optimization becomes more stable or effective.
-
-### Early stopping
-
-Test whether training can stop before overfitting.
-
-### Longer `max_length`
-
-Test whether truncation is causing information loss.
+Test whether optimization becomes more stable or effective. Run this only if
+the E0-E4 loss curves show instability, oscillation, or a plateau that a
+schedule would plausibly address. If it is not run, **record it in the
+"considered but not run" category with the reason.**
 
 ---
 
@@ -984,7 +1360,37 @@ The model should be explainable as:
 
 ---
 
-# 38. DistilBERT Experiment
+# 38. Experiment E7 — DistilBERT Transfer Learning
+
+This is the transfer-learning stage and the final experiment in the ladder.
+
+Execution environment: **local CPU strategy remains documented as the fallback
+(sections 25, 25A, 39), with Kaggle GPU as the preferred environment.**
+
+The subset size actually used, and the environment it ran in, must be recorded
+with the result. Do not assume the CPU-era subset size still applies if the
+experiment is run on GPU — record what was actually done.
+
+Record for E7:
+
+* pretrained checkpoint
+* tokenizer
+* `max_length`
+* learning rate
+* epochs
+* batch size
+* training subset size **and the environment it ran in**
+* Macro-F1, precision, recall, accuracy
+* training time
+* inference time where practical
+
+> **Data asymmetry must be stated explicitly.** If DistilBERT is fine-tuned on
+> a smaller stratified subset while the LSTM family uses the larger modeling
+> dataset, this MUST be stated in the final report and MUST NOT be presented as
+> an equal-data training comparison.
+
+Status: **PENDING — TO BE MEASURED**
+
 
 The final major experiment is transfer learning.
 
@@ -1103,17 +1509,94 @@ The goal is to compare:
 
 Create one central table:
 
-| Experiment | Change                          | Macro-F1 |     Δ F1 | Accuracy | Training Time | Why / Observation            |
-| ---------- | ------------------------------- | -------: | -------: | -------: | ------------: | ---------------------------- |
-| E0         | Simple LSTM + random embeddings |   Actual | Baseline |   Actual |        Actual | Baseline                     |
-| E1         | BiLSTM                          |   Actual |   Actual |   Actual |        Actual | Actual finding               |
-| E2         | + GloVe                         |   Actual |   Actual |   Actual |        Actual | Actual finding               |
-| E3         | + Class weights                 |   Actual |   Actual |   Actual |        Actual | Actual finding               |
-| E4+        | Optional justified enhancement  |   Actual |   Actual |   Actual |        Actual | Actual finding               |
-| Best RNN   | Enhanced LSTM                   |   Actual |   Actual |   Actual |        Actual | Best recurrent configuration |
-| Final      | DistilBERT                      |   Actual |   Actual |   Actual |        Actual | Transfer-learning result     |
+| Experiment | Change | Macro-F1 | Δ Macro-F1 | Accuracy | Precision | Recall | Training Time | Parameters | Main Finding |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| E0 | Simple LSTM | **0.8435** | — | **84.45%** | **0.8440** | **0.8438** | **4576.32 s** | **3,249,989** | Reference baseline |
+| E1 | BiLSTM | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING |
+| E2 | Stacked BiLSTM | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING |
+| E3 | GloVe | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING |
+| E4 | Regularization | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING |
+| E5 | Longer max_length | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING |
+| E6 | Class weights | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING |
+| E7 | DistilBERT | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING |
+| Best RNN | Best enhanced recurrent model | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | PENDING | Selected configuration |
 
-Do not fabricate numbers.
+The E0 row is populated from the verified `reports/experiment_results.csv` row
+and `reports/phase5_e0_baseline_report.md`.
+
+**All other values must come from actual runs. Never fabricate results.** Until
+an experiment has been executed, its cells stay `PENDING`.
+
+Where an experiment runs in a different compute environment (section 25A), note
+the environment alongside the training time so the comparison is not misread as
+equal-hardware.
+
+---
+
+# 43A. Decision-Driven Experimentation
+
+Every major experiment must be documented with this exact structure. **This
+structure is mandatory.**
+
+### 1. Objective
+What are we testing?
+
+### 2. Hypothesis
+Why do we expect this change to help?
+
+### 3. What changed?
+Exactly one major intended change wherever possible.
+
+### 4. What stayed fixed?
+List explicitly: dataset, split, tokenizer/vocabulary, preprocessing, seed,
+optimizer, learning rate, batch size, epochs, `max_length`, embedding strategy,
+and any other relevant control.
+
+### 5. Result
+Actual metrics.
+
+### 6. Delta
+New Macro-F1 minus previous Macro-F1.
+
+### 7. Per-class impact
+Which classes improved or worsened?
+
+### 8. Error/confusion impact
+Did the dominant error modes change?
+
+### 9. Computational impact
+Training time, parameter count, inference cost where relevant.
+
+### 10. Interpretation
+Why did the result likely happen?
+
+### 11. Decision
+**KEEP / REJECT / INCONCLUSIVE.**
+
+---
+
+# 43B. Controlled Variables Table
+
+Every experiment write-up must make it **obvious which single variable
+changed**. Maintain this table across the ladder:
+
+| Variable | E0 | E1 | E2 | E3 | E4 | E5 | E6 | E7 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Dataset | fixed | fixed | fixed | fixed | fixed | fixed | fixed | subset — state size |
+| Split | fixed | fixed | fixed | fixed | fixed | fixed | fixed | fixed |
+| Seed | 42 | 42 | 42 | 42 | 42 | 42 | 42 | 42 |
+| Vocabulary | same | same | same | same | same | same | same | DistilBERT tokenizer |
+| Preprocessing | same | same | same | same | same | same | same | same |
+| Optimizer | same | same | same | same | same | same | same | state |
+| Learning rate | same | same | same | same | same | same | same | state |
+| Batch size | same | same | same | same | same | same | same | state |
+| Epochs | same | same | same | same | varies | same | same | state |
+| `max_length` | 128 | 128 | 128 | 128 | 128 | **varies** | 128 | 128 initially |
+| Compute env | local CPU | local CPU | local CPU | local CPU | local CPU | local CPU | local CPU | **GPU** |
+| Intended change | baseline | BiLSTM | stacked depth | GloVe init | regularization | sequence length | class weights | transfer learning |
+
+Cells that legitimately differ (E5 `max_length`, E7 tokenizer and environment)
+are the **intended** change for that row and must be called out as such.
 
 ---
 
@@ -1139,20 +1622,98 @@ This is the core viva preparation structure.
 
 # 45. Negative Results Are Valid
 
+**An experiment does not need to improve Macro-F1 to be valuable.**
+
 Never assume that every enhancement must improve performance.
 
 Examples of valid findings:
 
-* GloVe provides little improvement.
-* Class weights improve minority recall but reduce overall accuracy.
-* Stacked LSTM overfits.
-* Longer sequences increase training cost without improving Macro-F1.
-* DistilBERT does not outperform the best LSTM on the chosen subset.
+* BiLSTM performs worse than the unidirectional LSTM.
+* Stacked layers overfit and reduce generalization.
+* GloVe provides little or no improvement.
+* Class weights have a near-zero effect.
+* Longer `max_length` increases compute without improving Macro-F1.
+* DistilBERT does not outperform the best LSTM under the constrained setup.
 * Dropout helps validation performance but reduces training performance.
+
+## Required handling when an experiment does not improve the metric
+
+1. **keep the experiment** — do not delete it from the ladder or the table
+2. **record the actual metric**
+3. **calculate the delta** even when it is negative
+4. **inspect where performance changed** (per-class, confusion matrix)
+5. **explain why the result may have occurred**
+6. **decide whether the technique should be retained** — KEEP / REJECT /
+   INCONCLUSIVE
+
+> **Never manipulate an experiment to force a positive result.**
 
 The project should explain actual results rather than manufacture a positive story.
 
 A surprising but well-explained result is more valuable than an obviously staged improvement.
+
+---
+
+# 45A. Evidence Before Decision
+
+Every major project decision must be supported by **visible evidence** wherever
+possible.
+
+| Decision | Must be supported by |
+| --- | --- |
+| Label set | Product / Sub-product / Issue / Sub-issue analysis |
+| `max_length` | actual tokenizer truncation analysis |
+| Regularization | learning curves and validation behavior |
+| Class weights | class distribution and training-only weights |
+| Architecture | per-class metrics, confusion matrix, Macro-F1 delta |
+| Model selection | quality + compute + error behavior together |
+
+The project must **not** say:
+
+> "we chose X because it is industry standard."
+
+It must say:
+
+> "we tested/observed X under these conditions and chose it because..."
+
+---
+
+# 45B. Effort and Engineering Work Requirements
+
+The project must visibly demonstrate that substantial analysis and engineering
+effort went into the solution.
+
+### Data investigation
+
+CFPB source audit; Product distribution analysis; Sub-product analysis; Issue
+analysis; Sub-issue analysis; narrative length analysis; temporal analysis;
+duplicate analysis; conflicting-label analysis.
+
+### Data engineering
+
+Reproducible acquisition process; raw/interim/processed separation; manifest;
+dataset versioning; leakage-safe grouping; deterministic split; tokenizer
+analysis.
+
+### Model experimentation
+
+Baseline architecture; architecture ablation; embedding ablation;
+regularization study; sequence-length study; class-weight study;
+transfer-learning study.
+
+### Model evaluation
+
+Macro-F1; accuracy; precision; recall; per-class metrics; confusion matrices;
+learning curves; error analysis; training cost.
+
+### Documentation
+
+Experiment registry; experiment reports; notebooks; final comparison table;
+final methodology explanation; limitations; viva-ready reasoning.
+
+> **Do not add technology merely to increase the apparent size of the project.**
+> The effort must be visible through actual analysis and controlled
+> experimentation.
 
 ---
 
@@ -1199,6 +1760,38 @@ Look for:
 * spelling/grammar issues
 * multiple issues in one complaint
 * rare terminology
+
+---
+
+# 46A. Targeted Error Analysis Requirements
+
+Targeted error analysis is required after each major model stage.
+
+At minimum, compare:
+
+* **E0 baseline**
+* **Best Enhanced LSTM**
+* **E7 DistilBERT**
+
+Analyze for each:
+
+* most confused class pairs
+* representative false positives
+* representative false negatives
+* long-text errors
+* short-text errors
+* ambiguous complaints
+* domain-specific language
+* duplicate / boilerplate behavior
+
+Use **actual predictions**.
+
+> **Do not cherry-pick only favorable examples.** A representative error sample
+> includes the cases the model got embarrassingly wrong.
+
+Known starting point from E0: the `Checking or savings account` and
+`Money transfer, virtual currency, or money service` pair is the dominant
+confusion to track across the ladder.
 
 ---
 
@@ -1658,19 +2251,27 @@ E0
 Simple LSTM + random embeddings
         ↓
 E1
-BiLSTM
+Bidirectional LSTM
         ↓
 E2
-BiLSTM + GloVe
+Stacked Bidirectional LSTM
         ↓
 E3
-BiLSTM + Class Weights
+GloVe embedding experiment
         ↓
-Optional justified enhancements
+E4
+Regularization / generalization study
+        ↓
+E5
+Sequence-length study
+        ↓
+E6
+Class-weight experiment
         ↓
 Best Enhanced LSTM
         ↓
-DistilBERT
+E7
+DistilBERT transfer learning
 ```
 
 This ordering is a project decision.
@@ -1687,21 +2288,39 @@ Example:
 
 ### E1 — BiLSTM
 
-Hypothesis:
+> Reading context from both directions may improve classification, particularly
+> for the Checking/Savings vs Money transfer confusion seen in E0.
 
-> Reading context from both directions may improve classification.
+### E2 — Stacked BiLSTM
 
-### E2 — GloVe
+> Additional recurrent depth may improve representation quality — or may
+> overfit, given E0 already shows mild overfitting.
 
-Hypothesis:
+### E3 — GloVe
 
-> Pretrained semantic initialization may produce better representations than random initialization.
+> Pretrained semantic initialization may produce better representations than
+> random initialization. Tempered expectation: token-frequency coverage is
+> already 99.11%, so the uncovered tail is rare words.
 
-### E3 — Class Weights
+### E4 — Regularization
 
-Hypothesis:
+> Dropout / recurrent dropout / early stopping may close the gap between the
+> epoch-6 validation peak (0.8513) and the final recorded E0 score (0.8435).
 
-> Class weighting may improve minority-class performance.
+### E5 — Sequence Length
+
+> Raising `max_length` from 128 to 256 cuts truncation from 72.45% to 41.46%
+> and may improve Macro-F1 — at roughly 4x attention cost.
+
+### E6 — Class Weights
+
+> Class weighting may improve minority-class performance. Expected delta is
+> near zero because this extract is only 1.19x imbalanced by acquisition design.
+
+### E7 — DistilBERT
+
+> Pretrained transformer representations may outperform the best recurrent
+> model, subject to the stated data asymmetry.
 
 A hypothesis may be disproven.
 
@@ -2039,44 +2658,85 @@ The completed project should contain:
 The completed project must tell one coherent story:
 
 ```text
-Real-world CFPB complaint data
+Real FinTech complaint data
         ↓
-Count audit
+data investigation
         ↓
-Data-quality audit
+label decision
         ↓
-Final label decision
+leakage-safe dataset construction
         ↓
-Modeling dataset
+simple LSTM baseline (E0)
         ↓
-Simple LSTM baseline
+identify weaknesses
         ↓
-Measure Macro-F1
+architecture enhancement (E1 BiLSTM, E2 stacked)
         ↓
-BiLSTM
+representation enhancement (E3 GloVe)
         ↓
-Measure Δ
+regularization / generalization experiments (E4)
         ↓
-GloVe
+sequence-length experiment (E5)
         ↓
-Measure Δ
+class-weight experiment (E6)
         ↓
-Class weights
+best recurrent model
         ↓
-Measure Δ
+DistilBERT transfer learning (E7)
         ↓
-Best Enhanced LSTM
+comparison
         ↓
-DistilBERT transfer learning
+error analysis
         ↓
-Final comparison
-        ↓
-Error analysis
-        ↓
-Business/engineering conclusion
+final engineering conclusion
 ```
 
+Every arrow between experiments carries a **measured delta and a written
+reason**, not merely a new model.
+
+The project is therefore simultaneously:
+
+1. **an NLP classification system**
+2. **a controlled model-enhancement study**
+
 The project is about **measuring the effect of model improvements**, not simply finding one model that gives the highest number.
+
+---
+
+# 79A. Viva-Defensibility Requirement
+
+The project owner must be able to answer every question below, **with evidence
+in the documentation** rather than from memory or general knowledge:
+
+### Data and scope
+* Why CFPB?
+* Why three years?
+* Why these Products?
+* Why Product instead of Issue?
+* Why group-aware splitting?
+* Why Macro-F1?
+
+### Modeling ladder
+* Why an LSTM baseline?
+* Why BiLSTM?
+* Why stacked layers?
+* Why GloVe?
+* Why regularization?
+* Why class weights?
+* Why longer `max_length`?
+* Why DistilBERT?
+
+### Comparison integrity
+* Why is the DistilBERT training set smaller?
+* Why was DistilBERT trained in a different compute environment?
+* Which enhancement helped most?
+* Which enhancement failed?
+* Why?
+* What is the main remaining error?
+* What is the compute trade-off?
+
+For each question the documentation must contain the **supporting evidence** —
+a table, a figure, a metric delta, or a recorded decision — not an assertion.
 
 ---
 
@@ -2146,17 +2806,34 @@ and we can show the configuration, dataset version, experiment registry, and cod
 # 82. Current Execution State
 
 ```text
-Phase 0 — Project Scope             LOCKED
-Phase 1 — Source/API Strategy      LOCKED
-Phase 2A — Count Audit             COMPLETE
-Phase 2B — Raw Acquisition         COMPLETE
-Phase 3 — Data Audit/Labels        COMPLETE — labels LOCKED
-Phase 4 — Dataset Construction     NEXT
-Phase 5 — LSTM Baseline            PENDING
-Phase 6 — Enhancements             PENDING
-Phase 7 — DistilBERT               PENDING
-Phase 8 — Final Comparison         PENDING
-Phase 9 — Documentation/Demo       PENDING
+Phase 0 — Project Scope              COMPLETE
+Phase 1 — Source/API Strategy        COMPLETE
+Phase 2A — Count Audit               COMPLETE
+Phase 2B — Raw Acquisition           COMPLETE
+Phase 3 — Data Audit + Label Set     COMPLETE — labels LOCKED
+Phase 4 — Modeling Dataset           COMPLETE
+Phase 5 — Simple LSTM Baseline       COMPLETE
+Phase 6 — Controlled Enhancements    NEXT
+Phase 7 — DistilBERT Transfer Learn  PENDING
+Phase 8 — Final Comparison           PENDING
+Phase 9 — Documentation/Viva         PENDING
+```
+
+Phase 6 contains:
+
+```text
+E1 — BiLSTM
+E2 — Stacked BiLSTM
+E3 — GloVe
+E4 — Regularization
+E5 — Sequence Length
+E6 — Class Weights
+```
+
+Phase 7 contains:
+
+```text
+E7 — DistilBERT
 ```
 
 Do not train models before the final label set is documented.
@@ -2224,7 +2901,7 @@ verbatim.** No merging, renaming, or exclusion.
    17 of its 48 values to cover 80% of rows with 16 values under 500 rows.
    `Sub-issue` is 100% missing for the whole Money transfer product.
 3. **Class balance in this extract is an acquisition artifact.** 1.19x here
-   against 8.3x in the real population. **E3 (class weights) should therefore
+   against 8.3x in the real population. **E6 (class weights) should therefore
    be expected to produce a near-zero delta** — state that as a hypothesis
    before running it, or revisit the Phase 4 sampling strategy to preserve
    natural imbalance. This is a Phase 4 decision for the project owner.
@@ -2246,19 +2923,38 @@ verbatim.** No merging, renaming, or exclusion.
 
 # 83. Current Immediate Task
 
-## Phase 4 — Modeling Dataset Construction
+## Phase 6 — Controlled LSTM Enhancements
 
-Phase 3 is complete and the label set is locked. Build the modeling dataset
-per sections 24, 26 and 27:
+Phases 4 and 5 are complete. The modeling dataset `cfpb_phase4_v1` exists and
+the E0 baseline is recorded in `reports/experiment_results.csv` at
+**Macro-F1 0.8435 / Accuracy 84.45%**.
 
-1. decide the sampling strategy, explicitly resolving the class-balance
-   question raised in Phase 3 finding 3
-2. group identical narratives so they cannot straddle the train/test split
-3. create a reproducible stratified train/validation/test split
-4. record the dataset version and seed
+Phase 6 runs the recurrent enhancement ladder **on the local CPU**
+(section 25A), in order:
 
-Do not begin Phase 5 (LSTM baseline) until the modeling dataset exists and its
-construction is documented.
+```text
+E1 — BiLSTM
+E2 — Stacked BiLSTM
+E3 — GloVe
+E4 — Regularization
+E5 — Sequence Length
+E6 — Class Weights
+```
+
+Rules for every Phase 6 experiment:
+
+1. change exactly one meaningful factor against its stated reference
+2. keep every control in the section 43B table fixed
+3. record the full section 43A structure — objective through KEEP/REJECT
+4. append the actual result row to `reports/experiment_results.csv`
+5. compute and report Δ Macro-F1
+6. keep negative results (section 45)
+
+E4 and E5 must remain **evidence-driven**: run them because the measured
+behavior of an earlier experiment justifies them, not to add a row.
+
+Do not begin Phase 7 (DistilBERT) until the best enhanced recurrent model has
+been identified and justified.
 
 ---
 

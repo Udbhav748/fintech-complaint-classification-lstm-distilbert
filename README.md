@@ -46,10 +46,10 @@ documentation does not claim otherwise.
 | 2A | CFPB count audit | **Complete** |
 | 2B | Raw narrative acquisition | **Complete** |
 | 3 | Raw data quality audit + final label set | **Complete** - labels locked |
-| 4 | Modelling dataset construction | Pending |
-| 5 | LSTM baseline (E0) | Pending |
-| 6 | Controlled LSTM enhancements (E1-E3) | Pending |
-| 7 | DistilBERT transfer learning | Pending |
+| 4 | Modelling dataset construction | **Complete** |
+| 5 | LSTM baseline (E0) | **Complete** - macro-F1 0.8435 |
+| 6 | Controlled LSTM enhancements (E1-E6) | In progress |
+| 7 | DistilBERT transfer learning (E7) | Pending |
 | 8 | Final comparison + error analysis | Pending |
 | 9 | Documentation + demo | Pending |
 
