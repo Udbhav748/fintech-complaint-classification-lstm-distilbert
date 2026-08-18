@@ -1,0 +1,50 @@
+# Experiment E0: Simple LSTM Baseline Configuration
+# Project: FinTech Complaint Classification
+
+experiment_id: "E0"
+experiment_name: "simple_lstm_baseline"
+description: "Simple single-layer unidirectional LSTM with randomly initialized trainable embeddings"
+
+# Data & Vocabulary
+data:
+  dataset_version: "cfpb_phase4_v1"
+  train_path: "data/processed/train.parquet"
+  val_path: "data/processed/validation.parquet"
+  test_path: "data/processed/test.parquet"
+  vocab_path: "data/processed/lstm_vocab.json"
+  label_mapping_path: "data/processed/label_mapping.json"
+  max_length: 128
+  num_classes: 5
+
+# Model Architecture
+model:
+  architecture: "simple_lstm"
+  vocab_size: 25000
+  embedding_dim: 128
+  hidden_dim: 64
+  num_layers: 1
+  bidirectional: false
+  dropout: 0.0
+  recurrent_dropout: 0.0
+  embedding_type: "random_trainable"
+  glove: false
+
+# Training Hyperparameters
+training:
+  seed: 42
+  batch_size: 64
+  epochs: 10
+  learning_rate: 0.001
+  optimizer: "adam"
+  weight_decay: 0.0
+  loss_function: "cross_entropy"
+  class_weights: false
+  device: "cpu"
+
+# Outputs & Logging
+output:
+  model_dir: "models/e0_lstm_baseline"
+  figures_dir: "reports/figures/phase5"
+  report_path: "reports/phase5_e0_baseline_report.md"
+  sample_predictions_path: "reports/e0_sample_predictions.json"
+  experiment_registry_path: "reports/experiment_results.csv"
