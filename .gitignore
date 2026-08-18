@@ -22,10 +22,14 @@ data/raw/cfpb/manifests/*
 
 # Pretrained vectors and model caches
 embeddings/
+data/embeddings/
 *.txt.gz
 glove*/
-models/
-checkpoints/
+
+# Anchored to the repository root on purpose: an unanchored `models/` also
+# matches `src/models/`, which would silently drop the model source code.
+/models/
+/checkpoints/
 *.h5
 *.keras
 *.pt
