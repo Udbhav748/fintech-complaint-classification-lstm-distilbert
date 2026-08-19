@@ -1,208 +1,147 @@
-# FinTech Complaint Classification: A Controlled LSTM-to-DistilBERT Enhancement Study
+# CFPB Complaint Classification
 
-Classify real FinTech customer complaints into product categories, and measure
-how much controlled recurrent-model enhancements improve that classification
-compared with pretrained Transformer transfer learning.
+5-class financial complaint text classification comparing a recurrent model ladder (LSTM variants) against a fine-tuned transformer (DistilBERT).
 
-The project question:
+---
 
-> How much can we improve FinTech complaint classification through controlled
-> recurrent-model enhancements, and how does the resulting recurrent model
-> compare with pretrained Transformer transfer learning?
+## Problem
 
-The method is baseline first, then one controlled change at a time, recording
-the macro-F1 delta and the reason for it at every step.
+Consumers submit unstructured complaint narratives to the Consumer Financial Protection Bureau (CFPB). The task is to classify each narrative into one of five primary financial product categories:
+1. **Checking or savings account**
+2. **Credit card**
+3. **Debt collection**
+4. **Money transfer, virtual currency, or money service**
+5. **Student loan**
 
-## Business problem
+The goal is not simply to chase a benchmark score, but to isolate the empirical contribution of each architectural, representation, and optimization enhancement across a disciplined ladder.
 
-A FinTech company receives complaints as free text through several channels.
-Each complaint has to reach the right product team. Manual routing does not
-scale, so the routing decision is modelled as text classification:
+---
 
-```
-Customer complaint text -> NLP classifier -> Complaint/product category
-```
+## Dataset
 
-## Data source
+- **Source:** CFPB Consumer Complaint Database (`data/combined_complaints.parquet`).
+- **Raw Extract:** 107,992 complaints across the 5 target categories.
+- **Deduplication:** Exact duplicate narratives (6,190 boilerplate submissions across 848 distinct texts) are removed prior to splitting, leaving **101,802** unique complaints.
+- **Class Balance:** Approximately 1.15:1 ratio post-deduplication (Debt collection: 24,007; Checking/savings: 21,547; Money transfer: 21,437; Credit card: 20,890; Student loan: 20,111).
+- **Split:** Stratified 80% train (81,441), 10% validation (10,180), 10% test (10,181), frozen on disk in `data/splits/`.
+- **Integrity:** Verified with cryptographic and content SHA-256 hashes (`data/dataset_manifest.json` and `data/splits/split_manifest.json`).
 
-The **CFPB Consumer Complaint Database**, a public database of real consumer
-financial complaints, accessed through its official API.
+---
 
-- Source population: **2023-08-17 to 2026-08-17** (three years)
-- Only complaints carrying a consumer narrative are in scope, since the task is
-  text classification
-- Provisional acquisition scope: five CFPB `Product` categories
+## Experimental Design
 
-The CFPB database is a project-selected dataset chosen because it provides real
-FinTech complaint narratives. It is not mandated by the course material, and the
-documentation does not claim otherwise.
+- **Single Controlled Variable:** Each step in the ladder introduces one isolated change (representation, directionality, regularization, or optimization).
+- **Fixed Split:** All models train and evaluate on the exact same frozen splits.
+- **Checkpoint Policy:** `ModelCheckpoint(save_best_only=True, monitor='val_macro_f1')` restores best validation weights on every run.
+- **Stability References:** Multi-seed evaluation (seeds 42, 123, 456) for M0 baseline and D0 transformer.
 
-## Project status
+---
 
-| Phase | Description | Status |
-|-------|-------------|--------|
-| 0 | Project definition and scope | Locked |
-| 1 | Source / API strategy | Locked |
-| 2A | CFPB count audit | **Complete** |
-| 2B | Raw narrative acquisition | **Complete** |
-| 3 | Raw data quality audit + final label set | **Complete** - labels locked |
-| 4 | Modelling dataset construction | **Complete** |
-| 5 | LSTM baseline (E0) | **Complete** - macro-F1 0.8435 |
-| 6 | Controlled LSTM enhancements (E1-E6) | In progress |
-| 7 | DistilBERT transfer learning (E7) | Pending |
-| 8 | Final comparison + error analysis | Pending |
-| 9 | Documentation + demo | Pending |
+## Model Ladder
 
-## Phase 2A result
+| Model | Architecture | Key Change | Hypothesis |
+|---|---|---|---|
+| **M0** | Unidirectional LSTM | Random embeddings, `max_len=128`, hidden dim 128 | Baseline stability reference across 3 seeds |
+| **M1** | Bidirectional LSTM | Bidirectional recurrent layer | Captures backward context (modest gain expected) |
+| **M2** | BiLSTM + Spatial Dropout | Spatial Dropout (0.2) + Dropout (0.3) | Regularization to reduce train/val gap |
+| **M3** | BiLSTM + Pretrained GloVe | GloVe-100d pretrained vectors | Accelerates convergence via pretrained semantics |
+| **M4** | BiLSTM + GloVe + Optimized | LR schedule + EarlyStopping + `max_len=256` | Efficiency and extended sequence length |
+| **D0** | DistilBERT | Fine-tuned `distilbert-base-uncased` | Pretrained contextual transformer benchmark |
 
-A single `/trends` request returns the full product-by-month breakdown for all
-five products across the three-year window.
-
-| Product | Narrative complaints | Median / month | Peak month |
-|---|---:|---:|---:|
-| Debt collection | 220,651 | 6,365 | 10,611 |
-| Checking or savings account | 109,780 | 2,696 | 13,696 |
-| Credit card | 108,204 | 2,979 | 4,065 |
-| Money transfer, virtual currency, or money service | 86,988 | 944 | 41,618 |
-| Student loan | 26,534 | 728 | 1,828 |
-
-**Total: 552,157 narrative-bearing complaints**, with no product falling below
-the very-sparse threshold. Three findings carried into Phase 2B:
-
-1. **2026-07 is incomplete.** Volume collapses across every product because the
-   CFPB publishes a narrative only after the company responds. The effective end
-   of the source population is earlier than the nominal 2026-08-17.
-2. **Money transfer 2025-01 is a 44x spike** (41,618 against a median of 944).
-   One month would otherwise dominate that class and distort macro-F1.
-3. **`has_narrative=yes` does not work.** The published API spec is wrong; the
-   live endpoint returns HTTP 424 and the working value is `true`.
-
-Full detail: [`reports/phase2a_count_audit.md`](reports/phase2a_count_audit.md).
-
-## Running the count audit
-
-```bash
-pip install -r requirements.txt
-python -m src.data_acquisition.cfpb_counts --config configs/data.yaml
-```
-
-Outputs land in `reports/`:
-
-- `phase2a_product_month_counts.csv` - one row per product-month
-- `phase2a_count_audit.md` - audit report with review flags
-- `phase2a_trends_raw.json` - unmodified API response
-
-## Phase 2B plan
-
-The extract targets a working dataset of roughly 80,000-120,000 rows rather than
-the full 552,157-row population. The selection rule is deterministic: for each
-product, take the most recent complete month and walk backwards, adding whole
-calendar months until that product's Phase 2A count reaches 20,000 rows.
-
-| Product | Windows | Months | Expected rows |
-|---|---:|---|---:|
-| Debt collection | 4 | 2026-03 → 2026-06 | 24,007 |
-| Checking or savings account | 7 | 2025-12 → 2026-06 | 21,547 |
-| Money transfer, virtual currency, or money service | 13 | 2025-06 → 2026-06 | 21,437 |
-| Credit card | 7 | 2025-12 → 2026-06 | 20,890 |
-| Student loan | 27 | 2024-04 → 2026-06 | 20,111 |
-| **Total** | **58** | | **107,992** |
-
-Windows are monthly and non-overlapping. Acquisition ends at **2026-06**, not
-the nominal 2026-08-17, because Phase 2A showed 2026-07 is still filling in.
-
-The recency rule also happens to exclude both volume spikes Phase 2A flagged
-(Money transfer 2025-01 at 44x its median, Checking or savings 2025-01 at 5.1x).
-That is a consequence of selecting recent windows, not a removal step.
-
-```bash
-python -m src.data_acquisition.cfpb_downloader --dry-run   # show the plan
-python -m src.data_acquisition.cfpb_downloader             # acquire
-python -m src.data_acquisition.cfpb_downloader --verify    # validate files on disk
-```
-
-`--verify` exists because the extract may be obtained outside this script. It
-runs the same integrity checks over whatever is already under
-`data/raw/cfpb/source/` and compares coverage per product-month against the
-Phase 2A counts, so a manually exported extract is validated exactly as
-strictly as a scripted one. Coverage is checked against the data itself rather
-than against request boundaries, so the file layout does not have to match the
-monthly windows.
-
-Each product-month is written as an immutable CSV under
-`data/raw/cfpb/source/`, with an audit trail in
-`data/raw/cfpb/manifests/acquisition_manifest.json` recording the query, the
-expected and retrieved row counts, checksums, and any failed windows.
-
-**Result:** 107,992 rows acquired. The CFPB edge began returning HTTP 403 to
-this client across the whole domain before the scripted per-month acquisition
-could run, so the same five product windows were retrieved manually via the
-official search CSV export and validated with `--verify` (below) instead. All
-58 planned product-months matched their Phase 2A expected count exactly - zero
-delta everywhere, no duplicate Complaint IDs, no missing narratives. Full
-detail: [`reports/phase2b_acquisition_report.md`](reports/phase2b_acquisition_report.md).
-
-## Final label set
-
-Locked in Phase 3 from the audit evidence: **5 classes, the native CFPB
-`Product` values used verbatim** - no merging, renaming, or exclusion.
-
-| Label | Rows | % |
-|---|---:|---:|
-| Debt collection | 24,007 | 22.23% |
-| Checking or savings account | 21,547 | 19.95% |
-| Money transfer, virtual currency, or money service | 21,437 | 19.85% |
-| Credit card | 20,890 | 19.34% |
-| Student loan | 20,111 | 18.62% |
-
-`Sub-product`, `Issue`, and `Sub-issue` were each evaluated and rejected on
-evidence - Debt collection's most common Sub-product is `I do not know`
-(45.97%), `Issue` needs 17 of 48 values to cover 80% of rows, and `Sub-issue`
-is 100% missing for the entire Money transfer product. `Product` is also the
-field that matches the business problem: routing a complaint to the correct
-product team.
-
-Decision and its limitations: [`reports/phase3_label_decision.md`](reports/phase3_label_decision.md).
-Full audit: [`reports/phase3_data_audit.md`](reports/phase3_data_audit.md).
-
-```bash
-python -m src.data.audit
-```
-
-## Project structure
-
-```
-configs/          Experiment and data configuration
-data/raw/         Official CFPB source data (not committed)
-data/interim/     Audited and transformed data
-data/processed/   Final train/validation/test sets
-src/              Reusable implementation code
-notebooks/        Exploration and result presentation
-reports/          Audit reports, experiment registry, figures
-tests/            Tests
-```
-
-`PROJECT_DIRECTIONS.md` is the single source of truth for scope, methodology,
-and coding standards. Read it before changing anything.
-
-## Compute constraint
-
-Development is **CPU-only** (no CUDA device available), which is a real
-constraint on the experiment design rather than a methodological choice:
-
-- LSTM experiments use the larger modelling dataset
-- DistilBERT fine-tuning uses a stratified ~8,000-10,000 sample subset
-- DistilBERT runs 1-2 epochs initially, with early stopping
-
-This is documented honestly in the final report. Results are never extrapolated
-to a configuration that was not actually run.
+---
 
 ## Evaluation
 
-Primary metric is **macro-F1**, because the class distribution is imbalanced and
-accuracy would hide minority-class failure. Accuracy, per-class precision and
-recall, confusion matrices, training time and parameter counts are recorded
-alongside it.
+- **Primary Metric:** Macro-Averaged F1 (`macro_f1`).
+- **Secondary Metrics:** Accuracy, Macro-Precision, Macro-Recall, Per-class F1, Confusion Matrix.
+- **Delta Metrics:**
+  - $\Delta\text{ vs Previous} = \text{Macro-F1}_{\text{current}} - \text{Macro-F1}_{\text{previous}}$
+  - $\Delta\text{ vs M0} = \text{Macro-F1}_{\text{current}} - \text{Macro-F1}_{\text{M0}}$
 
-The headline comparison is Simple LSTM vs Best Enhanced LSTM vs Fine-tuned
-DistilBERT, evaluated on the same split with the same protocol.
+---
+
+## Results
+
+*Results are recorded to `results/runs.csv` during execution and compiled dynamically via `src.results.generate_comparison_table()`.*
+
+| Model | Configuration | Macro-F1 | Accuracy | Δ vs Previous | Δ vs M0 | Interpretation |
+|---|---|---|---|---|---|---|
+| **M0** | Unidirectional LSTM baseline, random embeddings | — | — | — | — | Baseline reference |
+| **M1** | Bidirectional LSTM | — | — | — | — | Directionality effect |
+| **M2** | BiLSTM + Spatial Dropout | — | — | — | — | Regularization effect |
+| **M3** | BiLSTM + Pretrained GloVe-100d | — | — | — | — | Pretrained representation |
+| **M4** | BiLSTM + GloVe + LR schedule + EarlyStopping | — | — | — | — | Optimization & length bundle |
+| **D0** | DistilBERT (fine-tuned transformer) | — | — | — | — | Transformer comparison |
+
+---
+
+## Error Analysis
+
+*(To be populated following final test set evaluation)*
+- Hardest class distinctions (e.g. Credit Card vs Checking/Savings dispute narratives).
+- Impact of CFPB `XXXX` redaction tokens on tokenization and classification.
+- Truncation error analysis for long complaints (>256 words).
+
+---
+
+## Limitations
+
+- **M4 Enhancement Bundling:** Learning rate scheduling, early stopping, and extending `max_len` from 128 to 256 are bundled in M4 due to compute budget. The standalone contribution of `max_len` is not isolated.
+- **Redaction Reliance:** CFPB data contains synthetic redaction tokens (`XXXX`) whose distribution varies by product category.
+- **Hardware Variation:** Training runtimes reflect CPU / single-GPU environments and are recorded in `results/runs.csv`.
+
+---
+
+## Reproduction
+
+### Environment Setup
+```bash
+python -m venv .venv
+# Activate virtual environment:
+# Windows: .venv\Scripts\activate
+# Linux/macOS: source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Verification & Split Freezing
+```bash
+python src/verify_all.py
+```
+
+### Running Unit Tests
+```bash
+python -m unittest discover tests
+```
+
+---
+
+## Project Structure
+
+```text
+├── configs/
+│   └── data_config.json          # Central dataset and tokenization parameters
+├── data/
+│   ├── combined_complaints.parquet # Master dataset (107,992 rows)
+│   ├── dataset_manifest.json     # Cryptographic & content dataset fingerprint
+│   ├── splits/                   # Frozen train/val/test split indices (.npy)
+│   └── embeddings/               # GloVe pretrained vectors
+├── notebooks/
+│   ├── 01_eda.ipynb              # Dataset audit, length, and GloVe coverage analysis
+│   ├── 02_baselines.ipynb        # M0 baseline LSTM training and stability check
+│   ├── 03_ladder.ipynb           # M1–M4 recurrent ladder experiments
+│   └── 04_distilbert.ipynb       # D0 DistilBERT fine-tuning and evaluation
+├── results/
+│   ├── runs.csv                  # Immutable experiment execution record
+│   └── metadata/                 # Detailed per-run JSON metadata
+├── src/
+│   ├── data.py                   # Data loading, deduplication, and labels
+│   ├── fingerprint.py            # Dataset & split cryptographic fingerprinting
+│   ├── split.py                  # Stratified splitting and invariant validation
+│   ├── evaluation.py             # Macro-F1, metrics, and delta calculations
+│   ├── checkpoint.py             # Deterministic checkpoints and metric gating
+│   ├── config.py                 # Configuration loader and validator
+│   ├── logging_utils.py          # Structured lightweight logger
+│   ├── reproducibility.py        # Multi-framework seed control and environment capture
+│   └── results.py                # runs.csv schema validation and table generator
+└── tests/                        # Focused CPU unit test suite
+```

@@ -84,7 +84,7 @@ M0 and D0 receive three seeds because they anchor the baseline and the final mod
 | Longer `max_length` | M4 |
 | LSTM → DistilBERT | D0 |
 | Stacked LSTM layers | Excluded — lower-priority architectural variation under the time and compute budget |
-| Class weights | Excluded — 1.19:1 imbalance is mild; substantial benefit not expected |
+| Class weights | Excluded — 1.153:1 imbalance after deduplication is mild; the largest reweighting available is ×1.15 on ~19k examples per class, so substantial benefit is not expected (Stage 1 audit) |
 
 8 of 9 covered. Both exclusions are stated with reasons rather than omitted.
 
@@ -162,11 +162,17 @@ These are hypotheses, not facts. A failed prediction is written up with an expla
 
 > LR scheduling, early stopping, and longer `max_length` are treated as a single optimization-and-context stage. Scheduling and stopping interact by design — a schedule alters when the stopping criterion fires. `max_length` is bundled here because the time budget does not allow a standalone row. The individual contribution of `max_length` cannot be isolated from this experiment. This is stated as a limitation, not hidden.
 
+### 8.1 D0 vs M4 — Unequal Context
+
+`max_len=256` for D0 was not specified in the original plan and was set by the Stage 1 audit so that the headline comparison holds the *nominal* window constant. It does not hold the *effective* window constant. WordPiece produces a median 1.26× more tokens than the Keras tokenizer on this text, so at 256 tokens M4 reads 74.6% of all corpus tokens while D0 reads 64.9% of its own.
+
+D0 is therefore handicapped on context. If D0 still beats M4 the conclusion is only stronger; if it loses narrowly, this asymmetry is the first thing to check before concluding anything about model families. Reported wherever D0 vs M4 is reported.
+
 ---
 
 ## 9. Pipeline Stages
 
-1. **Data audit** — `XXXX` redaction check, dedupe, length percentiles under both tokenizers, vocab coverage curve, class balance → locks `data_config`
+1. **Data audit** — ✅ complete (`notebooks/01_eda.ipynb`, `configs/data_config.json`). `XXXX` redaction check, dedupe, near-duplicate measurement, length percentiles under both tokenizers, vocab coverage curve, class balance. Findings in §14.3
 2. **Reference baseline** — TF-IDF + Logistic Regression, CPU, off-quota. Answers whether sequence modeling beats bag-of-words on this task. Auxiliary only: it is never labeled M0 and is not one of the 6 configurations
 3. **M0 × 3 seeds** → inspect σ before proceeding. If σ > 0.8 F1 points, most ladder deltas are unresolvable and that is addressed before continuing
 4. **M1 → M4** sequentially, one rung at a time
@@ -222,7 +228,8 @@ Logic lives in importable modules rather than notebook cells: it survives Kaggle
 |---|---|
 | σ too large to resolve deltas | Caught at the M0 checkpoint; null results reported honestly rather than overclaimed |
 | `recurrent_dropout` disables the cuDNN fast path → ~5–10× slower epochs | Expected, budgeted, logged as the trade-off it is |
-| GloVe coverage poor on financial and redacted text | Measured and reported at M3 — explains the delta either way |
+| GloVe coverage poor on financial and redacted text | Measured in Stage 1: 99.16% of tokens covered, but only 15–26 of each class's 30 most distinctive terms. The high-signal vocabulary (`mohela`, `navient`, `coinbase`, `fdcpa`, `pslf`) is exactly what stays randomly initialised, so M3 should be expected to gain less than raw coverage suggests |
+| Near-duplicate templates leak across splits | Measured in Stage 1: 7.8% of rows at cosine ≥ 0.90, inflating the reference metric by ~0.5 Macro-F1 points. Handled by the grouped split in §14.4 |
 | Kaggle session dies mid-run | Checkpoints written to `/kaggle/working`; logic in `src/`, so a crash costs a run and not the code |
 
 ---
@@ -397,7 +404,9 @@ clean project
 
 ---
 
-# 14.3 Stage 1 — Data Audit
+# 14.3 Stage 1 — Data Audit ✅ COMPLETE
+
+Delivered in `notebooks/01_eda.ipynb`, with reusable logic in `src/data.py`, `src/text.py` and `src/embeddings.py`. Frozen output: `configs/data_config.json`.
 
 Goal: establish exactly what the dataset contains before modeling.
 
@@ -437,6 +446,28 @@ Do not begin model training until:
 * tokenizer-specific length behavior is understood
 * the GloVe coverage question is measured
 
+All five are satisfied.
+
+### Findings and decisions
+
+| Finding | Evidence | Decision |
+|---|---|---|
+| Schema and labels as specified | 107,992 rows, 16 columns, 5 products, unique `Complaint ID`, 0 nulls or blanks | Narrative → Product; on-disk label strings are canonical |
+| Heavy exact duplication | 7,038 rows over 848 texts; largest groups 832 / 293 / 238; 85% in Debt collection | Deduplicate on narrative before splitting → 101,802 rows |
+| Ambiguous labels | 7 texts (49 rows) filed under more than one product | Keep. 0.05% label-noise floor; partly explains the predicted Debt collection ↔ Credit card confusion |
+| **Near-duplicate leakage** | 7.8% of rows have a ≥0.90 cosine twin after exact dedup; 25.9% within Debt collection | **Exact dedup is insufficient — Stage 2 split must be group-aware (§14.4)** |
+| Leakage is material | TF-IDF reference scores 0.922 Macro-F1 on contaminated test docs vs 0.858 on clean ones; aggregate inflated ~0.5 points, 57% of the contaminated slice is Debt collection | Same range as the 0.8-point spread §9 calls unresolvable, and a floor for higher-capacity models |
+| Mild class imbalance | 1.153:1 after dedup; smallest class 18.3% | Class weights stay excluded, as pre-registered |
+| Long right tail | median 178 words, p90 436, max 5,699 | M0–M3 `max_len=128`, M4 `max_len=256` — confirmed, not revised |
+| WordPiece inflates length | median ×1.26; 43.9% truncated at 256 vs 31.0% for Keras | D0 `max_len=256`; unequal-context caveat recorded in §8.1 |
+| Redaction is not a shortcut | `XXXX` in 86.8% of docs; class density 4.03–4.80%; redaction-only probe 0.274 Macro-F1 vs 0.200 chance | Retain `XXXX`; logged as a weak confound |
+| Encoding damage | 673 rows (0.66%) wrapped in a `b'...'` byte-repr, present in all five classes | Strip the wrapper at preprocessing (`src.text.strip_bytes_wrapper`) |
+| Task is strongly lexical | TF-IDF + LR reaches 0.863 Macro-F1; product cues in 28–71% of own class vs 0.2–3.3% elsewhere | Realistic signal, not leakage; supports the M1 hypothesis in §7 |
+| Vocabulary is long-tailed | 57,396 types, 48% hapax, top 20k covers 99.78% of tokens | `max_features=20000`, `<OOV>` token |
+| GloVe misses the signal words | 99.16% token coverage but only 15–26 of each class's top 30 distinctive terms | Run M3 as planned; expect a smaller gain than raw coverage implies |
+
+Two decisions changed the plan, both recorded above and neither touching the experimental design: the split becomes group-aware (§14.4), and D0 gets an explicit `max_len` with a stated caveat (§8.1). The six configurations, the 10 fits, the metric and the epoch budget are unchanged.
+
 ### Commit
 
 ```text
@@ -457,12 +488,21 @@ Create:
 
 Use stratification.
 
+### Required change from the Stage 1 audit
+
+Exact deduplication before splitting is **not** sufficient. 7.8% of the deduplicated rows still have a ≥0.90 cosine near-duplicate elsewhere in the corpus — lightly edited template letters, 25.9% of Debt collection — and the audit measured the cost: the TF-IDF reference scores 0.922 Macro-F1 on test documents whose near-twin sits in train against 0.858 on the rest, inflating the aggregate by ~0.5 points.
+
+The split must therefore keep near-duplicate clusters (TF-IDF cosine ≥ 0.90) whole inside a single split, rather than letting cluster members scatter across train, val and test.
+
+This does not alter the locked experimental design: no rows are removed, the row count stays 101,802, the 80/10/10 stratified proportions stay, and the six configurations and 10 fits are untouched. It changes only which rows land in which split. It must be decided now because every model shares one frozen split — retrofitting it later invalidates every result produced before the change.
+
 ### Tasks
 
 * create the split once
 * save the indices
 * verify class proportions
 * verify no duplicate narrative crosses splits
+* verify no near-duplicate cluster crosses splits
 * load the same indices in every experiment
 
 ### Output
