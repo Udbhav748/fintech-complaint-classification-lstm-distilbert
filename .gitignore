@@ -24,6 +24,9 @@ data/raw/cfpb/manifests/*
 embeddings/
 data/embeddings/
 *.txt.gz
+*.zip
+kaggle_output/
+*.txt
 glove*/
 
 # Anchored to the repository root on purpose: an unanchored `models/` also

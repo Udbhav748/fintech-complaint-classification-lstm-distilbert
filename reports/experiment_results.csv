@@ -1,2 +1,0 @@
-experiment_id,model,dataset_version,embedding_type,vocabulary_size,embedding_dim,lstm_units,max_length,batch_size,learning_rate,epochs,seed,macro_f1,macro_precision,macro_recall,accuracy,training_time_seconds,total_parameters,trainable_parameters,notes
-E0,Simple LSTM,cfpb_phase4_v1,Random Trainable,25000,128,64,128,64,0.0010,10,42,0.8435,0.8440,0.8438,0.8445,4576.3205,3249989,3249989,"Reference baseline E0: single-layer unidirectional LSTM with random trainable embeddings, no dropout, no class weights."
