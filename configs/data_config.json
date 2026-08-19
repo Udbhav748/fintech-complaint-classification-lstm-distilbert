@@ -1,0 +1,74 @@
+{
+  "dataset": {
+    "path": "data/combined_complaints.parquet",
+    "text_column": "Consumer complaint narrative",
+    "label_column": "Product",
+    "labels": [
+      "Checking or savings account",
+      "Credit card",
+      "Debt collection",
+      "Money transfer, virtual currency, or money service",
+      "Student loan"
+    ],
+    "rows_raw": 107992,
+    "rows_after_dedup": 101802
+  },
+  "cleaning": {
+    "deduplicate_on": "narrative, keep first",
+    "rows_removed": 6190,
+    "strip_bytes_repr_wrapper": true,
+    "keep_xxxx_redactions": true,
+    "lowercase": "left to each tokenizer"
+  },
+  "split": {
+    "train_val_test": [
+      0.8,
+      0.1,
+      0.1
+    ],
+    "stratify_on": "Product",
+    "group_by": "near-duplicate cluster, tfidf cosine >= 0.90",
+    "seed": 42
+  },
+  "keras_tokenizer": {
+    "max_features": 20000,
+    "oov_token": "<OOV>",
+    "filters": "!\"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n",
+    "lower": true,
+    "max_len": {
+      "M0": 128,
+      "M1": 128,
+      "M2": 128,
+      "M3": 128,
+      "M4": 256
+    }
+  },
+  "distilbert": {
+    "checkpoint": "distilbert-base-uncased",
+    "max_len": 256
+  },
+  "glove": {
+    "path": "data/embeddings/glove.6B.100d.txt",
+    "dim": 100,
+    "trainable": true
+  },
+  "class_weights": {
+    "enabled": false,
+    "reason": "class ratio 1.153:1 after dedup"
+  },
+  "audit": {
+    "class_ratio": 1.153,
+    "words_median": 178,
+    "words_p90": 436,
+    "keras_truncated_at_128_%": 65.6,
+    "keras_truncated_at_256_%": 31.0,
+    "wordpiece_truncated_at_128_%": 74.4,
+    "wordpiece_truncated_at_256_%": 43.9,
+    "vocabulary_types": 57396,
+    "glove_token_coverage_%": 99.16,
+    "glove_oov_token_%": 0.84,
+    "xxxx_present_%": 86.8,
+    "near_duplicate_rate_at_0.90_%": 7.8,
+    "tfidf_reference_macro_f1": 0.863
+  }
+}
