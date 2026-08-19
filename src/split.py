@@ -6,18 +6,23 @@ Enforces:
 - Complete coverage of the deduplicated dataset
 - Stratified class distribution
 - Zero cross-split duplicate text leakage
+- Zero cross-split near-duplicate cluster leakage
 - Duplicate safety (deduplication verified before split)
+
+Splitting is group-aware. `groups` is required rather than optional because an
+ungrouped split silently leaks near-duplicate templates across the boundary and
+inflates every downstream metric - see src/dedup.py. Callers with nothing to
+group pass `np.arange(len(df))`.
 
 All validation functions fail loudly with SplitValidationError upon invariant violation.
 """
 
-from collections import Counter
 from pathlib import Path
-from typing import Optional, Union
+from typing import Union
 
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedGroupKFold
 
 from src.data import LABEL_COL, TEXT_COL
 from src.reproducibility import set_seed
@@ -30,6 +35,7 @@ class SplitValidationError(ValueError):
 
 def create_stratified_split(
     df: pd.DataFrame,
+    groups: np.ndarray,
     train_ratio: float = 0.80,
     val_ratio: float = 0.10,
     test_ratio: float = 0.10,
@@ -37,10 +43,15 @@ def create_stratified_split(
     label_col: str = LABEL_COL,
     text_col: str = TEXT_COL,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Creates a deterministic, stratified train/val/test split indices tuple.
+    """Creates a deterministic, stratified, group-aware train/val/test split.
+
+    Rows sharing a group id always land in the same split. Groups are the
+    near-duplicate clusters from src.dedup; pass np.arange(len(df)) to make every
+    row its own group.
 
     Args:
         df: Cleaned and deduplicated DataFrame.
+        groups: Group id per row. Rows in one group are never separated.
         train_ratio: Target proportion for training set (default: 0.80).
         val_ratio: Target proportion for validation set (default: 0.10).
         test_ratio: Target proportion for test set (default: 0.10).
@@ -55,34 +66,37 @@ def create_stratified_split(
     if not np.isclose(total_ratio, 1.0):
         raise ValueError(f"Split ratios must sum to 1.0, got {total_ratio}")
 
+    total_ratio_parts = (train_ratio, val_ratio, test_ratio)
+    n_folds = int(round(1 / min(val_ratio, test_ratio)))
+    if not all(np.isclose(r * n_folds, round(r * n_folds)) for r in total_ratio_parts):
+        raise ValueError(
+            f"Ratios {total_ratio_parts} are not expressible as whole folds of 1/{n_folds}"
+        )
+
+    groups = np.asarray(groups)
+    if len(groups) != len(df):
+        raise ValueError(f"groups has {len(groups)} entries but df has {len(df)} rows")
+
     set_seed(seed)
-    n = len(df)
-    indices = np.arange(n)
     labels = df[label_col].values
 
-    # Step 1: Split into train and temporary holdout (val + test)
-    holdout_ratio = val_ratio + test_ratio
-    train_idx, holdout_idx = train_test_split(
-        indices,
-        test_size=holdout_ratio,
-        stratify=labels,
-        random_state=seed,
-    )
+    # Whole groups are dealt into n_folds stratified folds, then folds are
+    # assigned to splits. Going through folds rather than two successive
+    # train_test_split calls is what keeps a group from being torn in half.
+    folds = StratifiedGroupKFold(n_splits=n_folds, shuffle=True, random_state=seed)
+    fold_of_row = np.empty(len(df), dtype=np.int64)
+    for fold_id, (_, fold_rows) in enumerate(folds.split(np.zeros(len(df)), labels, groups)):
+        fold_of_row[fold_rows] = fold_id
 
-    # Step 2: Split holdout equally into validation and test (e.g. 50/50 of the 20% holdout)
-    holdout_labels = labels[holdout_idx]
-    relative_test_ratio = test_ratio / holdout_ratio
-    val_sub_idx, test_sub_idx = train_test_split(
-        np.arange(len(holdout_idx)),
-        test_size=relative_test_ratio,
-        stratify=holdout_labels,
-        random_state=seed,
-    )
+    n_val_folds = int(round(val_ratio * n_folds))
+    n_test_folds = int(round(test_ratio * n_folds))
+    val_folds = set(range(n_val_folds))
+    test_folds = set(range(n_val_folds, n_val_folds + n_test_folds))
 
-    val_idx = holdout_idx[val_sub_idx]
-    test_idx = holdout_idx[test_sub_idx]
+    val_idx = np.where(np.isin(fold_of_row, list(val_folds)))[0]
+    test_idx = np.where(np.isin(fold_of_row, list(test_folds)))[0]
+    train_idx = np.where(~np.isin(fold_of_row, list(val_folds | test_folds)))[0]
 
-    # Convert to sorted contiguous int64 arrays
     train_idx = np.ascontiguousarray(np.sort(train_idx), dtype=np.int64)
     val_idx = np.ascontiguousarray(np.sort(val_idx), dtype=np.int64)
     test_idx = np.ascontiguousarray(np.sort(test_idx), dtype=np.int64)
@@ -93,6 +107,7 @@ def create_stratified_split(
         train_idx=train_idx,
         val_idx=val_idx,
         test_idx=test_idx,
+        groups=groups,
         expected_train_ratio=train_ratio,
         expected_val_ratio=val_ratio,
         expected_test_ratio=test_ratio,
@@ -108,6 +123,7 @@ def validate_split(
     train_idx: np.ndarray,
     val_idx: np.ndarray,
     test_idx: np.ndarray,
+    groups: np.ndarray,
     expected_train_ratio: float = 0.80,
     expected_val_ratio: float = 0.10,
     expected_test_ratio: float = 0.10,
@@ -122,7 +138,8 @@ def validate_split(
     2. Index Disjointness: train ∩ val = ∅, train ∩ test = ∅, val ∩ test = ∅.
     3. Complete Coverage: train ∪ val ∪ test == set(range(len(df))).
     4. Cross-split Text Leakage: No identical narrative text appears across splits.
-    5. Proportions & Stratification: Class distribution matches dataset within tolerance.
+    5. Cross-split Group Leakage: No group id appears in more than one split.
+    6. Proportions & Stratification: Class distribution matches dataset within tolerance.
     """
     errors: list[str] = []
     n_total = len(df)
@@ -179,7 +196,26 @@ def validate_split(
     if leak_vt:
         errors.append(f"Cross-split text leakage detected: {len(leak_vt)} duplicate narratives cross val/test.")
 
-    # 5. Split Size Proportions
+    # 5. Cross-split Group Leakage (near-duplicate clusters must stay whole)
+    groups = np.asarray(groups)
+    if len(groups) != n_total:
+        errors.append(f"groups has {len(groups)} entries but df has {n_total} rows.")
+    else:
+        g_train = set(groups[train_idx].tolist())
+        g_val = set(groups[val_idx].tolist())
+        g_test = set(groups[test_idx].tolist())
+        for name, shared in (
+            ("train/val", g_train & g_val),
+            ("train/test", g_train & g_test),
+            ("val/test", g_val & g_test),
+        ):
+            if shared:
+                errors.append(
+                    f"Cross-split group leakage detected: {len(shared)} near-duplicate "
+                    f"clusters cross {name}."
+                )
+
+    # 6. Split Size Proportions
     actual_train_r = n_train / n_total
     actual_val_r = n_val / n_total
     actual_test_r = n_test / n_total
@@ -197,7 +233,7 @@ def validate_split(
             f"Test split size ratio mismatch: expected ~{expected_test_ratio:.2f}, got {actual_test_r:.4f}"
         )
 
-    # 6. Stratification Class Distribution
+    # 7. Stratification Class Distribution
     overall_dist = df[label_col].value_counts(normalize=True)
     for split_name, split_idx in [("train", train_idx), ("val", val_idx), ("test", test_idx)]:
         split_dist = df.iloc[split_idx][label_col].value_counts(normalize=True)

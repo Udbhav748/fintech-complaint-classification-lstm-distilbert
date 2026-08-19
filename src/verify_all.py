@@ -44,6 +44,7 @@ from src.results import (
     log_run_to_csv,
     validate_runs_csv,
 )
+from src.dedup import load_clusters
 from src.split import (
     create_stratified_split,
     load_splits,
@@ -83,7 +84,8 @@ def run_full_verification() -> bool:
     # 3. Split Creation & Validation
     logger.info("[3/6] Verifying Split Generation & Invariants...")
     split_dir = Path("data/splits")
-    train_idx, val_idx, test_idx = create_stratified_split(df_dedup, seed=42)
+    clusters = load_clusters(split_dir / "near_dup_clusters.npy", expected_rows=len(df_dedup))
+    train_idx, val_idx, test_idx = create_stratified_split(df_dedup, clusters, seed=42)
     save_splits(train_idx, val_idx, test_idx, output_dir=split_dir)
     loaded_tr, loaded_v, loaded_te = load_splits(split_dir=split_dir)
 
@@ -91,7 +93,7 @@ def run_full_verification() -> bool:
     assert len(loaded_v) == 10180, f"Expected 10,180 val rows (10%), got {len(loaded_v)}"
     assert len(loaded_te) == 10181, f"Expected 10,181 test rows (10%), got {len(loaded_te)}"
 
-    validate_split(df_dedup, loaded_tr, loaded_v, loaded_te)
+    validate_split(df_dedup, loaded_tr, loaded_v, loaded_te, clusters)
     split_fp = create_split_fingerprint(df_dedup, loaded_tr, loaded_v, loaded_te)
     split_fp.save(split_dir / "split_manifest.json")
     is_split_valid, split_mismatches = verify_split_fingerprint(df_dedup, loaded_tr, loaded_v, loaded_te, split_dir / "split_manifest.json")
