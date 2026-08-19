@@ -1081,7 +1081,7 @@ final project check
 
 # 14.19 Stage 17 — External Review
 
-After all implementation work is complete, ask Claude or Antigravity to review the project and this file.
+After all implementation work is complete, have an independent reviewer go through the project and this file.
 
 The reviewer must inspect:
 
