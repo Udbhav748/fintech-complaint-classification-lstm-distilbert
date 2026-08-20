@@ -1,0 +1,100 @@
+{
+  "label": "TFIDF_REFERENCE",
+  "dataset_content_sha256": "eb66684f66769cdef277a9bed3fbffdbfb30b9a4e91882273084a6ef31a77df6",
+  "preprocessing_version": "pp-v1",
+  "tfidf_config": {
+    "analyzer": "word",
+    "ngram_range": [
+      1,
+      2
+    ],
+    "min_df": 2,
+    "max_df": 0.95,
+    "sublinear_tf": true
+  },
+  "logreg_config": {
+    "max_iter": 1000,
+    "C": 1.0,
+    "solver": "lbfgs"
+  },
+  "vocabulary_size": 619462,
+  "macro_f1": 0.8707487900723045,
+  "accuracy": 0.8681858363618505,
+  "macro_precision": 0.8710156676935966,
+  "macro_recall": 0.8709467796798649,
+  "per_class": {
+    "Checking or savings account": {
+      "precision": 0.7834164023561395,
+      "recall": 0.803065490013934,
+      "f1": 0.7931192660550459,
+      "support": 2153
+    },
+    "Credit card": {
+      "precision": 0.8667329686723023,
+      "recall": 0.8424359594006766,
+      "f1": 0.8544117647058823,
+      "support": 2069
+    },
+    "Debt collection": {
+      "precision": 0.8996945010183299,
+      "recall": 0.9464381360471344,
+      "f1": 0.9224745497259201,
+      "support": 1867
+    },
+    "Money transfer, virtual currency, or money service": {
+      "precision": 0.8248423095584667,
+      "recall": 0.8118433619866284,
+      "f1": 0.8182912154031288,
+      "support": 2094
+    },
+    "Student loan": {
+      "precision": 0.9803921568627451,
+      "recall": 0.950950950950951,
+      "f1": 0.9654471544715447,
+      "support": 1998
+    }
+  },
+  "confusion_matrix": [
+    [
+      1729,
+      130,
+      13,
+      278,
+      3
+    ],
+    [
+      135,
+      1743,
+      112,
+      71,
+      8
+    ],
+    [
+      14,
+      60,
+      1767,
+      7,
+      19
+    ],
+    [
+      324,
+      54,
+      8,
+      1700,
+      8
+    ],
+    [
+      5,
+      24,
+      64,
+      5,
+      1900
+    ]
+  ],
+  "val_macro_f1": 0.8749704736119766,
+  "runtime_seconds": 260.31982946395874,
+  "sklearn_version": "1.9.0",
+  "python_version": "3.13.9",
+  "git_commit": "acc6395f71eeda5cbd43125dbf28fd106fc17166",
+  "created_at_utc": "2026-08-20T03:54:32.198537+00:00"
+}

@@ -942,7 +942,7 @@ run baseline
 
 ---
 
-# 14.8 Stage 6 — Auxiliary TF-IDF Reference
+# 14.8 Stage 6 — Auxiliary TF-IDF Reference ✅ COMPLETE
 
 Run:
 
@@ -961,6 +961,68 @@ It is:
 Question:
 
 > Does sequence modeling provide a meaningful advantage over a simple bag-of-words reference?
+
+Delivered in `src/tfidf_reference.py`, `notebooks/04_tfidf_reference.ipynb`.
+Result saved to `results/tfidf_reference.json` (label `TFIDF_REFERENCE`) — not
+`results/runs.csv`, since `src.results.validate_runs_csv` strictly rejects any
+experiment name outside `src.checkpoint.VALID_EXPERIMENTS` (M0–M4, D0). That
+guard is what it's for; this stage doesn't work around it.
+
+### Configuration (fixed before fitting, not tuned against a result)
+
+```text
+TF-IDF:     analyzer=word, ngram_range=(1,2), min_df=2, max_df=0.95, sublinear_tf=True
+LogReg:     max_iter=1000, C=1.0, solver=lbfgs (multinomial by default here)
+```
+
+The task's own suggested conservative starting point — no configuration search
+was run. Text goes through the same `normalize_text` (strip the `b'...'` wrapper
+only) Task 3 locked; nothing was invented specifically for TF-IDF.
+
+### Result
+
+| Metric | Value |
+|---|---:|
+| Macro-F1 (test) | **0.8707** |
+| Accuracy | 0.8682 |
+| Macro Precision | 0.8710 |
+| Macro Recall | 0.8709 |
+| Macro-F1 (validation, descriptive only) | 0.8750 |
+| Vocabulary size | 619,462 |
+| Fit time | 260s |
+
+Fit on the frozen train split only (81,442 rows); validation transformed but used
+only descriptively, never for model selection; test evaluated once, after the
+model was already fixed. `vectorizer.vocabulary_` confirmed unchanged after
+transforming validation/test.
+
+### TF-IDF reference − M0 = **+0.0199**
+
+TF-IDF (0.8707) exceeds M0 (0.8508 ± 0.0021). Per this stage's own pre-registered
+interpretation rule for this case: this is not read as "the LSTM is bad." Both
+share the same frozen dataset fingerprint, split, and evaluation layer
+(`src.evaluation.compute_metrics`), so the comparison isn't confounded by
+different data or metric code. Interpreted instead as confirmation of what the
+Stage 1 audit already found — this task is strongly lexically separable — and as
+a genuine reference point for M1–M4: an architectural/representation
+improvement is doing real work only once it approaches or exceeds this number,
+not merely M0.
+
+### Per-class comparison
+
+Same relative pattern as M0: Student loan easiest (F1 0.965), Checking/savings
+hardest (F1 0.793) — consistent with the task being lexically driven under both
+models, not a model-specific artifact.
+
+### Feature inspection (leakage/sanity check)
+
+Top per-class terms are servicer names, product terms, and platform names
+(`chime`, `overdraft` for Checking/savings; `synchrony`, `citi`, `barclays` for
+Credit card; `paypal`, `cashapp`, `coinbase`, `zelle` for Money transfer;
+`mohela`, `nelnet`, `forbearance` for Student loan) — the same class-distinctive
+vocabulary the Stage 1 audit found, not `XXXX`-pattern redaction artifacts or
+template boilerplate. Read as useful lexical signal, not a shortcut or confirmed
+leakage.
 
 ### Commit
 
