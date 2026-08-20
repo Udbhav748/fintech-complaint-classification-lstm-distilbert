@@ -645,44 +645,90 @@ add preprocessing
 
 ---
 
-# 14.5 Stage 3 — Build the Evaluation Layer
+# 14.5 Stage 3 — Build the Evaluation Layer ✅ COMPLETE
 
 Build evaluation before serious model training.
 
+Delivered in `src/evaluation.py`, `src/results.py`, `src/checkpoint.py`, with a
+short demonstration in `notebooks/03_evaluation.ipynb`. One evaluation path,
+already in place before this stage from Antigravity's earlier work
+(`compute_metrics`, `calculate_deltas`, `generate_comparison_table`,
+`validate_runs_csv`, checkpoint metadata enforcement) and extended here rather
+than duplicated.
+
 ### Tasks
 
-Implement:
+Implemented (pre-existing, verified) and extended:
 
-* accuracy
-* macro precision
-* macro recall
-* macro-F1
-* confusion matrix
-* per-class metrics
-* delta calculation
+* accuracy, macro precision, macro recall, macro-F1 — `compute_metrics`, all four
+  matched against `sklearn.metrics` to 7 decimal places on synthetic examples
+  covering balanced correct predictions, one class with poor recall, highly
+  uneven class frequencies, a class the model never predicts, a class with zero
+  true support, and all-predictions-one-class.
+* confusion matrix — fixed 5×5, canonical order, integer counts; a dedicated test
+  confirms `cm[i][j]` means true=`LABELS[i]`, predicted=`LABELS[j]`, not just that
+  the shape is right.
+* per-class precision/recall/F1/support — canonical `LABELS` order, dict keys
+  checked directly against `LABELS`.
+* delta calculation — `calculate_deltas` (incremental = current − previous,
+  cumulative = current − M0), unrounded internally, `format_delta` only rounds
+  for display. Already matched Task 4's terminology exactly; no rename needed.
+* **new** `seed_statistics(values, ddof=1)` — mean/std/n across seed runs,
+  extracted from `generate_comparison_table`'s previously-inline `np.std(...,
+  ddof=1)` so the M0/D0 seed spread is computed in exactly one place. A
+  single-seed rung reports `std=None`, not `std=0` — no spread was measured for
+  M1–M4, and treating that as a real zero would misstate it as a measured
+  stability.
+* **new** `compute_val_macro_f1` — the canonical checkpoint metric, a thin
+  documented wrapper making explicit that it must be called once per epoch on
+  the *full* validation set, never as a running per-batch average. Verified two
+  ways: matches manual sklearn Macro-F1 on synthetic validation predictions, and
+  a constructed example shows the naive per-batch-average pattern disagreeing by
+  ~0.046 — concrete evidence for why post-epoch full-set computation is required,
+  not just a warning in a docstring.
+* **new** input validation in `compute_metrics` — mismatched lengths, empty
+  input, non-1D arrays, out-of-range integer label ids, and unrecognized string
+  labels all raise `ValueError` now rather than letting `sklearn`'s
+  `labels=`-restricted averaging silently drop the offending class from the
+  score.
+* **new** `verify_run_traceability` (`src/results.py`) — checks a `runs.csv` row's
+  `dataset_version` against the frozen split's `dataset_content_sha256`, and that
+  `checkpoint_path` resolves to a `CheckpointMetadata` record with matching
+  experiment/seed and `monitor_metric == "val_macro_f1"`. `git_commit` and
+  `preprocessing_version` are traced through `src.reproducibility.EnvironmentInfo`
+  and `artifacts/preprocessing/preprocessing_version.json` respectively rather
+  than duplicated into `RUNS_SCHEMA` — the schema is not changed.
 
-Verify:
+Verified:
 
 ```text
 manual sklearn Macro-F1
 =
-logged validation Macro-F1
+compute_val_macro_f1 (the logged validation Macro-F1)
 ```
 
-Also verify that checkpoint selection uses the correct validation metric.
+Checkpoint selection: `src/checkpoint.py` already enforces
+`monitor_metric == "val_macro_f1"` at save time (`save_checkpoint_record` raises
+`CheckpointValidationError` otherwise) — confirmed still correct, no change needed.
 
 ### Output
 
-A single evaluation path shared by all models.
+A single evaluation path shared by all models: M0–M4 and D0 all call
+`compute_metrics`/`compute_val_macro_f1` — no per-notebook metric reimplementation.
+No M0–D0 notebooks exist yet (Task 5/6 not started), so there was nothing to check
+for stale metric references; this is the interface those notebooks will call.
 
 ### Gate
 
-Metric calculations must be independently checked before M0.
+Metric calculations independently checked before M0: 35 tests across
+`tests/test_evaluation.py` (23) and `tests/test_results.py` (8, including
+traceability), full suite 92/92 passing, `scripts/project_check.py` green before
+and after.
 
 ### Commit
 
 ```text
-add eval metrics
+verify eval
 ```
 
 ---

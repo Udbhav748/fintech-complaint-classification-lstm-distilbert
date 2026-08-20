@@ -23,7 +23,7 @@ from sklearn.metrics import (
     recall_score,
 )
 
-from src.data import LABELS, SHORT_LABELS
+from src.data import LABELS
 
 
 def compute_metrics(
@@ -53,10 +53,43 @@ def compute_metrics(
     y_true_arr = np.asarray(y_true)
     y_pred_arr = np.asarray(y_pred)
 
+    if y_true_arr.ndim != 1 or y_pred_arr.ndim != 1:
+        raise ValueError(
+            f"y_true/y_pred must be 1-D, got shapes {y_true_arr.shape} and {y_pred_arr.shape}"
+        )
+
     if len(y_true_arr) != len(y_pred_arr):
         raise ValueError(
             f"y_true length ({len(y_true_arr)}) must equal y_pred length ({len(y_pred_arr)})"
         )
+
+    if len(y_true_arr) == 0:
+        raise ValueError("y_true/y_pred must not be empty")
+
+    # Fail loudly on out-of-range labels rather than let sklearn silently drop
+    # them from a class-restricted average - an out-of-range prediction is a bug
+    # upstream (e.g. an argmax over the wrong number of output units), not a
+    # class this metric should quietly ignore.
+    if np.issubdtype(y_true_arr.dtype, np.integer) or np.issubdtype(y_pred_arr.dtype, np.integer):
+        if not (np.issubdtype(y_true_arr.dtype, np.integer) and np.issubdtype(y_pred_arr.dtype, np.integer)):
+            raise ValueError(
+                f"y_true and y_pred must use the same label type (both integer ids or both "
+                f"strings), got dtypes {y_true_arr.dtype} and {y_pred_arr.dtype}"
+            )
+        num_classes = len(labels)
+        out_of_range = np.concatenate(
+            [y_true_arr[(y_true_arr < 0) | (y_true_arr >= num_classes)],
+             y_pred_arr[(y_pred_arr < 0) | (y_pred_arr >= num_classes)]]
+        )
+        if out_of_range.size > 0:
+            raise ValueError(
+                f"Label id(s) {sorted(set(out_of_range.tolist()))} fall outside the valid range "
+                f"[0, {num_classes}) for {num_classes} canonical classes"
+            )
+    else:
+        unknown = (set(y_true_arr.tolist()) | set(y_pred_arr.tolist())) - set(labels)
+        if unknown:
+            raise ValueError(f"Label(s) {sorted(unknown)} are not in the canonical label set {labels}")
 
     acc = float(accuracy_score(y_true_arr, y_pred_arr))
     macro_f1 = float(f1_score(y_true_arr, y_pred_arr, average="macro", zero_division=0))
@@ -146,3 +179,56 @@ def format_metric(val: Optional[float], std: Optional[float] = None, decimals: i
     if std is not None and not np.isnan(std) and std > 0:
         return f"{val:.{decimals}f} ± {std:.{decimals}f}"
     return f"{val:.{decimals}f}"
+
+
+def seed_statistics(values: Union[np.ndarray, list[float]], ddof: int = 1) -> dict[str, Any]:
+    """Mean/std/n across seed runs - the single place this project computes it.
+
+    `results.generate_comparison_table` calls this rather than recomputing
+    `np.std(..., ddof=1)` inline, so M0's and D0's seed spread is calculated the
+    same way everywhere.
+
+    `ddof=1` (sample standard deviation, Bessel-corrected) is the project default:
+    3 seeds is a sample of the seed population, not the population itself. With
+    fewer than 2 values, std is undefined (not zero) and reported as None - a
+    single-seed rung (M1-M4) has no seed spread to report, and treating that as
+    "std=0" would misrepresent it as a measured stability rather than an absence
+    of the measurement. Callers must not apply this to single-seed rungs as if it
+    were a real statistic (see `project_plan.md` §9's stability-reference rule).
+    """
+    arr = np.asarray(values, dtype=float)
+    n = len(arr)
+    if n == 0:
+        raise ValueError("seed_statistics requires at least one value")
+    return {
+        "mean": float(np.mean(arr)),
+        "std": float(np.std(arr, ddof=ddof)) if n > 1 else None,
+        "n": n,
+        "ddof": ddof,
+    }
+
+
+def compute_val_macro_f1(
+    y_true: Union[np.ndarray, list[int]],
+    y_pred: Union[np.ndarray, list[int]],
+    labels: Optional[list[str]] = None,
+) -> float:
+    """The canonical `val_macro_f1` checkpoint metric - call this once per epoch
+    on predictions over the FULL validation set, never as a running per-batch
+    average.
+
+    Macro-F1 is not decomposable across batches: precision and recall for each
+    class depend on totals (true positives, false positives, false negatives)
+    accumulated over the whole set, and F1 is a nonlinear (harmonic-mean)
+    combination of those. Averaging per-batch macro-F1 scores gives a different,
+    generally biased number - worse for small batches, and the bias does not
+    cancel out over an epoch. `tests/test_evaluation.py` demonstrates this
+    concretely with a constructed example where the two disagree.
+
+    This is a thin wrapper around `compute_metrics`'s `macro_f1` (itself verified
+    against `sklearn.metrics.f1_score(average="macro")`), kept as its own
+    function so the model factory (Task 5) has one unambiguous, tested call site
+    to use inside a Keras `on_epoch_end` callback: predict on the full validation
+    set, call this, compare against the best checkpoint's value.
+    """
+    return compute_metrics(y_true, y_pred, labels=labels)["macro_f1"]

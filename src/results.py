@@ -10,11 +10,11 @@ Enforces:
 from pathlib import Path
 from typing import Any, Optional, Union
 
-import numpy as np
 import pandas as pd
 
-from src.checkpoint import VALID_EXPERIMENTS
-from src.evaluation import calculate_deltas, format_delta, format_metric
+from src.checkpoint import CheckpointMetadata, get_metadata_path, VALID_EXPERIMENTS
+from src.evaluation import calculate_deltas, format_delta, format_metric, seed_statistics
+from src.fingerprint import SplitFingerprint
 
 RUNS_SCHEMA = [
     "experiment",
@@ -243,20 +243,14 @@ def generate_comparison_table(
             continue
 
         desc = descriptions.get(exp, "")
-        n_seeds = len(sub)
 
-        f1_vals = sub["macro_f1"].values
-        acc_vals = sub["accuracy"].values
-
-        mean_f1 = float(np.mean(f1_vals))
-        std_f1 = float(np.std(f1_vals, ddof=1)) if n_seeds > 1 else None
+        f1_stats = seed_statistics(sub["macro_f1"].values)
+        acc_stats = seed_statistics(sub["accuracy"].values)
+        mean_f1 = f1_stats["mean"]
         f1_means[exp] = mean_f1
 
-        mean_acc = float(np.mean(acc_vals))
-        std_acc = float(np.std(acc_vals, ddof=1)) if n_seeds > 1 else None
-
-        f1_str = format_metric(mean_f1, std_f1)
-        acc_str = format_metric(mean_acc, std_acc)
+        f1_str = format_metric(mean_f1, f1_stats["std"])
+        acc_str = format_metric(acc_stats["mean"], acc_stats["std"])
 
         # Calculate Deltas
         prev_exp = VALID_EXPERIMENTS[i - 1] if i > 0 else None
@@ -283,3 +277,54 @@ def generate_comparison_table(
         })
 
     return pd.DataFrame(rows)
+
+
+def verify_run_traceability(
+    run_dict: dict[str, Any],
+    split_manifest_path: Union[str, Path] = "data/splits/split_manifest.json",
+    checkpoint_dir: Union[str, Path] = "checkpoints",
+) -> tuple[bool, list[str]]:
+    """Checks that a result row can actually be traced back to what produced it.
+
+    `RUNS_SCHEMA`'s `dataset_version` and `checkpoint_path` are the two fields
+    that carry provenance; this function is what makes them mean something,
+    rather than being strings nobody checks. Verifies:
+
+    1. `dataset_version` equals the frozen split's `dataset_content_sha256` -
+       the row describes a result on *this* dataset/split, not some other one.
+    2. `checkpoint_path` has a matching `CheckpointMetadata` record (written by
+       `src.checkpoint.save_checkpoint_record`) whose `experiment`/`seed` agree
+       with the row's own `experiment`/`seed`, and whose `monitor_metric` is
+       `val_macro_f1` - the model-selection policy this project requires.
+
+    Does not check `git_commit` or `preprocessing_version` as run-record columns:
+    those are captured separately (`src.reproducibility.EnvironmentInfo`,
+    `artifacts/preprocessing/preprocessing_version.json`) rather than duplicated
+    into every row of `results/runs.csv`, consistent with "use the existing
+    project schema" - `RUNS_SCHEMA` is not extended here.
+    """
+    errors: list[str] = []
+
+    expected_hash = SplitFingerprint.load(split_manifest_path).dataset_content_sha256
+    if run_dict.get("dataset_version") != expected_hash:
+        errors.append(
+            f"dataset_version '{run_dict.get('dataset_version')}' does not match the frozen "
+            f"split's dataset_content_sha256 '{expected_hash}'"
+        )
+
+    experiment = run_dict.get("experiment")
+    seed = run_dict.get("seed")
+    meta_path = get_metadata_path(experiment, seed, checkpoint_dir=checkpoint_dir)
+    if not meta_path.exists():
+        errors.append(f"No checkpoint metadata found for {experiment} seed={seed} at {meta_path}")
+    else:
+        meta = CheckpointMetadata.load(meta_path)
+        if meta.experiment != experiment or meta.seed != seed:
+            errors.append(
+                f"Checkpoint metadata at {meta_path} is for {meta.experiment} seed={meta.seed}, "
+                f"not {experiment} seed={seed}"
+            )
+        if meta.monitor_metric != "val_macro_f1":
+            errors.append(f"Checkpoint metadata monitor_metric is '{meta.monitor_metric}', not 'val_macro_f1'")
+
+    return len(errors) == 0, errors
