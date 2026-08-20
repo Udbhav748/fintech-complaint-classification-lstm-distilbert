@@ -1,0 +1,21 @@
+{
+  "experiment": "M4",
+  "seed": 42,
+  "git_commit": "feaafd6d43dc2950dbb19991665cff6b027a4cbc",
+  "kaggle_dataset": "udbhav748/cfpb-m4-frozen-inputs",
+  "kaggle_kernel": "udbhav748/cfpb-m4-seed-42",
+  "dataset_content_sha256": "eb66684f66769cdef277a9bed3fbffdbfb30b9a4e91882273084a6ef31a77df6",
+  "preprocessing_version": "pp-v1",
+  "glove_matrix_metadata": {
+    "glove_path": "../data/embeddings/glove.6B.100d.txt",
+    "dim": 100,
+    "vocab_size": 20000,
+    "matched_types": 17335,
+    "unmatched_types": 2664,
+    "coverage_%": 86.68,
+    "oov_init": "independent uniform(-0.05, 0.05) per unmatched row",
+    "padding_row_init": "zero (row 0)",
+    "seed": 42,
+    "layer_trainable": "set by the model factory (Task 4), not fixed here - data_config.glove.trainable=true applies to every row unless the Embedding layer separately masks index 0"
+  }
+}

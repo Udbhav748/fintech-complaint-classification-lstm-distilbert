@@ -125,7 +125,7 @@ EXPERIMENT_CONFIGS: dict[str, dict[str, Any]] = {
         "lr_schedule_patience": 2,
         "lr_schedule_min_lr": 1e-5,
         "optimizer": "adam",
-        "epochs": 20,
+        "epochs": 10,
         "early_stopping": True,
         "early_stopping_patience": 3,
         "early_stopping_restore_best_weights": True,

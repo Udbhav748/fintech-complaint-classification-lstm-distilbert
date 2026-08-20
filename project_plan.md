@@ -1417,7 +1417,7 @@ add glove
 
 ---
 
-# 14.12 Stage 10 — M4
+# 14.12 Stage 10 — M4 ✅ COMPLETE
 
 Run:
 
@@ -1425,43 +1425,196 @@ Run:
 
 This is the final recurrent configuration.
 
-### Tasks
+Everything from M3 held fixed: GloVe 100d, bidirectional, dropout 0.3,
+recurrent_dropout 0.2, spatial_dropout 0.2, same tokenizer, vocabulary, split,
+optimizer, base learning rate, batch size, `ModelCheckpoint` policy. M4 adds
+exactly three bundled changes: `max_len=256`, `ReduceLROnPlateau`
+(factor=0.5, patience=2, min_lr=1e-5), `EarlyStopping` (patience=3,
+restore_best_weights=True) — all fixed before this run, per the locked
+configuration table in §14.6.
 
-* increase maximum context length
-* enable learning-rate scheduling
-* enable early stopping
-* keep checkpointing enabled
-* restore best validation weights
+Trained on Kaggle GPU via `scripts/run_m4.py` (orchestrator) +
+`scripts/kaggle_train_m4.py` (training kernel, identical pipeline to M3's
+plus an LR-logging callback) + `scripts/kaggle_package_m4.py` (frozen-input
+packaging, incl. the same GloVe matrix M3 used). Single seed, per the locked
+10-fit budget (§3.2): `src.config.EXPERIMENT_CONFIGS["M4"]["seeds"] = [42]`.
 
-### Important
+### Configuration bug found during pre-flight
 
-M4 is a bundled optimization/context stage.
-
-Do not claim that the individual contribution of:
-
-* LR scheduling
-* early stopping
-* max_len
-
-is separately identified.
-
-Only report the combined effect.
-
-### Question
-
-> Does the combined optimization/context stage improve the best recurrent configuration?
-
-Record:
+`EXPERIMENT_CONFIGS["M4"]["epochs"]` was set to **20** in `src/config.py`,
+contradicting the project-wide, ladder-wide maximum of 10 epochs locked in
+§4/§13 ("Maximum epoch budget of 10... never per-model"). No prior task ever
+recorded a decision to raise M4's budget specifically, and the task brief for
+this stage independently and repeatedly specifies a 10-epoch ceiling — this
+was a drift between the config file and the locked specification, not an
+intentional value. **Corrected to 10 before any M4 training ran**; no run was
+ever performed with the incorrect value. Verified after training completed:
 
 ```text
-M4 − M3
-M4 − M0
+EXPERIMENT_CONFIGS["M4"]["epochs"] == 10
+max(history epochs) == 8 <= 10
+run_record.json epochs_run == 8 <= 10
 ```
+
+All four checks (config, `src/config.py`, the training history, and the
+registered `results/runs.csv` row) agree on the 10-epoch ceiling.
+
+### Architecture check (before training)
+
+Verified programmatically via the model factory, small script, no training:
+
+```text
+layers: InputLayer -> Embedding -> SpatialDropout1D -> Bidirectional(LSTM) -> Dense
+same GloVe matrix as M3 (same artifact, same values, loaded as-is)
+dropout=0.3, recurrent_dropout=0.2, spatial_dropout=0.2 (unchanged from M3)
+max_len: 256 (only architecture change from M3), output_classes: 5
+callback order: ModelCheckpoint -> ReduceLROnPlateau -> EarlyStopping, all
+monitoring val_macro_f1
+```
+
+M3 and M4 total parameters: **identical, 2,235,781**. LSTM and Dense weight
+shapes are independent of sequence length — only the `Embedding` layer's
+*output* shape changes (`(None, 256, 100)` vs `(None, 128, 100)`), and no new
+learnable parameters are introduced by a longer input. Input shape confirmed
+`(None, 256)`.
+
+### Truncation at max_len=256 (re-confirmed against Task 3's audit)
+
+| Split | Truncated at 128 | Truncated at 256 |
+|---|---:|---:|
+| Train | 66.4% | 31.5% |
+
+Matches Task 3's frozen train-split figures exactly — no tokenizer or
+preprocessing drift. This is model-token truncation (Keras tokenizer word
+counts), not whitespace-word truncation; the two are related but not
+identical, per Task 3's own caveat.
+
+### Result
+
+| Seed | Macro-F1 | Accuracy | Macro Precision | Macro Recall | Best Epoch | Epochs Run | Time (s) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 42 | 0.8710 | 0.8682 | 0.8713 | 0.8710 | 5 | 8 | 10,941 |
+
+**M4 − M3 = +0.0054** (exact: 0.005355986585742878)
+**M4 − M0 = +0.0202** (exact: 0.02022374634829438; M0 mean = 0.8508)
+
+Both deltas are comfortably outside M0's own three-seed spread (0.0041) — a
+real, resolved effect for the combined stage.
+
+### Checkpoint selection, verified twice
+
+Best validation Macro-F1 (0.8772) occurred at epoch 5. Independent
+`sklearn`-backed recompute on the restored best-epoch weights agreed with the
+Keras training-time value within 4.0e-8 (`results/m4/seed42/val_check.json`).
+`EarlyStopping(restore_best_weights=True)` already restores the best weights
+into the model when it fires; `model.load_weights(checkpoint_path)` was still
+called explicitly afterward (same code path as every prior rung) and is a
+no-op here since both point at the same best-epoch weights. The frozen test
+set was evaluated only after this selection was finalized.
+
+### Scheduler / early-stopping observations (descriptive, not causal)
+
+```text
+LR history:  1e-3 (epochs 1-6) -> 5e-4 (epochs 7-8)
+LR reduction: 1 event, at epoch 7 - two stagnant validation-Macro-F1 epochs
+              (6, 7) after the best (epoch 5), matching patience=2
+Training stopped: after epoch 8 - three stagnant epochs (6, 7, 8) after the
+              best, matching patience=3
+```
+
+Both callbacks fired exactly where their configured `patience` values predict,
+which is evidence the callback wiring is correct — not evidence about what
+caused the Macro-F1 result itself. Per the bundled-stage rule (§14.12's own
+"Important" note, carried over from the task brief): this is *not* read as
+"early stopping improved Macro-F1 by X" or "the scheduler improved Macro-F1 by
+X." Training terminated 2 epochs early relative to the 10-epoch ceiling and
+restored the best-validation weights; that is a termination/efficiency
+behavior, consistent with §4's stated purpose for the checkpoint rule, not a
+separate accuracy lever.
+
+### Training-time note
+
+10,941s (~182 minutes) vs M3's 6,793s (~113 minutes) — about 1.61× longer in
+wall time, despite running only 8 epochs vs M3's 10. Per-epoch cost roughly
+doubled (~1,368s/epoch vs ~679s/epoch), consistent with `max_len=256`
+approximately doubling the sequence-length-dependent cost of each LSTM step;
+early stopping's 2-epoch reduction partially offset that increase (a ~2×
+per-epoch cost × 0.8 epoch-count ratio ≈ 1.6×, matching the observed 1.61×).
+`recurrent_dropout=0.2` remains unchanged from M2/M3 and still disables the
+cuDNN fast path throughout.
+
+### Convergence / efficiency analysis (Part 14)
+
+| Epoch | M3 val loss | M3 val Macro-F1 | M4 val loss | M4 val Macro-F1 |
+|---:|---:|---:|---:|---:|
+| 1 | 0.4863 | 0.8209 | 0.4692 | 0.8262 |
+| 4 | 0.3768 | 0.8692 | 0.3557 | 0.8752 |
+| 5 (M4 best) | 0.3791 | 0.8700 | 0.3531 | **0.8772** |
+| 7 (M3 best) | 0.3836 | 0.8707 | 0.3620 | 0.8747 |
+| 8 (M4 stops) | 0.4001 | 0.8673 | 0.3741 | 0.8722 |
+
+M4's validation Macro-F1 leads M3's at every epoch they share, and M4's
+validation loss stays lower throughout as well — the combined stage is not
+simply "M3 with fewer epochs." Fewer epochs run is not itself read as
+"better" (§14's explicit caution); it reflects `EarlyStopping` terminating
+once no further validation gain was observed, on a curve that was already
+ahead of M3's at every point along the way. Longer `max_len` is not, on its
+own, concluded to have caused the improvement — it is one of three bundled
+changes, and this curve comparison describes the combined stage's behavior,
+not an isolated cause.
+
+### Per-class comparison
+
+| Class | M3 F1 | M4 F1 | Δ |
+|---|---:|---:|---:|
+| Checking or savings account | 0.7816 | 0.7862 | +0.0046 |
+| Credit card | 0.8490 | 0.8574 | +0.0084 |
+| Debt collection | 0.9203 | 0.9269 | +0.0065 |
+| Money transfer, virtual currency, or money service | 0.8081 | 0.8144 | +0.0062 |
+| Student loan | 0.9693 | 0.9703 | +0.0010 |
+
+All five classes improve — broad-based and comparatively even (+0.0010 to
++0.0084), unlike M1's concentrated regression or M2's concentrated recovery.
+No single class dominates the aggregate delta. Consistent with a combined
+optimization/context stage that helps generally rather than fixing one
+specific class-boundary weakness.
+
+### Context: TF-IDF and D0 asymmetry note
+
+M4 (0.8710) is the first rung to numerically exceed the TF-IDF auxiliary
+reference (0.8707) — reported as context per §12 of the task brief, not as an
+official ladder comparison; TF-IDF is not, and has never been, a target this
+stage was tuned toward. Separately, `max_len=256` for M4 is the same value
+already locked for D0 (§8.1's D0-vs-M4 unequal-context note becomes directly
+relevant once D0 exists); nothing about that comparison is evaluated in this
+stage.
+
+### Interpretation
+
+**The combined M4 optimization/context stage improved Macro-F1 by +0.0054
+relative to M3, and by +0.0202 relative to M0** — both real, resolved
+effects under the pre-registered stability reference (§9). Per this stage's
+explicit rule, the gain is not assigned to LR scheduling, early stopping, or
+`max_len=256` individually; the project's own methodology (§8) states this
+bundling was intentional, and no standalone row isolates any one component.
+The curve evidence (Part 14) shows M4 ahead of M3 from epoch 1 onward, which
+is consistent with `max_len=256` (more context per complaint, truncation
+dropping from 66.4% to 31.5%) being a plausible contributor from very early
+in training, before the scheduler or early stopping had done anything yet —
+but this is an observation about timing, not proof of causal attribution, and
+is reported as such.
+
+### Limitation
+
+The individual contributions of LR scheduling, early stopping, and
+`max_len=256` cannot be isolated from this single bundled run, and are not
+claimed to be — consistent with the limitation already logged in §8 before
+M4 was run.
 
 ### Commit
 
 ```text
-add final lstm
+run m4
 ```
 
 ---
