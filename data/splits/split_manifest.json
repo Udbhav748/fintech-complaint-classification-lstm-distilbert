@@ -1,10 +1,10 @@
 {
   "dataset_content_sha256": "eb66684f66769cdef277a9bed3fbffdbfb30b9a4e91882273084a6ef31a77df6",
-  "train_indices_sha256": "2d0196f10a9ca85b7b5341228eb3775d9269b35f9d9e0885597b168cf22ae385",
-  "val_indices_sha256": "e47e854ab76be0eb4038b2f4ccc2c9620ff8f5d7f76fb04eb0be27ca8a519dcb",
-  "test_indices_sha256": "2c357ea1a42cda7f45856fe3effbb2def101cb014463881fa647465a670532a7",
-  "train_count": 81441,
-  "val_count": 10180,
+  "train_indices_sha256": "ef3c3df3ff27c5920fa6e46f3eb70f001e87815f0750848273d22119a7d648c5",
+  "val_indices_sha256": "067e3ba685061b5290a82046295799757bb99a26e693fdaaad0ccae2172a237f",
+  "test_indices_sha256": "24e320554e4ddb40106b03c10cff88256e4285f1d7f7e21eacf8b2b42d0ae2c8",
+  "train_count": 81442,
+  "val_count": 10179,
   "test_count": 10181,
   "total_count": 101802,
   "train_class_distribution": {
@@ -12,14 +12,14 @@
     "Money transfer, virtual currency, or money service": 16752,
     "Credit card": 16547,
     "Student loan": 15988,
-    "Debt collection": 14935
+    "Debt collection": 14936
   },
   "val_class_distribution": {
     "Checking or savings account": 2152,
     "Money transfer, virtual currency, or money service": 2094,
     "Credit card": 2068,
     "Student loan": 1999,
-    "Debt collection": 1867
+    "Debt collection": 1866
   },
   "test_class_distribution": {
     "Checking or savings account": 2153,
@@ -33,5 +33,5 @@
   "test_ratio": 0.1,
   "disjoint_indices_verified": true,
   "zero_duplicate_cross_split_verified": true,
-  "created_at_utc": "2026-08-19T22:39:07.892646+00:00"
+  "created_at_utc": "2026-08-20T00:29:43.159978+00:00"
 }

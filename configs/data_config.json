@@ -27,7 +27,7 @@
       0.1
     ],
     "stratify_on": "Product",
-    "group_by": "near-duplicate cluster, tfidf cosine >= 0.90",
+    "group_by": "near-duplicate cluster, tfidf cosine >= 0.7",
     "seed": 42
   },
   "keras_tokenizer": {
@@ -69,6 +69,7 @@
     "glove_oov_token_%": 0.84,
     "xxxx_present_%": 86.8,
     "near_duplicate_rate_at_0.90_%": 7.8,
+    "near_duplicate_rate_at_grouping_threshold_%": 10.8,
     "tfidf_reference_macro_f1": 0.863
   }
 }

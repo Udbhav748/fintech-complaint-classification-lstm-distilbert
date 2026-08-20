@@ -89,9 +89,12 @@ def run_full_verification() -> bool:
     save_splits(train_idx, val_idx, test_idx, output_dir=split_dir)
     loaded_tr, loaded_v, loaded_te = load_splits(split_dir=split_dir)
 
-    assert len(loaded_tr) == 81441, f"Expected 81,441 train rows (80%), got {len(loaded_tr)}"
-    assert len(loaded_v) == 10180, f"Expected 10,180 val rows (10%), got {len(loaded_v)}"
-    assert len(loaded_te) == 10181, f"Expected 10,181 test rows (10%), got {len(loaded_te)}"
+    # Exact counts shift by a few rows with the near-duplicate grouping, so the
+    # proportions are asserted instead of frozen row counts.
+    total = len(df_dedup)
+    for name, idx, target in (("train", loaded_tr, 0.80), ("val", loaded_v, 0.10), ("test", loaded_te, 0.10)):
+        share = len(idx) / total
+        assert abs(share - target) < 0.005, f"{name} split is {share:.4f} of the data, expected ~{target}"
 
     validate_split(df_dedup, loaded_tr, loaded_v, loaded_te, clusters)
     split_fp = create_split_fingerprint(df_dedup, loaded_tr, loaded_v, loaded_te)

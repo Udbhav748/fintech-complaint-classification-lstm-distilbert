@@ -24,7 +24,7 @@ All figures below are outputs of the Stage 1 audit (`notebooks/01_eda.ipynb`), m
 | Rows after deduplication | 101,802 |
 | Class distribution | Checking/savings 21,524 · Money transfer 20,940 · Credit card 20,684 · Student loan 19,985 · Debt collection 18,669 |
 | Class ratio | 1.153:1 (1.194:1 before deduplication) |
-| Near-duplicates surviving exact dedup | 7.8% of rows at cosine ≥ 0.90 (Debt collection 25.9%) |
+| Near-duplicates surviving exact dedup | 7.8% of rows at cosine ≥ 0.90, 10.8% at ≥ 0.70 (Debt collection 25.9%) |
 | Narrative length (words) | median 178 · p75 288 · p90 436 · max 5,699 |
 | Keras token length | median 180 · p90 438 |
 | DistilBERT WordPiece length | median 228 · p90 563 (×1.26 the Keras length) |
@@ -229,7 +229,7 @@ Logic lives in importable modules rather than notebook cells: it survives Kaggle
 | σ too large to resolve deltas | Caught at the M0 checkpoint; null results reported honestly rather than overclaimed |
 | `recurrent_dropout` disables the cuDNN fast path → ~5–10× slower epochs | Expected, budgeted, logged as the trade-off it is |
 | GloVe coverage poor on financial and redacted text | Measured in Stage 1: 99.16% of tokens covered, but only 15–26 of each class's 30 most distinctive terms. The high-signal vocabulary (`mohela`, `navient`, `coinbase`, `fdcpa`, `pslf`) is exactly what stays randomly initialised, so M3 should be expected to gain less than raw coverage suggests |
-| Near-duplicate templates leak across splits | Measured in Stage 1: 7.8% of rows at cosine ≥ 0.90, inflating the reference metric by ~0.5 Macro-F1 points. Handled by the grouped split in §14.4 |
+| Near-duplicate templates leak across splits | Measured in Stage 1, sized per similarity band in Stage 2. Handled by the grouped split at cosine ≥ 0.70 (§14.4); cross-split cluster leakage is now a split invariant |
 | Kaggle session dies mid-run | Checkpoints written to `/kaggle/working`; logic in `src/`, so a crash costs a run and not the code |
 
 ---
@@ -455,7 +455,7 @@ All five are satisfied.
 | Schema and labels as specified | 107,992 rows, 16 columns, 5 products, unique `Complaint ID`, 0 nulls or blanks | Narrative → Product; on-disk label strings are canonical |
 | Heavy exact duplication | 7,038 rows over 848 texts; largest groups 832 / 293 / 238; 85% in Debt collection | Deduplicate on narrative before splitting → 101,802 rows |
 | Ambiguous labels | 7 texts (49 rows) filed under more than one product | Keep. 0.05% label-noise floor; partly explains the predicted Debt collection ↔ Credit card confusion |
-| **Near-duplicate leakage** | 7.8% of rows have a ≥0.90 cosine twin after exact dedup; 25.9% within Debt collection | **Exact dedup is insufficient — Stage 2 split must be group-aware (§14.4)** |
+| **Near-duplicate leakage** | 7.8% of rows have a ≥0.90 cosine twin after exact dedup; 25.9% within Debt collection | **Exact dedup is insufficient — split must be group-aware. Implemented in Stage 2, with the threshold refined to 0.70 on per-band evidence (§14.4)** |
 | Leakage is material | TF-IDF reference scores 0.922 Macro-F1 on contaminated test docs vs 0.858 on clean ones; aggregate inflated ~0.5 points, 57% of the contaminated slice is Debt collection | Same range as the 0.8-point spread §9 calls unresolvable, and a floor for higher-capacity models |
 | Mild class imbalance | 1.153:1 after dedup; smallest class 18.3% | Class weights stay excluded, as pre-registered |
 | Long right tail | median 178 words, p90 436, max 5,699 | M0–M3 `max_len=128`, M4 `max_len=256` — confirmed, not revised |
@@ -488,13 +488,29 @@ Create:
 
 Use stratification.
 
-### Required change from the Stage 1 audit
+### Required change from the Stage 1 audit — implemented
 
-Exact deduplication before splitting is **not** sufficient. 7.8% of the deduplicated rows still have a ≥0.90 cosine near-duplicate elsewhere in the corpus — lightly edited template letters, 25.9% of Debt collection — and the audit measured the cost: the TF-IDF reference scores 0.922 Macro-F1 on test documents whose near-twin sits in train against 0.858 on the rest, inflating the aggregate by ~0.5 points.
+Exact deduplication before splitting is **not** sufficient. Lightly edited template letters survive it, and when one lands in train and its twin in test the model scores the twin from memory.
 
-The split must therefore keep near-duplicate clusters (TF-IDF cosine ≥ 0.90) whole inside a single split, rather than letting cluster members scatter across train, val and test.
+The threshold was set by measurement, not assumption. Holding the TF-IDF reference fixed and slicing the test set by each document's highest cosine similarity to any training document — against a baseline of formulaic documents with no training twin at all (Macro-F1 0.837):
 
-This does not alter the locked experimental design: no rows are removed, the row count stays 101,802, the 80/10/10 stratified proportions stay, and the six configurations and 10 fits are untouched. It changes only which rows land in which split. It must be decided now because every model shares one frozen split — retrofitting it later invalidates every result produced before the change.
+| Similarity band | Share of test | Macro-F1 | vs baseline |
+|---|---:|---:|---:|
+| 0.80 – 0.90 | 8.5% | 0.928 | +0.091 |
+| 0.70 – 0.80 | 1.7% | 0.923 | +0.086 |
+| 0.60 – 0.70 | 1.8% | 0.870 | +0.034 |
+| 0.50 – 0.60 | 4.9% | 0.856 | +0.019 |
+| below 0.50 | 83.1% | 0.849 | +0.012 |
+
+Inflation is flat and large above 0.70 and collapses immediately below it, so clusters are cut at **cosine ≥ 0.70** rather than the 0.90 the audit first proposed. The baseline is *lower* than the bulk of the test set (0.837 vs 0.849) — formulaic complaints are intrinsically harder, not easier — which rules out "template text is just easy" as an explanation for the gap.
+
+Clusters are connected components (`src/dedup.py`), computed once and frozen as `data/splits/near_dup_clusters.npy`. The split is built by dealing whole clusters into stratified folds (`StratifiedGroupKFold`), so no cluster can be torn across a boundary. `groups` is a required argument to `create_stratified_split` and `validate_split` — an ungrouped split is no longer expressible.
+
+This does not alter the locked experimental design: no rows are removed, the row count stays 101,802, the 80/10/10 stratified proportions stay, and the six configurations and 10 fits are untouched. It changes only which rows land in which split.
+
+**Known limitation.** The residual 0.60–0.70 band (1.8% of test, +0.034) is left ungrouped. Below 0.70 cosine similarity increasingly reflects shared product vocabulary rather than a shared template, and grouping on it would start folding the label into the split. Reported rather than chased further.
+
+**Cluster structure, checked before grouping on it.** 93,805 clusters over 101,802 rows: 91,324 singletons, 2,481 multi-row clusters holding 10,478 rows (10.3%). Sizes are small — median 2, p90 4, p95 6 — and the largest connected component is 696 rows (0.7% of the corpus), so transitive chaining does not collapse the corpus into one giant group. 128 clusters (1.16% of rows) span more than one product; each is dominated by a single label (largest: 297 Money transfer vs 1 Checking/savings), matching the same generic credit-report-dispute pattern found in the exact-duplicate label-noise check, not a clustering failure.
 
 ### Tasks
 

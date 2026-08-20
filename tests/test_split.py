@@ -34,13 +34,15 @@ class TestSplitValidation(unittest.TestCase):
                 })
                 uid += 1
         self.clean_df = pd.DataFrame(rows)
+        # No near-duplicates in the synthetic data: every row is its own group.
+        self.groups = np.arange(len(self.clean_df))
 
     def tearDown(self):
         shutil.rmtree(self.temp_dir, ignore_errors=True)
 
     def test_create_and_validate_stratified_split_success(self):
         train_idx, val_idx, test_idx = create_stratified_split(
-            self.clean_df, train_ratio=0.80, val_ratio=0.10, test_ratio=0.10, seed=42
+            self.clean_df, self.groups, train_ratio=0.80, val_ratio=0.10, test_ratio=0.10, seed=42
         )
 
         self.assertEqual(len(train_idx), 800)
@@ -48,10 +50,10 @@ class TestSplitValidation(unittest.TestCase):
         self.assertEqual(len(test_idx), 100)
 
         # Invariant checks
-        validate_split(self.clean_df, train_idx, val_idx, test_idx)
+        validate_split(self.clean_df, train_idx, val_idx, test_idx, self.groups)
 
     def test_save_and_load_splits(self):
-        train_idx, val_idx, test_idx = create_stratified_split(self.clean_df, seed=42)
+        train_idx, val_idx, test_idx = create_stratified_split(self.clean_df, self.groups, seed=42)
         save_splits(train_idx, val_idx, test_idx, output_dir=self.temp_dir)
 
         loaded_tr, loaded_v, loaded_te = load_splits(split_dir=self.temp_dir)
@@ -69,7 +71,7 @@ class TestSplitValidation(unittest.TestCase):
         test_idx = np.arange(900, 1000)
 
         with self.assertRaises(SplitValidationError) as ctx:
-            validate_split(df_with_dups, train_idx, val_idx, test_idx)
+            validate_split(df_with_dups, train_idx, val_idx, test_idx, self.groups)
         self.assertIn("Duplicate safety violated", str(ctx.exception))
 
     def test_fails_on_index_disjointness_violation(self):
@@ -79,7 +81,7 @@ class TestSplitValidation(unittest.TestCase):
         test_idx = np.arange(900, 1000)
 
         with self.assertRaises(SplitValidationError) as ctx:
-            validate_split(self.clean_df, train_idx, val_idx, test_idx)
+            validate_split(self.clean_df, train_idx, val_idx, test_idx, self.groups)
         self.assertIn("Index disjointness violated", str(ctx.exception))
 
     def test_fails_on_complete_coverage_violation(self):
@@ -89,7 +91,7 @@ class TestSplitValidation(unittest.TestCase):
         test_idx = np.arange(900, 1000)
 
         with self.assertRaises(SplitValidationError) as ctx:
-            validate_split(self.clean_df, train_idx, val_idx, test_idx)
+            validate_split(self.clean_df, train_idx, val_idx, test_idx, self.groups)
         self.assertIn("Complete coverage violated", str(ctx.exception))
 
     def test_fails_on_cross_split_text_leakage(self):
@@ -102,8 +104,40 @@ class TestSplitValidation(unittest.TestCase):
         test_idx = np.arange(900, 1000)
 
         with self.assertRaises(SplitValidationError) as ctx:
-            validate_split(df_leaked, train_idx, val_idx, test_idx)
+            validate_split(df_leaked, train_idx, val_idx, test_idx, self.groups)
         self.assertIn("Cross-split text leakage detected", str(ctx.exception))
+
+    def test_fails_on_cross_split_group_leakage(self):
+        # A near-duplicate cluster whose members straddle the train/test boundary.
+        groups = np.arange(len(self.clean_df))
+        groups[950] = groups[10]
+
+        train_idx = np.arange(800)
+        val_idx = np.arange(800, 900)
+        test_idx = np.arange(900, 1000)
+
+        with self.assertRaises(SplitValidationError) as ctx:
+            validate_split(self.clean_df, train_idx, val_idx, test_idx, groups)
+        self.assertIn("Cross-split group leakage detected", str(ctx.exception))
+
+    def test_grouped_split_keeps_clusters_whole(self):
+        # Force 50 clusters of 4 rows each and confirm none is torn apart.
+        groups = np.arange(len(self.clean_df))
+        for cluster, start in enumerate(range(0, 200, 4)):
+            groups[start:start + 4] = 10_000 + cluster
+
+        train_idx, val_idx, test_idx = create_stratified_split(
+            self.clean_df, groups, seed=42
+        )
+        validate_split(self.clean_df, train_idx, val_idx, test_idx, groups)
+
+        for split_idx in (train_idx, val_idx, test_idx):
+            self.assertEqual(len(split_idx), len(set(split_idx.tolist())))
+        assigned = {}
+        for name, split_idx in (("train", train_idx), ("val", val_idx), ("test", test_idx)):
+            for g in set(groups[split_idx].tolist()):
+                self.assertNotIn(g, assigned, f"group {g} also appears in {assigned.get(g)}")
+                assigned[g] = name
 
 
 if __name__ == "__main__":
