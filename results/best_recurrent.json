@@ -1,0 +1,19 @@
+{
+  "best_recurrent_experiment": "M4",
+  "best_recurrent_macro_f1": 0.8710237463482944,
+  "best_recurrent_delta_vs_m0": 0.020190667574296328,
+  "tfidf_reference_macro_f1": 0.8707487900723045,
+  "m0_mean_macro_f1": 0.850833078773998,
+  "m0_std_macro_f1": 0.002068765063694662,
+  "m0_seed_spread": 0.004125488876295158,
+  "candidates": {
+    "M0": 0.850833078773998,
+    "M1": 0.8485154570891954,
+    "M2": 0.8517974977710514,
+    "M3": 0.8656677597625515,
+    "M4": 0.8710237463482944
+  },
+  "selection_rule": "highest recorded test Macro-F1 among M0 (3-seed mean) and M1-M4 (single seed)",
+  "git_commit": "78f6c157befaf28af686674072d7d5caec4bc72d",
+  "created_at_utc": "2026-08-20T19:53:36.845898+00:00"
+}
