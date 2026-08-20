@@ -456,7 +456,7 @@ All five are satisfied.
 | Heavy exact duplication | 7,038 rows over 848 texts; largest groups 832 / 293 / 238; 85% in Debt collection | Deduplicate on narrative before splitting → 101,802 rows |
 | Ambiguous labels | 7 texts (49 rows) filed under more than one product | Keep. 0.05% label-noise floor; partly explains the predicted Debt collection ↔ Credit card confusion |
 | **Near-duplicate leakage** | 7.8% of rows have a ≥0.90 cosine twin after exact dedup; 25.9% within Debt collection | **Exact dedup is insufficient — split must be group-aware. Implemented in Stage 2, with the threshold refined to 0.70 on per-band evidence (§14.4)** |
-| Leakage is material | TF-IDF reference scores 0.922 Macro-F1 on contaminated test docs vs 0.858 on clean ones; aggregate inflated ~0.5 points, 57% of the contaminated slice is Debt collection | Same range as the 0.8-point spread §9 calls unresolvable, and a floor for higher-capacity models |
+| Leakage is material | TF-IDF reference scores 0.922 Macro-F1 on contaminated test docs vs 0.858 on clean ones; ~0.45 Macro-F1 points of observed aggregate contribution, 57% of the contaminated slice is Debt collection | Same range as the 0.8-point spread §9 calls unresolvable, and a floor for higher-capacity models |
 | Mild class imbalance | 1.153:1 after dedup; smallest class 18.3% | Class weights stay excluded, as pre-registered |
 | Long right tail | median 178 words, p90 436, max 5,699 | M0–M3 `max_len=128`, M4 `max_len=256` — confirmed, not revised |
 | WordPiece inflates length | median ×1.26; 43.9% truncated at 256 vs 31.0% for Keras | D0 `max_len=256`; unequal-context caveat recorded in §8.1 |
