@@ -733,30 +733,106 @@ verify eval
 
 ---
 
-# 14.6 Stage 4 — Build the Recurrent Model Factory
+# 14.6 Stage 4 — Build the Recurrent Model Factory ✅ COMPLETE
 
 Create a small model-building interface for M0–M4.
 
 The model factory should make the experiment differences visible.
 
-The configuration should control only the planned changes:
+Delivered in `src/models.py` (new), reading `src.config.EXPERIMENT_CONFIGS` as the
+single source of truth rather than duplicating hyperparameters. Verified in
+`tests/test_models.py` (40 tests). D0 is not built by this factory — DistilBERT is
+handled separately.
+
+### Two hyperparameters this stage found undefined, and locked before implementing
+
+`EXPERIMENT_CONFIGS` had `dropout` and `spatial_dropout` for M2–M4, but no
+`recurrent_dropout` value anywhere in the repo, despite §3.1 naming it explicitly
+("M2 = M1 + dropout & `recurrent_dropout`"). M4's `lr_schedule="reduce_on_plateau"`
+had no `factor`/`patience`/`min_lr`. Per this stage's own rule — invent nothing,
+stop and report a genuinely undefined hyperparameter — both were raised and fixed
+by explicit decision before any model was built, not picked silently:
+
+* `recurrent_dropout = 0.2` for M2, M3, M4 (input `dropout` stays 0.3 — a
+  deliberately lower rate on the recurrent state than on the input connections).
+* M4's `ReduceLROnPlateau`: `factor=0.5`, `patience=2`, `min_lr=1e-5`, monitoring
+  `val_macro_f1`. Chosen so the LR drop (patience=2) has one epoch to help before
+  `EarlyStopping`'s patience=3 would end training. `EarlyStopping` additionally
+  gets `restore_best_weights=True`, made explicit rather than left as a default.
+
+Both are now in `EXPERIMENT_CONFIGS` (`src/config.py`) as fixed, pre-registered
+settings — not tuned after seeing any result, consistent with the rest of the
+locked ladder.
+
+### Configuration → architecture
 
 ```text
-embedding
-bidirectional
-dropout
-recurrent_dropout
-max_len
-learning_rate
-scheduler
-early_stopping
+embedding        -> "random" (M0-M2) or "glove" (M3-M4), matrix from src.embeddings
+bidirectional     -> LSTM vs Bidirectional(LSTM) wrapper
+dropout           -> LSTM's own `dropout` kwarg (input connections)
+recurrent_dropout -> LSTM's own `recurrent_dropout` kwarg (recurrent connections)
+spatial_dropout   -> SpatialDropout1D after the embedding, only added when > 0
+max_len           -> Input layer shape
+learning_rate     -> Adam optimizer
+scheduler         -> ReduceLROnPlateau callback (M4 only)
+early_stopping    -> EarlyStopping callback (M4 only)
 ```
 
-Avoid creating a large generic framework.
+One clear model definition (`build_recurrent_model`), one clearly visible
+configuration change per rung:
 
-The goal is:
+| Rung | Layer sequence | What changed from the previous rung |
+|---|---|---|
+| M0 | Input → Embedding → LSTM → Dense | — (baseline) |
+| M1 | Input → Embedding → Bidirectional(LSTM) → Dense | direction only |
+| M2 | + SpatialDropout1D, `dropout`/`recurrent_dropout` on the LSTM | regularization only |
+| M3 | same layer sequence as M2 | embedding source only (GloVe matrix, not rebuilt here — received from `src.embeddings.build_embedding_matrix`) |
+| M4 | same layer sequence as M3 | `max_len` 128→256, `ReduceLROnPlateau` + `EarlyStopping` callbacks added |
 
-> one clear model definition, with one clearly visible configuration change per rung.
+No stacked LSTM anywhere, no class weights — both stay excluded, verified by a test
+that inspects every experiment's built layers and asserts exactly one recurrent
+layer.
+
+### `val_macro_f1` as a real Keras metric
+
+`MacroF1Score(keras.metrics.Metric)` accumulates a confusion matrix across every
+batch in an epoch and computes precision/recall/F1 from the *full* accumulated
+matrix in `result()` — not a per-batch average, which Task 4 already established
+is mathematically wrong for macro-F1. Verified numerically equal to
+`src.evaluation.compute_val_macro_f1` (itself already verified against sklearn) to
+5 decimal places across simulated uneven batches, so `monitor="val_macro_f1"` in
+`ModelCheckpoint`/`EarlyStopping`/`ReduceLROnPlateau` means exactly what the
+evaluation layer means by it. `ModelCheckpoint(monitor="val_macro_f1",
+save_best_only=True)` is present for every rung (M0–M4), matching the fixed
+experimental control in §4; the scheduler and early stopping are added only for
+M4. Callbacks are configured, not run — no training happened in this stage.
+
+### Loss, labels, output
+
+`sparse_categorical_crossentropy` — matches the integer class ids
+`src.preprocessing.class_ids`/`src.evaluation` already use, not one-hot. Output
+layer size is `len(LABELS)` (5), read from `src.data`, not hardcoded; a test
+asserts `output_classes != 5` fails config validation.
+
+### Environment note
+
+This is the first stage in the project that requires TensorFlow/Keras — every
+prior stage deliberately stayed framework-agnostic (see `src/keras_tokenizer.py`'s
+docstring for why that mattered for Task 3). TensorFlow is not installed in the
+base environment this project has mostly run in; a separate `ai-ml` conda
+environment (already present on this machine, TensorFlow 2.21.0/Keras 3.15.0) was
+used to build and test `src/models.py`. `tests/test_models.py` detects TensorFlow's
+absence and skips cleanly rather than failing when run in the base environment —
+confirmed: base env reports 92 passed / 40 skipped, `ai-ml` env reports 132/132
+passed, and `scripts/project_check.py` passes in both. Training in the next task
+runs on Kaggle GPU regardless, where TensorFlow is preinstalled.
+
+### Reproducibility
+
+Same config + same seed → identical initial weights (tested). Same config →
+identical parameter shapes (tested). This is a CPU-only claim: TensorFlow does not
+guarantee bitwise-identical results on GPU/cuDNN even with a fixed seed, and that
+limitation is not overpromised away here.
 
 ### Commit
 
