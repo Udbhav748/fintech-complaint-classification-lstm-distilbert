@@ -20,8 +20,9 @@ data/raw/cfpb/manifests/*
 
 !data/**/.gitkeep
 
-# Pretrained vectors and model caches
-embeddings/
+# Pretrained vectors and model caches. `data/embeddings/` only (not a bare
+# `embeddings/`) - unanchored, that also matched `artifacts/embeddings/`, which
+# holds small derived artifacts (the GloVe matrix + metadata) meant to be committed.
 data/embeddings/
 *.txt.gz
 *.zip

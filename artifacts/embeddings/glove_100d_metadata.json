@@ -1,0 +1,12 @@
+{
+  "glove_path": "../data/embeddings/glove.6B.100d.txt",
+  "dim": 100,
+  "vocab_size": 20000,
+  "matched_types": 17335,
+  "unmatched_types": 2664,
+  "coverage_%": 86.68,
+  "oov_init": "independent uniform(-0.05, 0.05) per unmatched row",
+  "padding_row_init": "zero (row 0)",
+  "seed": 42,
+  "layer_trainable": "set by the model factory (Task 4), not fixed here - data_config.glove.trainable=true applies to every row unless the Embedding layer separately masks index 0"
+}

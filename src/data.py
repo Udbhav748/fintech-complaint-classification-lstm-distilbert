@@ -17,6 +17,9 @@ LABELS = [
     "Student loan",
 ]
 
+CLASS_TO_ID = {label: i for i, label in enumerate(LABELS)}
+ID_TO_CLASS = {i: label for label, i in CLASS_TO_ID.items()}
+
 SHORT_LABELS = {
     "Checking or savings account": "Checking/savings",
     "Credit card": "Credit card",

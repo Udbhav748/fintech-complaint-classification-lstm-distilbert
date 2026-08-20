@@ -1,0 +1,85 @@
+{
+  "tensorflow_version": "2.21.0",
+  "overall_pass": true,
+  "cases": {
+    "plain": {
+      "pass": true,
+      "issues": []
+    },
+    "ties_in_frequency": {
+      "pass": true,
+      "issues": []
+    },
+    "punctuation_heavy": {
+      "pass": true,
+      "issues": []
+    },
+    "xxxx_redaction": {
+      "pass": true,
+      "issues": []
+    },
+    "digits_and_amounts": {
+      "pass": true,
+      "issues": []
+    },
+    "mixed_case": {
+      "pass": true,
+      "issues": []
+    },
+    "unicode": {
+      "pass": true,
+      "issues": []
+    },
+    "empty_and_whitespace": {
+      "pass": true,
+      "issues": []
+    },
+    "cfpb_realistic": {
+      "pass": true,
+      "issues": []
+    },
+    "pad_sequences_pre_pre_matches_keras": {
+      "pass": true,
+      "ours": [
+        [
+          0,
+          1,
+          2,
+          3
+        ],
+        [
+          0,
+          0,
+          4,
+          5
+        ],
+        [
+          7,
+          8,
+          9,
+          10
+        ]
+      ],
+      "theirs": [
+        [
+          0,
+          1,
+          2,
+          3
+        ],
+        [
+          0,
+          0,
+          4,
+          5
+        ],
+        [
+          7,
+          8,
+          9,
+          10
+        ]
+      ]
+    }
+  }
+}

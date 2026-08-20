@@ -1,0 +1,26 @@
+{
+  "version_id": "pp-v1",
+  "dataset_content_sha256": "eb66684f66769cdef277a9bed3fbffdbfb30b9a4e91882273084a6ef31a77df6",
+  "normalization_steps": [
+    "strip_bytes_wrapper"
+  ],
+  "tokenizer_vocab_size": 20000,
+  "max_features": 20000,
+  "oov_token": "<OOV>",
+  "padding": "pre",
+  "truncating": "post",
+  "max_len_by_experiment": {
+    "M0": 128,
+    "M1": 128,
+    "M2": 128,
+    "M3": 128,
+    "M4": 256,
+    "D0": 256
+  },
+  "glove_source_path": "data/embeddings/glove.6B.100d.txt",
+  "glove_dim": 100,
+  "glove_coverage_pct": 86.68,
+  "distilbert_checkpoint": "distilbert-base-uncased",
+  "distilbert_max_len": 256,
+  "created_at_utc": "2026-08-20T01:38:15.316276+00:00"
+}

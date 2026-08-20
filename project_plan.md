@@ -547,6 +547,104 @@ freeze data split
 
 ---
 
+# 14.4B Stage 2B — Text Preprocessing ✅ COMPLETE
+
+Inserted between Stage 2 and Stage 3; existing stage numbers (§14.5 onward) are
+unchanged rather than renumbered, to avoid touching already-approved sections for
+one insertion.
+
+Delivered in `notebooks/02_preprocessing.ipynb`, with reusable logic in
+`src/keras_tokenizer.py`, `src/preprocessing.py`, and extensions to
+`src/embeddings.py`/`src/fingerprint.py`. Frozen output:
+`artifacts/tokenizer/keras_tokenizer.json`, `artifacts/embeddings/glove_100d_matrix.npy`
+(+ metadata), `artifacts/preprocessing/preprocessing_version.json`.
+
+Every parameter used here was already committed in `configs/data_config.json`
+(`max_features`, `oov_token`, `max_len` per experiment, GloVe path/dim, DistilBERT
+checkpoint) — this stage implements those values, it does not re-derive them.
+
+### Normalization
+
+One step, audit-justified: undo the `b'...'` byte-repr wrapper found in 0.66% of
+narratives. Nothing else — no lowercasing, punctuation/digit/stopword removal, or
+stemming. Casing carries tone signal, punctuation and amounts are meaningful,
+`XXXX` is retained per the Stage 1 decision, and lowercasing/splitting is the
+tokenizer's job rather than a step ahead of it.
+
+### Keras tokenizer
+
+`src/keras_tokenizer.py` is a project-specific, TensorFlow-free implementation of
+the `tf.keras.preprocessing.text.Tokenizer` behavior this project needs — not
+TensorFlow itself, and not a claim of identity with every Keras code path.
+Differential-tested against a real `tf.keras.preprocessing.text.Tokenizer`
+(TensorFlow 2.21.0, installed in a throwaway venv for that one check only, removed
+afterward — the shared environment was never touched) across plain text, frequency
+ties, punctuation, `XXXX` redactions, digits, mixed case, Unicode, empty strings,
+and OOV handling on held-out text. All cases matched; result recorded at
+`artifacts/preprocessing/keras_tokenizer_equivalence.json`, re-runnable via
+`scripts/verify_keras_tokenizer_equivalence.py` whenever the fit/transform logic
+changes.
+
+Fit on the frozen train split only (81,442 rows) — `fit_tokenizer_on_train` is the
+single call site in the project, tested to never see validation/test text. Raw
+vocabulary 50,879 words, capped to `max_features=20000`. Train OOV 0.212%,
+validation 0.278%, test 0.287% — close together, which is the expected signature of
+a representative split rather than a concerning gap.
+
+### Padding and truncation
+
+`padding="pre"` keeps the Keras default (real tokens end up adjacent to the final
+timestep an unmasked LSTM reads — recheck if the model factory adds a `Masking`
+layer). `truncating="post"` **deviates** from the Keras default (`"pre"`), on
+evidence rather than a guess: a TF-IDF + LogisticRegression probe on the frozen
+split scored 0.852 Macro-F1 keeping only the first 128 words of each narrative,
+0.832 keeping only the last 128, against 0.858 for the untruncated text. CFPB
+complaints front-load the core issue in the opening sentences.
+
+Real Keras-tokenizer truncation on the frozen train split: 66.4% at `max_len=128`,
+31.5% at `max_len=256` — within a point of the Stage 1 audit's whitespace-based
+estimate (65.6% / 31.0%), confirming rather than contradicting it.
+
+### GloVe (M3)
+
+Matrix built from the train-fitted vocabulary via `embeddings.build_embedding_matrix`
+(streams the 347 MB file once). Two coverage numbers, both correct, measuring
+different things: **type** coverage 86.68% (matched embedding rows / vocab_size —
+how many rows stay randomly initialised) and **token** coverage 99.16% (matched
+rows weighted by train frequency — how much of the text read is pretrained,
+matching the Stage 1 audit's dataset-wide figure exactly). They diverge because the
+unmatched words are disproportionately rare (servicer names, statute numbers), as
+the audit found. Row 0 (padding) is zero; each unmatched word gets its own
+independently-drawn small random vector, not zero or a shared placeholder — tested.
+Trainability is a model-factory decision (Task 4): `data_config.glove.trainable`
+applies to every row unless the model separately masks index 0.
+
+### DistilBERT (D0)
+
+Separate code path — DistilBERT's own pretrained WordPiece tokenizer, never fit on
+this dataset. `max_len=256` confirmed synchronized across `project_plan.md`
+(§3.1/§8.1), `configs/data_config.json`, `src/config.py`'s D0 entry, and this
+notebook, asserted rather than eyeballed. Real WordPiece truncation on the frozen
+train split at 256: 44.4% (val 41.3%, test 41.9%) — the full padded
+`input_ids`/`attention_mask` arrays are not precomputed or committed (~208 MB,
+trivially regenerable via `tokenize_for_distilbert`).
+
+### Artifacts
+
+Committed (small, ~10 MB total): tokenizer `word_index` JSON, GloVe matrix + metadata,
+`PreprocessingVersion` record, the TensorFlow differential-test result. **Not**
+committed: the padded train/val/test integer sequence arrays (~42 MB at 128, ~83 MB
+at 256) or the full DistilBERT arrays (~208 MB) — both regenerate in seconds from
+these artifacts plus the frozen split via `build_sequences`/`tokenize_for_distilbert`.
+
+### Commit
+
+```text
+add preprocessing
+```
+
+---
+
 # 14.5 Stage 3 — Build the Evaluation Layer
 
 Build evaluation before serious model training.

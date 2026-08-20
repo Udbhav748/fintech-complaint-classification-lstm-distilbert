@@ -414,3 +414,52 @@ def verify_split_fingerprint(
         raise SplitFingerprintMismatchError(error_msg)
 
     return is_valid, mismatches
+
+
+@dataclass
+class PreprocessingVersion:
+    """Explicit record of what preprocessing produced a given experiment's inputs.
+
+    Changes whenever a meaningful preprocessing rule changes - the version_id is a
+    human label bumped by hand, not an auto-generated hash, so a diff in
+    `project_plan.md`/git history explains *why* it changed alongside *that* it did.
+    """
+    version_id: str
+    dataset_content_sha256: str
+    normalization_steps: list[str]
+    tokenizer_vocab_size: int
+    max_features: int
+    oov_token: str
+    padding: str
+    truncating: str
+    max_len_by_experiment: dict[str, int]
+    glove_source_path: str
+    glove_dim: int
+    glove_coverage_pct: float
+    distilbert_checkpoint: str
+    distilbert_max_len: int
+    created_at_utc: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+    def to_json(self, indent: int = 2) -> str:
+        return json.dumps(self.to_dict(), indent=indent)
+
+    def save(self, path: Union[str, Path]) -> None:
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(self.to_json())
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "PreprocessingVersion":
+        return cls(**data)
+
+    @classmethod
+    def load(cls, path: Union[str, Path]) -> "PreprocessingVersion":
+        path = Path(path)
+        if not path.exists():
+            raise FileNotFoundError(f"Preprocessing version manifest not found: {path}")
+        with open(path, "r", encoding="utf-8") as f:
+            return cls.from_dict(json.load(f))
