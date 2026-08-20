@@ -1141,35 +1141,128 @@ run bilstm
 
 ---
 
-# 14.10 Stage 8 — M2
+# 14.10 Stage 8 — M2 ✅ COMPLETE
 
 Run:
 
 **M1 + dropout + recurrent_dropout**
 
-Keep all previous settings fixed.
+Everything else held fixed: random embeddings, `max_len=128`, same tokenizer,
+vocabulary, split, optimizer, learning rate, batch size, epoch ceiling (10),
+`ModelCheckpoint(monitor="val_macro_f1", save_best_only=True)`. No GloVe, no
+LR scheduling, no early stopping — those are later rungs.
 
-### Question
+Trained on Kaggle GPU via `scripts/run_m2.py` (orchestrator) +
+`scripts/kaggle_train_m2.py` (training kernel, identical pipeline to M1's) +
+`scripts/kaggle_package_m2.py` (frozen-input packaging). Single seed, per the
+locked 10-fit budget (§3.2): `src.config.EXPERIMENT_CONFIGS["M2"]["seeds"] = [42]`.
 
-> Did regularization improve generalization?
+### Architecture check (before training)
 
-Record:
+Verified programmatically via the model factory, small script, no training:
 
 ```text
-M2 − M1
-M2 − M0
+layers: InputLayer -> Embedding -> SpatialDropout1D -> Bidirectional(LSTM) -> Dense
+bidirectional wrapper: Bidirectional, underlying recurrent layer: LSTM
+LSTM dropout=0.3, recurrent_dropout=0.2, SpatialDropout1D rate=0.2
+embedding_type: random (use_glove=False)
+max_len: 128, output_classes: 5, lr_schedule=None, early_stopping=False
 ```
 
-Also inspect:
+M1 and M2 total parameters: **identical, 2,235,781**. Dropout, recurrent
+dropout, and spatial dropout are training-time regularization with no
+learnable weights of their own — `SpatialDropout1D` adds a structural layer
+with 0 parameters — so an unchanged parameter count is exactly what the config
+diff predicts, not an omission.
 
-* train/validation gap
-* validation curve
-* best epoch
+### Result
+
+| Seed | Macro-F1 | Accuracy | Macro Precision | Macro Recall | Best Epoch | Epochs Run | Time (s) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 42 | 0.8518 | 0.8485 | 0.8545 | 0.8513 | 4 | 10 | 6,790 |
+
+**M2 − M1 = +0.0033** (exact: 0.003282040681856002)
+**M2 − M0 = +0.0010** (exact: 0.0009974977710514032; M0 mean = 0.8508)
+
+### Training-time trade-off (`recurrent_dropout`)
+
+6,790s (~113 minutes) vs M1's 274s — a **~24.8×** slowdown, at the extreme end
+of but consistent with the pre-registered risk (§12: "`recurrent_dropout`
+disables the cuDNN fast path → ~5–10× slower epochs"). Confirmed as expected
+GPU-execution-path behavior, not an anomaly: `recurrent_dropout > 0` forces
+Keras off the fused cuDNN LSTM kernel onto a much slower per-timestep
+implementation. `recurrent_dropout` was kept at the locked value throughout —
+the slowdown is a recorded trade-off, not a reason to change the configuration
+(§18: no tuning after seeing results). Kaggle GPU: P100, same as every prior
+rung.
+
+### Checkpoint selection, verified twice
+
+`ModelCheckpoint(monitor="val_macro_f1", save_best_only=True)` selected epoch
+4. Independent `sklearn`-backed recompute on the restored best-epoch weights
+agreed with the Keras training-time value within 5.7e-11
+(`results/m2/seed42/val_check.json`) — the tightest agreement of any rung so
+far. The frozen test set was evaluated only after this selection was
+finalized, same structural guarantee as M0/M1.
+
+### Regularization analysis (Part 10)
+
+| Epoch | M1 train loss | M1 val loss | M1 gap | M2 train loss | M2 val loss | M2 gap |
+|---:|---:|---:|---:|---:|---:|---:|
+| 4 (best) | 0.3461 | 0.4180 | +0.0719 | 0.3772 | 0.4030 | +0.0258 |
+| 10 (last) | 0.1243 | 0.7271 | +0.6028 | 0.2122 | 0.5031 | +0.2908 |
+
+At the shared best epoch (4), M2's train/val loss gap is roughly a third of
+M1's; by epoch 10 M2's gap is less than half of M1's (+0.29 vs +0.60). M2's
+training loss is *higher* than M1's at every epoch — direct evidence
+regularization is doing what it is supposed to: preventing the model from
+fitting the training data as tightly. Peak validation Macro-F1 is also higher
+for M2 (0.8619 at epoch 4) than M1 (0.8591 at epoch 4), and M2's post-peak
+validation degradation is slower (val_macro_f1 falls to 0.8476 by epoch 10,
+vs M1's 0.8297). Conclusion: **M2 reduced overfitting and modestly improved
+both peak and late-training validation performance** — not "no meaningful
+effect" and not "over-regularized."
+
+### Per-class comparison
+
+| Class | M1 F1 | M2 F1 | Δ |
+|---|---:|---:|---:|
+| Checking or savings account | 0.7651 | 0.7676 | +0.0025 |
+| Credit card | 0.8364 | 0.8307 | −0.0057 |
+| Debt collection | 0.9108 | 0.9117 | +0.0009 |
+| Money transfer, virtual currency, or money service | 0.7715 | 0.7893 | +0.0177 |
+| Student loan | 0.9587 | 0.9597 | +0.0010 |
+
+Improvement is not concentrated in one class the way M1's regression was:
+three of five classes improve modestly, one (Credit card) declines slightly,
+and the largest single mover is Money transfer (+0.0177) — the same class that
+carried nearly all of M1's decline versus M0 (§14.9, −0.0174). Regularization
+recovers most of what bidirectionality cost that specific class, though this
+reads as the aggregate delta partly self-correcting a prior-rung weakness
+rather than broad regularization gains across the board.
+
+### Interpretation
+
+M2 − M1 (+0.0033) is a real, modest improvement supported by direct
+train/validation curve evidence (Part 10), not inferred from the test number
+alone. It remains smaller than M0's own three-seed spread (0.0041), so per the
+pre-registered stability rule (§9) it is reported as a **plausible but not
+clearly resolved improvement** — consistent in direction with the pre-registered
+hypothesis (§7: "Small positive... depends on whether M1 is overfitting"), and
+M1 was shown here to be overfitting more than M2 (Part 10), which is exactly
+the condition the hypothesis predicted would produce a gain. M2 − M0
+(+0.0010) is smaller still and not treated as a resolved effect on its own —
+reported for completeness (§9's required cumulative delta), not as a claim
+that regularization alone beats the baseline.
+
+TF-IDF (0.8707) remains well above M2; this is expected context, not a target
+M2 was tuned toward (§12), and is not used as the delta reference for this
+rung.
 
 ### Commit
 
 ```text
-add dropout
+run dropout
 ```
 
 ---

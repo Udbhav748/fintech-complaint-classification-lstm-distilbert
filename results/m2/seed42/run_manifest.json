@@ -1,0 +1,9 @@
+{
+  "experiment": "M2",
+  "seed": 42,
+  "git_commit": "a69aba000777ca20a9a4dc5026ca899d1b053f88",
+  "kaggle_dataset": "udbhav748/cfpb-m2-frozen-inputs",
+  "kaggle_kernel": "udbhav748/cfpb-m2-seed-42",
+  "dataset_content_sha256": "eb66684f66769cdef277a9bed3fbffdbfb30b9a4e91882273084a6ef31a77df6",
+  "preprocessing_version": "pp-v1"
+}
