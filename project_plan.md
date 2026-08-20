@@ -1032,28 +1032,111 @@ add tfidf check
 
 ---
 
-# 14.9 Stage 7 — M1
+# 14.9 Stage 7 — M1 ✅ COMPLETE
 
 Run:
 
 **M0 + Bidirectional LSTM**
 
-Keep the remaining settings fixed.
+Everything else held fixed: random embeddings, `max_len=128`, same tokenizer,
+vocabulary, split, optimizer, learning rate, batch size, epoch ceiling (10),
+and `ModelCheckpoint(monitor="val_macro_f1", save_best_only=True)` checkpoint
+policy. No dropout, no `recurrent_dropout`, no GloVe, no LR scheduling, no
+early stopping — those are later rungs.
 
-### Question
+Trained on Kaggle GPU via `scripts/run_m1.py` (orchestrator) +
+`scripts/kaggle_train_m1.py` (training kernel, identical pipeline to M0's) +
+`scripts/kaggle_package_m1.py` (frozen-input packaging). Single seed, per the
+locked 10-fit budget (§3.2): `src.config.EXPERIMENT_CONFIGS["M1"]["seeds"] = [42]`.
 
-> Did bidirectional context help?
+### Architecture check (before training)
 
-Record:
+Verified programmatically via the model factory, small script, no training:
 
 ```text
-M1 − M0
+layers: InputLayer -> Embedding -> Bidirectional(LSTM) -> Dense
+bidirectional wrapper: Bidirectional, underlying recurrent layer: LSTM
+embedding_type: random (use_glove=False)
+dropout: 0.0, recurrent_dropout: 0.0
+max_len: 128, output_classes: 5
 ```
+
+M0 total parameters: 2,117,893. M1 total parameters: 2,235,781. Difference:
+117,888 — fully explained by the extra backward-direction LSTM
+(4 × ((100+128)×128 + 128) = 117,248 parameters) plus the Dense layer's doubled
+input width from the concatenated forward/backward output (256 vs 128 → 5×128 =
+640 extra weights). 117,248 + 640 = 117,888, exact match. No unexplained
+parameter growth.
+
+### Result
+
+| Seed | Macro-F1 | Accuracy | Macro Precision | Macro Recall | Best Epoch | Epochs Run | Time (s) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 42 | 0.8485 | 0.8455 | 0.8541 | 0.8484 | 4 | 10 | 274 |
+
+**M1 − M0 = −0.0023** (exact: −0.002284542910804599; M0 mean = 0.8508)
+
+### Checkpoint selection, verified twice
+
+`ModelCheckpoint(monitor="val_macro_f1", save_best_only=True)` selected epoch 4.
+Independent `sklearn`-backed recompute on the restored best-epoch weights agreed
+with the Keras training-time value within 2.8e-8
+(`results/m1/seed42/val_check.json`). The frozen test set was evaluated only
+after this selection was finalized — same structural guarantee as M0 (test
+evaluation runs strictly after `model.load_weights(checkpoint_path)`, and
+`ModelCheckpoint` never sees a test metric).
+
+### Interpretation
+
+M1's delta (−0.0023) is smaller in magnitude than M0's own three-seed spread
+(std 0.0021, min–max spread 0.0041) — per the pre-registered stability rule
+(§9), this is reported as **no clear evidence of a meaningful improvement or
+regression**, not as a real effect in either direction. Bidirectional context
+did not measurably help or hurt the Simple LSTM baseline on this task.
+
+This is consistent with the pre-registered hypothesis (§7): "Complaint topics
+are lexically distinctive; keyword presence matters more than word order" —
+and with the TF-IDF reference finding (§14.8) that the task is strongly
+lexically separable. A bag-of-words model with no sequence information at all
+already exceeds both M0 and M1, which is the kind of task where reading a
+sequence backward as well as forward is not expected to add much: the signal
+BiLSTM could exploit (word order, long-range dependency) is not the dominant
+signal driving this classification problem. TF-IDF is not used as the delta
+reference for the ladder (§14.11's note on that comparison); this observation
+is interpretive context, not a new baseline.
+
+### Per-class comparison
+
+| Class | M0 mean F1 (3 seeds) | M1 F1 | Δ |
+|---|---:|---:|---:|
+| Checking or savings account | 0.7650 | 0.7651 | +0.0001 |
+| Credit card | 0.8367 | 0.8364 | −0.0003 |
+| Debt collection | 0.9053 | 0.9108 | +0.0055 |
+| Money transfer, virtual currency, or money service | 0.7889 | 0.7715 | −0.0174 |
+| Student loan | 0.9582 | 0.9587 | +0.0005 |
+
+Four of five classes are flat (±0.0055). The aggregate delta is driven almost
+entirely by Money transfer, which drops 0.0174 F1 — confusion matrix shows this
+class's recall falling most against Checking/savings (505 of 2,094 Money
+transfer test examples predicted as Checking/savings, vs M0's confusion
+pattern in the same range). Both classes involve account-level transaction
+disputes with overlapping vocabulary (banks, transfers, holds), so this reads
+as a genuine class-boundary difficulty rather than an artifact — the same kind
+of semantic overlap flagged for Debt collection ↔ Credit card in §10, not
+specific to bidirectionality.
+
+### Training curve
+
+Best epoch is 4 for both M0 (seed 42) and M1 — no earlier or later overfitting
+onset. M1's train loss is consistently lower than M0's at every epoch (more
+parameters fit the training data more closely, as expected), but validation
+loss rises after epoch 4–5 in both runs at a similar rate. No evidence that
+bidirectional context changes the overfitting profile at this scale.
 
 ### Commit
 
 ```text
-add bilstm
+run bilstm
 ```
 
 ---
