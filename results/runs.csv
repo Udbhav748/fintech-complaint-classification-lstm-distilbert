@@ -1,0 +1,4 @@
+experiment,model,seed,macro_f1,accuracy,macro_precision,macro_recall,best_epoch,epochs_run,train_time,parameter_count,checkpoint_path,dataset_version
+M0,"Unidirectional LSTM baseline, random embeddings",42,0.8488613915919311,0.8461840683626363,0.8527839080534324,0.8492673215434197,4,10,162.91945004463196,2117893,checkpoints\M0_seed42.weights.h5,eb66684f66769cdef277a9bed3fbffdbfb30b9a4e91882273084a6ef31a77df6
+M0,"Unidirectional LSTM baseline, random embeddings",123,0.8506509642618367,0.8482467341125626,0.8521231178090989,0.851353394084633,4,10,157.62828040122986,2117893,checkpoints\M0_seed123.weights.h5,eb66684f66769cdef277a9bed3fbffdbfb30b9a4e91882273084a6ef31a77df6
+M0,"Unidirectional LSTM baseline, random embeddings",456,0.8529868804682262,0.8504076220410569,0.8528561370561889,0.8532900288665987,3,10,178.7926208972931,2117893,checkpoints\M0_seed456.weights.h5,eb66684f66769cdef277a9bed3fbffdbfb30b9a4e91882273084a6ef31a77df6

@@ -842,7 +842,7 @@ add model factory
 
 ---
 
-# 14.7 Stage 5 — M0 Baseline
+# 14.7 Stage 5 — M0 Baseline ✅ COMPLETE
 
 Train:
 
@@ -859,30 +859,85 @@ Run:
 
 **3 seeds**
 
-### Tasks
+Trained on Kaggle GPU via `scripts/run_m0.py` (orchestrator) +
+`scripts/kaggle_train_m0.py` (per-seed training kernel) +
+`scripts/kaggle_package_m0.py` (frozen-input dataset packaging). All three seeds
+completed, validated, and registered in one sequential run; no seed was retried
+or re-run.
 
-* train
-* checkpoint best validation model
-* record metrics
-* record training time
-* record parameter count
-* record best epoch
-* calculate mean ± std
+### Result
+
+| Seed | Macro-F1 | Accuracy | Macro Precision | Macro Recall | Best Epoch | Epochs Run | Time (s) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 42 | 0.8489 | 0.8462 | 0.8528 | 0.8493 | 4 | 10 | 163 |
+| 123 | 0.8507 | 0.8482 | 0.8521 | 0.8513 | 4 | 10 | 158 |
+| 456 | 0.8530 | 0.8504 | 0.8529 | 0.8533 | 3 | 10 | 179 |
+
+**M0 Macro-F1 = 0.8508 ± 0.0021** (mean ± sample std, `ddof=1`, `src.evaluation.seed_statistics`)
+Min 0.8489, max 0.8530, spread 0.0041.
+
+Parameter count: 2,117,893 (identical across all three seeds — confirms no
+configuration drift between runs). All three used the same frozen dataset
+(`dataset_content_sha256 = eb66684f...`), the same frozen split, the same frozen
+tokenizer, and `preprocessing_version = pp-v1`.
+
+### Stability check
+
+std = 0.0021, well inside the pre-registered 0.008 (0.8 Macro-F1 point) threshold
+from §9 — not a new threshold invented for this task. Ladder deltas from M1
+onward are resolvable against this spread. Per §9's rule, an M1-M4 delta smaller
+than roughly this spread should be read as indistinguishable from run-to-run
+variance, not as a real effect — reported as a stability reference, not a
+significance test.
+
+### Checkpoint selection, verified twice
+
+For every seed, `ModelCheckpoint(monitor="val_macro_f1", save_best_only=True)`
+selected the best epoch, and the training kernel independently recomputed
+validation Macro-F1 with `sklearn`-backed `compute_val_macro_f1` on the restored
+best-epoch weights before trusting the result — agreement was within 1.6e-8 on
+every seed (`results/m0/seed{N}/val_check.json`). The frozen test set was
+evaluated only after this selection was finalized; there is no code path in
+`scripts/kaggle_train_m0.py` where test data could influence which epoch was
+chosen (`ModelCheckpoint` monitors `val_macro_f1`, never a test metric, and the
+test-evaluation code runs strictly after `model.load_weights(checkpoint_path)`).
+
+### Implementation issue found and fixed during this stage
+
+Two Kaggle-mechanics bugs, not modeling/methodology changes: (1) Kaggle derives a
+new kernel's actual slug from its title, not the `id` field, when the two
+disagree — the orchestrator's title now *is* the slug, so they can't diverge
+again. (2) the private dataset mounted at
+`/kaggle/input/datasets/<user>/<slug>/`, not the flat `/kaggle/input/<slug>/`
+path assumed initially — found via a throwaway diagnostic kernel before spending
+GPU time on the real run, fixed in `scripts/kaggle_train_m0.py`'s `INPUT_DIR`.
+Neither bug affected data, preprocessing, or the model itself; both were caught
+before any GPU training ran against them.
+
+### Artifacts
+
+Checkpoints (`checkpoints/M0_seed{42,123,456}.weights.h5`, ~25MB each after
+Keras 3 also serializes optimizer state, ~73MB total) are **not** committed —
+larger than anything else this project has put in git, and the existing
+`.gitignore` already deliberately excludes `/checkpoints/`. Their metadata,
+history, test predictions (traceable to `test_idx`), confusion matrices,
+per-class metrics, and a `run_manifest.json` (git commit, Kaggle dataset/kernel
+identifiers, dataset + preprocessing version) are committed under
+`results/m0/seed{N}/` and `results/runs.csv`.
 
 ### Required output
 
-M0 becomes the official baseline.
+M0 is now the official baseline. Not compared against M1 yet — M1 has not run.
 
 ### Gate
 
-Inspect M0 variance before continuing.
-
-If the baseline is unstable, investigate before running the ladder.
+M0 variance inspected: stable, well within the pre-registered threshold. Proceed
+to the ladder.
 
 ### Commit
 
 ```text
-add baseline
+run baseline
 ```
 
 ---

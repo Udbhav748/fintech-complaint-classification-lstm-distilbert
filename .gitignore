@@ -30,6 +30,12 @@ kaggle_output/
 *.txt
 glove*/
 
+# Kaggle staging: the dataset package built for upload, and raw per-seed kernel
+# output before it's validated and the useful parts are copied into results/.
+# Never the canonical location for anything - see scripts/run_m0.py.
+kaggle_staging/
+kaggle_runs/
+
 # Anchored to the repository root on purpose: an unanchored `models/` also
 # matches `src/models/`, which would silently drop the model source code.
 /models/

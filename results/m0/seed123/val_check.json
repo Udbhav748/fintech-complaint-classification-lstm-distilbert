@@ -1,0 +1,5 @@
+{
+  "best_val_macro_f1_from_history": 0.857119083404541,
+  "best_val_macro_f1_independent_sklearn": 0.8571191521297463,
+  "agreement": 6.872520530443182e-08
+}
