@@ -1,0 +1,82 @@
+{
+  "macro_f1": 0.87399085012272,
+  "accuracy": 0.8721147235045673,
+  "macro_precision": 0.8736412598229648,
+  "macro_recall": 0.8754031915702702,
+  "per_class": {
+    "Checking or savings account": {
+      "precision": 0.8161947342275211,
+      "recall": 0.7631212261960055,
+      "f1": 0.7887662025924148,
+      "support": 2153
+    },
+    "Credit card": {
+      "precision": 0.8660496833901608,
+      "recall": 0.8593523441275979,
+      "f1": 0.8626880155264435,
+      "support": 2069
+    },
+    "Debt collection": {
+      "precision": 0.8857566765578635,
+      "recall": 0.9592929833958221,
+      "f1": 0.9210593983029056,
+      "support": 1867
+    },
+    "Money transfer, virtual currency, or money service": {
+      "precision": 0.8140726933830382,
+      "recall": 0.8342884431709646,
+      "f1": 0.8240566037735849,
+      "support": 2094
+    },
+    "Student loan": {
+      "precision": 0.9861325115562404,
+      "recall": 0.960960960960961,
+      "f1": 0.973384030418251,
+      "support": 1998
+    }
+  },
+  "confusion_matrix": [
+    [
+      1643,
+      158,
+      22,
+      328,
+      2
+    ],
+    [
+      98,
+      1778,
+      127,
+      62,
+      4
+    ],
+    [
+      8,
+      49,
+      1791,
+      7,
+      12
+    ],
+    [
+      262,
+      53,
+      23,
+      1747,
+      9
+    ],
+    [
+      2,
+      15,
+      59,
+      2,
+      1920
+    ]
+  ],
+  "labels": [
+    "Checking or savings account",
+    "Credit card",
+    "Debt collection",
+    "Money transfer, virtual currency, or money service",
+    "Student loan"
+  ]
+}

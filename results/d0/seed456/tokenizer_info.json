@@ -1,0 +1,5 @@
+{
+  "checkpoint": "distilbert-base-uncased",
+  "tokenizer_class": "DistilBertTokenizerFast",
+  "transformers_version": "4.57.6"
+}

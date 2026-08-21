@@ -1,0 +1,11 @@
+{
+  "experiment": "D0",
+  "seed": 456,
+  "git_commit": "3482062a9e89f77dd4c5bcdda23d87e7ab940618",
+  "kaggle_dataset": "udbhav748/cfpb-d0-frozen-inputs",
+  "kaggle_kernel": "udbhav748/cfpb-d0-seed-456",
+  "dataset_content_sha256": "eb66684f66769cdef277a9bed3fbffdbfb30b9a4e91882273084a6ef31a77df6",
+  "preprocessing_version": "pp-v1",
+  "distilbert_checkpoint": "distilbert-base-uncased",
+  "tokenizer_class": "DistilBertTokenizerFast"
+}

@@ -1,0 +1,26 @@
+{
+  "python_version": "3.12.13",
+  "os_platform": "Linux 6.12.90+",
+  "git_commit": "unknown",
+  "git_branch": "unknown",
+  "git_dirty": false,
+  "packages": {
+    "torch": "2.10.0+cu128",
+    "tensorflow": "2.20.0",
+    "transformers": "4.57.6",
+    "scikit-learn": "1.6.1",
+    "pandas": "2.3.3",
+    "numpy": "2.0.2",
+    "scipy": "1.16.3",
+    "accelerate": "1.13.0",
+    "tokenizers": "0.22.2",
+    "pyarrow": "24.0.0"
+  },
+  "device": {
+    "device_type": "cuda",
+    "device_name": "Tesla P100-PCIE-16GB",
+    "device_count": 1,
+    "cuda_available": true,
+    "cuda_version": "12.8"
+  }
+}
