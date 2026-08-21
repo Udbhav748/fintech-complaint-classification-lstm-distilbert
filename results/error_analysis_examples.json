@@ -1,0 +1,422 @@
+{
+  "Money transfer -> Checking (M4)": {
+    "total_in_pair": 327,
+    "examples": [
+      {
+        "test_idx": 60898,
+        "true": "Money transfer, virtual currency, or money service",
+        "m4_pred": "Checking or savings account",
+        "d0_pred": "Credit card",
+        "excerpt": "XX/XX/XXXX. XXXX i XXXX XXXX I got XXXX. They called me from XXXX # they said my card been used in Oklahoma. So I hung up called chime. And the automated message says hi we found...",
+        "xxxx_count": 10,
+        "word_count": 229,
+        "keras_truncated": false,
+        "wp_truncated": true
+      },
+      {
+        "test_idx": 60937,
+        "true": "Money transfer, virtual currency, or money service",
+        "m4_pred": "Checking or savings account",
+        "d0_pred": "Money transfer, virtual currency, or money service",
+        "excerpt": "In late XX/XX/year>, I submitted multiple written requests to XXXX to revoke ACH authorization for future withdrawals, as is my legal right under the Electronic Fund Transfer Act...",
+        "xxxx_count": 4,
+        "word_count": 149,
+        "keras_truncated": false,
+        "wp_truncated": false
+      },
+      {
+        "test_idx": 60986,
+        "true": "Money transfer, virtual currency, or money service",
+        "m4_pred": "Checking or savings account",
+        "d0_pred": "Checking or savings account",
+        "excerpt": "I have deposited a check under my brothers name when he was XXXX XXXX XXXX, last year and they closed my account because of fraud. I gave them all the information they need, his...",
+        "xxxx_count": 4,
+        "word_count": 130,
+        "keras_truncated": false,
+        "wp_truncated": false
+      },
+      {
+        "test_idx": 61123,
+        "true": "Money transfer, virtual currency, or money service",
+        "m4_pred": "Checking or savings account",
+        "d0_pred": "Checking or savings account",
+        "excerpt": "I made an ACH transfer from an external bank account ( let 's call it XXXX XXXX ) to Marcus ( run by Goldman Sachs ) on XX/XX/year>, with the goal of eventually transferring the...",
+        "xxxx_count": 12,
+        "word_count": 516,
+        "keras_truncated": true,
+        "wp_truncated": true
+      },
+      {
+        "test_idx": 61143,
+        "true": "Money transfer, virtual currency, or money service",
+        "m4_pred": "Checking or savings account",
+        "d0_pred": "Checking or savings account",
+        "excerpt": "Chime has a mypay account a deposit was put into the account and it was not touched another deposit came into the account and they took that one. Now from the understanding with...",
+        "xxxx_count": 0,
+        "word_count": 73,
+        "keras_truncated": false,
+        "wp_truncated": false
+      }
+    ]
+  },
+  "Checking -> Money transfer (M4)": {
+    "total_in_pair": 292,
+    "examples": [
+      {
+        "test_idx": 41,
+        "true": "Checking or savings account",
+        "m4_pred": "Money transfer, virtual currency, or money service",
+        "d0_pred": "Money transfer, virtual currency, or money service",
+        "excerpt": "On XX/XX/year>, I was induced by an online merchant to send two XXXX payments totaling {$630.00} ( {$510.00} and {$120.00} ). The seller represented themselves as a legitimate...",
+        "xxxx_count": 5,
+        "word_count": 169,
+        "keras_truncated": false,
+        "wp_truncated": false
+      },
+      {
+        "test_idx": 273,
+        "true": "Checking or savings account",
+        "m4_pred": "Money transfer, virtual currency, or money service",
+        "d0_pred": "Money transfer, virtual currency, or money service",
+        "excerpt": "On XX/XX/XXXX, I initiated a fully authorized ACH transfer from my account at XXXX XXXX XXXX to my Axos Bank Account. This transaction was successfully cleared, and the funds...",
+        "xxxx_count": 18,
+        "word_count": 278,
+        "keras_truncated": true,
+        "wp_truncated": true
+      },
+      {
+        "test_idx": 381,
+        "true": "Checking or savings account",
+        "m4_pred": "Money transfer, virtual currency, or money service",
+        "d0_pred": "Money transfer, virtual currency, or money service",
+        "excerpt": "I am submitting this response regarding case number XXXX because Cash Apps response contains factual inaccuracies and fails to address the core issues raised in my complaint. Cash...",
+        "xxxx_count": 4,
+        "word_count": 550,
+        "keras_truncated": true,
+        "wp_truncated": true
+      },
+      {
+        "test_idx": 482,
+        "true": "Checking or savings account",
+        "m4_pred": "Money transfer, virtual currency, or money service",
+        "d0_pred": "Money transfer, virtual currency, or money service",
+        "excerpt": "Cash App denied my fraud dispute without providing any evidence to support the denial. I disputed several in-store transactions that I did not make and did not authorize. Cash...",
+        "xxxx_count": 2,
+        "word_count": 166,
+        "keras_truncated": false,
+        "wp_truncated": false
+      },
+      {
+        "test_idx": 493,
+        "true": "Checking or savings account",
+        "m4_pred": "Money transfer, virtual currency, or money service",
+        "d0_pred": "Money transfer, virtual currency, or money service",
+        "excerpt": "I have a business account that needs yearly verification by Wise. The verification asked was an upload of the XXXX number of the company. As I requested an XXXX number this year,...",
+        "xxxx_count": 5,
+        "word_count": 150,
+        "keras_truncated": false,
+        "wp_truncated": false
+      }
+    ]
+  },
+  "Credit card -> Checking (M4)": {
+    "total_in_pair": 143,
+    "examples": [
+      {
+        "test_idx": 21601,
+        "true": "Credit card",
+        "m4_pred": "Checking or savings account",
+        "d0_pred": "Checking or savings account",
+        "excerpt": "Company Name : Wells Fargo Bank , N.A . Product/Service : Checking Account & Credit Card Payment Plan Core Issue : Unfair/Deceptive Practice Unauthorized Debit, Sequential...",
+        "xxxx_count": 5,
+        "word_count": 456,
+        "keras_truncated": true,
+        "wp_truncated": true
+      },
+      {
+        "test_idx": 21609,
+        "true": "Credit card",
+        "m4_pred": "Checking or savings account",
+        "d0_pred": "Debt collection",
+        "excerpt": "Good evening. I'm profoundly XXXX. My husband is XXXX. I don't know XXXX, so I rely heavily on XXXX XXXX, XXXX or XXXX XXXX. I was trying to get ahold of USAA to figure out ways...",
+        "xxxx_count": 15,
+        "word_count": 230,
+        "keras_truncated": false,
+        "wp_truncated": true
+      },
+      {
+        "test_idx": 21611,
+        "true": "Credit card",
+        "m4_pred": "Checking or savings account",
+        "d0_pred": "Checking or savings account",
+        "excerpt": "Subject : Formal Complaint Regarding Closed Checking Account, Withheld Funds, and Unresolved Credit Card Account I am submitting this formal complaint regarding Truist Bank 's...",
+        "xxxx_count": 8,
+        "word_count": 381,
+        "keras_truncated": true,
+        "wp_truncated": true
+      },
+      {
+        "test_idx": 21618,
+        "true": "Credit card",
+        "m4_pred": "Checking or savings account",
+        "d0_pred": "Checking or savings account",
+        "excerpt": "XX/XX/year> - deposit for trip to XXXX declined. Called XXXX and held for XX/XX/XXXX. Received incoming call ( missed ) from fraud department and instructed to call PNC 's fraud...",
+        "xxxx_count": 23,
+        "word_count": 296,
+        "keras_truncated": true,
+        "wp_truncated": true
+      },
+      {
+        "test_idx": 21656,
+        "true": "Credit card",
+        "m4_pred": "Checking or savings account",
+        "d0_pred": "Money transfer, virtual currency, or money service",
+        "excerpt": "I have found out that i was added unauthorized to an XXXX account",
+        "xxxx_count": 1,
+        "word_count": 13,
+        "keras_truncated": false,
+        "wp_truncated": false
+      }
+    ]
+  },
+  "Credit card -> Debt coll. (M4)": {
+    "total_in_pair": 94,
+    "examples": [
+      {
+        "test_idx": 21731,
+        "true": "Credit card",
+        "m4_pred": "Debt collection",
+        "d0_pred": "Debt collection",
+        "excerpt": "A letter was mailed and no response from the company. The debt was bought from a collection company. The debt was paid. Under the federal Fair Credit Reporting Act ( FCRA ),...",
+        "xxxx_count": 0,
+        "word_count": 63,
+        "keras_truncated": false,
+        "wp_truncated": false
+      },
+      {
+        "test_idx": 22200,
+        "true": "Credit card",
+        "m4_pred": "Debt collection",
+        "d0_pred": "Debt collection",
+        "excerpt": "I disputed inaccurate information with the credit bureaus, and they verified the accounts without providing any documentation or evidence as required under FCRA 609 and FCRA 611....",
+        "xxxx_count": 0,
+        "word_count": 53,
+        "keras_truncated": false,
+        "wp_truncated": false
+      },
+      {
+        "test_idx": 22319,
+        "true": "Credit card",
+        "m4_pred": "Debt collection",
+        "d0_pred": "Debt collection",
+        "excerpt": "I am filing a formal complaint against Equifax Information Services, LLC for the continued reporting of an inaccurate and fraudulent account listed as XXXX XXXX XXXX XXXX XXXX....",
+        "xxxx_count": 20,
+        "word_count": 511,
+        "keras_truncated": true,
+        "wp_truncated": true
+      },
+      {
+        "test_idx": 22367,
+        "true": "Credit card",
+        "m4_pred": "Debt collection",
+        "d0_pred": "Debt collection",
+        "excerpt": "Upon looking at my credit report I see a unauthorized acct on my profile, please remove it, thanks",
+        "xxxx_count": 0,
+        "word_count": 18,
+        "keras_truncated": false,
+        "wp_truncated": false
+      },
+      {
+        "test_idx": 22543,
+        "true": "Credit card",
+        "m4_pred": "Debt collection",
+        "d0_pred": "Debt collection",
+        "excerpt": "kindly ask for the immediate removal of this inquiry from my credit report, as it is not connected to me, and I have no relationship with the creditors involved.",
+        "xxxx_count": 0,
+        "word_count": 29,
+        "keras_truncated": false,
+        "wp_truncated": false
+      }
+    ]
+  },
+  "both_wrong": {
+    "total_in_group": 920,
+    "examples": [
+      {
+        "test_idx": 14,
+        "true": "Checking or savings account",
+        "m4_pred": "Credit card",
+        "d0_pred": "Credit card",
+        "excerpt": "We are submitting this complaint regarding the closure of our Citi / AAdvantage credit card account on XX/XX/XXXX by Citibank. This account was not opened through a new...",
+        "xxxx_count": 11,
+        "word_count": 255,
+        "keras_truncated": true,
+        "wp_truncated": true
+      },
+      {
+        "test_idx": 41,
+        "true": "Checking or savings account",
+        "m4_pred": "Money transfer, virtual currency, or money service",
+        "d0_pred": "Money transfer, virtual currency, or money service",
+        "excerpt": "On XX/XX/year>, I was induced by an online merchant to send two XXXX payments totaling {$630.00} ( {$510.00} and {$120.00} ). The seller represented themselves as a legitimate...",
+        "xxxx_count": 5,
+        "word_count": 169,
+        "keras_truncated": false,
+        "wp_truncated": false
+      },
+      {
+        "test_idx": 273,
+        "true": "Checking or savings account",
+        "m4_pred": "Money transfer, virtual currency, or money service",
+        "d0_pred": "Money transfer, virtual currency, or money service",
+        "excerpt": "On XX/XX/XXXX, I initiated a fully authorized ACH transfer from my account at XXXX XXXX XXXX to my Axos Bank Account. This transaction was successfully cleared, and the funds...",
+        "xxxx_count": 18,
+        "word_count": 278,
+        "keras_truncated": true,
+        "wp_truncated": true
+      },
+      {
+        "test_idx": 381,
+        "true": "Checking or savings account",
+        "m4_pred": "Money transfer, virtual currency, or money service",
+        "d0_pred": "Money transfer, virtual currency, or money service",
+        "excerpt": "I am submitting this response regarding case number XXXX because Cash Apps response contains factual inaccuracies and fails to address the core issues raised in my complaint. Cash...",
+        "xxxx_count": 4,
+        "word_count": 550,
+        "keras_truncated": true,
+        "wp_truncated": true
+      },
+      {
+        "test_idx": 421,
+        "true": "Checking or savings account",
+        "m4_pred": "Credit card",
+        "d0_pred": "Credit card",
+        "excerpt": "I booked my hotel stay through Chase XXXX and completed the stay as scheduled. After checkout, I required an itemized receipt for business reimbursement. I contacted Chase XXXX on...",
+        "xxxx_count": 6,
+        "word_count": 135,
+        "keras_truncated": false,
+        "wp_truncated": false
+      }
+    ]
+  },
+  "d0_only_errors (M4 correct, D0 wrong)": {
+    "total_in_group": 364,
+    "examples": [
+      {
+        "test_idx": 59,
+        "true": "Checking or savings account",
+        "m4_pred": "Checking or savings account",
+        "d0_pred": "Money transfer, virtual currency, or money service",
+        "excerpt": "On XX/XX/year>, there were XXXX debit card transactions from my account that I did not authorize. XXXX transaction for {$1300.00} was declined. A second transaction for the same...",
+        "xxxx_count": 8,
+        "word_count": 192,
+        "keras_truncated": false,
+        "wp_truncated": false
+      },
+      {
+        "test_idx": 113,
+        "true": "Checking or savings account",
+        "m4_pred": "Checking or savings account",
+        "d0_pred": "Credit card",
+        "excerpt": "I have unauthorized charges on my chime card from XXXX XXXX XXXX chime refuses to refund my money",
+        "xxxx_count": 3,
+        "word_count": 18,
+        "keras_truncated": false,
+        "wp_truncated": false
+      },
+      {
+        "test_idx": 335,
+        "true": "Checking or savings account",
+        "m4_pred": "Checking or savings account",
+        "d0_pred": "Credit card",
+        "excerpt": "XX/XX/year> I was at the bar. I seen a random {$48.00} appear, didn't make sense I was busy. So I tell the bartender, he confirms it not them, they close my tab and I cancel the...",
+        "xxxx_count": 2,
+        "word_count": 117,
+        "keras_truncated": false,
+        "wp_truncated": false
+      },
+      {
+        "test_idx": 624,
+        "true": "Checking or savings account",
+        "m4_pred": "Checking or savings account",
+        "d0_pred": "Credit card",
+        "excerpt": "To whom it may concern, I am writing to dispute a fraudulent account/transaction that is appearing on my credit report. This incident occurred around XXXX, when my phone was...",
+        "xxxx_count": 9,
+        "word_count": 285,
+        "keras_truncated": true,
+        "wp_truncated": true
+      },
+      {
+        "test_idx": 1035,
+        "true": "Checking or savings account",
+        "m4_pred": "Checking or savings account",
+        "d0_pred": "Credit card",
+        "excerpt": "I asked bank of america to reverse the off set fee that was taken out of my account, and they said, \" they can not do that ''. I notified them ahead of time that I was not able to...",
+        "xxxx_count": 1,
+        "word_count": 75,
+        "keras_truncated": false,
+        "wp_truncated": false
+      }
+    ]
+  },
+  "m4_only_errors (M4 wrong, D0 correct)": {
+    "total_in_group": 422,
+    "examples": [
+      {
+        "test_idx": 193,
+        "true": "Checking or savings account",
+        "m4_pred": "Credit card",
+        "d0_pred": "Checking or savings account",
+        "excerpt": "I opened three accounts with Synchrony Bank in XX/XX/year> and transferred {$3300.00} into those accounts from my personal XXXX XXXX XXXX account. These were legitimate transfers...",
+        "xxxx_count": 15,
+        "word_count": 265,
+        "keras_truncated": true,
+        "wp_truncated": true
+      },
+      {
+        "test_idx": 613,
+        "true": "Checking or savings account",
+        "m4_pred": "Credit card",
+        "d0_pred": "Checking or savings account",
+        "excerpt": "Chase sent a letter regarding the {$2000.00} dispute charge, denying the dispute for the reason was because it was done face to face. I called and explain why I disputed the claim...",
+        "xxxx_count": 0,
+        "word_count": 83,
+        "keras_truncated": false,
+        "wp_truncated": false
+      },
+      {
+        "test_idx": 646,
+        "true": "Checking or savings account",
+        "m4_pred": "Money transfer, virtual currency, or money service",
+        "d0_pred": "Checking or savings account",
+        "excerpt": "On XX/XX/year>, at approximately XXXX XXXX, I deposited {$500.00} in cash onto my Chime account at a XXXX location in XXXX, XXXX. This was a routine deposit intended for bill...",
+        "xxxx_count": 31,
+        "word_count": 459,
+        "keras_truncated": true,
+        "wp_truncated": true
+      },
+      {
+        "test_idx": 893,
+        "true": "Checking or savings account",
+        "m4_pred": "Money transfer, virtual currency, or money service",
+        "d0_pred": "Checking or savings account",
+        "excerpt": "I received a wire transfer in XXXX totaling amount XXXX XXXX from my business partner, my account was perfectly fine months after I did multiple transactions in and out the bank....",
+        "xxxx_count": 3,
+        "word_count": 166,
+        "keras_truncated": false,
+        "wp_truncated": false
+      },
+      {
+        "test_idx": 970,
+        "true": "Checking or savings account",
+        "m4_pred": "Money transfer, virtual currency, or money service",
+        "d0_pred": "Checking or savings account",
+        "excerpt": "So on XX/XX/year> I was scammed out of {$550.00} dollars on my debit card to purchase XXXX gift cards and XXXX gift cards from a Scammer claiming to be XXXX XXXX support but they...",
+        "xxxx_count": 18,
+        "word_count": 261,
+        "keras_truncated": true,
+        "wp_truncated": true
+      }
+    ]
+  }
+}

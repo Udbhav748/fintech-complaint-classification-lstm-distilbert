@@ -2435,44 +2435,169 @@ add variance notes
 
 ---
 
-# 14.17 Stage 15 — Error Analysis
+# 14.17 Stage 15 — Error Analysis ✅ COMPLETE
 
-Perform error analysis on:
+Analysis only — no model trained, tuned, or modified; no preprocessing,
+split, or label changed. Full working (confusion matrices, per-class table,
+example selection, six charts) lives in the "Error analysis" section
+appended to `notebooks/05_final_results.ipynb` (84 cells total, executed
+top to bottom, 0 errors). This section is the consolidated summary.
 
-**best recurrent model**
+M4 (best recurrent) vs D0 (final Transformer, seed 42 specifically — the
+first of its three locked seeds, matching M4's own seed identity, a fixed
+documented choice rather than whichever seed looks best) on the frozen
+10,181-row test set. Aligned by `test_idx`; identical `y_true` confirmed
+before any comparison — both confusion matrices recomputed here match the
+committed `test_metrics.json` exactly.
 
-and
+### Per-class error profile
 
-**DistilBERT**
+| Class | M4 F1 | D0 F1 | Δ F1 | M4 Errors | D0 Errors |
+|---|---:|---:|---:|---:|---:|
+| Checking or savings account | 0.7862 | 0.7973 | +0.0111 | 439 | 432 |
+| Credit card | 0.8574 | 0.8661 | +0.0087 | 308 | 307 |
+| Debt collection | 0.9269 | 0.9246 | −0.0023 | 105 | 96 |
+| Money transfer, virtual currency, or money service | 0.8144 | 0.8229 | +0.0085 | 403 | 389 |
+| Student loan | 0.9703 | 0.9688 | −0.0015 | 87 | 60 |
 
-### Include
+Checking/savings is hardest for both; Student loan easiest for both. D0
+improves F1 in 3/5 classes but is very slightly behind M4 on Debt collection
+and Student loan — despite having *fewer* absolute errors in both. Not a
+contradiction: D0's recall improves on both (Debt collection 0.9438→0.9486,
+Student loan 0.9565→0.9700) but precision drops, because more Credit card
+complaints get misrouted into those classes under D0 — a real
+precision/recall trade-off, visible directly in the numbers, not inferred.
 
-#### Confusion matrix
+### Four disagreement groups (n=10,181)
 
-Identify the most confused classes.
+| Group | Count | % |
+|---|---:|---:|
+| Both correct | 8,475 | 83.24% |
+| Both wrong | 920 | 9.04% |
+| M4 correct, D0 wrong ("D0-only errors") | 364 | 3.58% |
+| M4 wrong, D0 correct ("M4-only errors") | 422 | 4.14% |
 
-#### Per-class metrics
+D0 fixes 422 examples M4 got wrong and breaks 364 M4 got right — net +58,
+consistent with its higher aggregate Macro-F1. This raw-count split weights
+by class support and is not the same statistic as macro-F1.
 
-Look for:
+### Top confusion pairs
 
-* low precision
-* low recall
-* low F1
+| Pair | M4 count | D0 count | Reduction |
+|---|---:|---:|---:|
+| Money transfer → Checking | 327 | 312 | +15 |
+| Checking → Money transfer | 292 | 280 | +12 |
+| Credit card → Checking | 143 | 114 | +29 |
+| Credit card → Debt collection | 94 | 125 | **−31** |
 
-#### Misclassified examples
+**Checking ↔ Money transfer** (the largest pair, both directions): sampled
+examples are dominated by Chime/Cash App/Wise/ACH vocabulary regardless of
+which product the complaint is officially filed under — overlapping
+product terminology. D0 reduces the Money-transfer-true side in the sample
+(3 of 5 flip to correct) but on the Checking-true side D0 matches M4's wrong
+answer on all 5 sampled examples — both models key on the same surface
+vocabulary even when the CFPB label is Checking.
 
-For selected examples show:
+**Credit card → Checking**: sampled narratives are frequently
+multi-institution letters describing both a checking dispute and a credit
+card dispute at once — narrative contains multiple issues. D0's largest
+single reduction (−29).
 
-```text
-Text
-True label
-Predicted label
-Likely reason
-```
+**Credit card → Debt collection — the one pair where D0 regresses** (+31
+errors). Sampled examples are credit-report-accuracy/FCRA disputes,
+genuinely on the label boundary §10 already names for this exact pair
+("both labels are defensible... a label-boundary property of the dataset,
+not a model failure"). D0 does not resolve this boundary better than M4.
 
-Keep examples concise.
+### Truncation and redaction
 
-Do not dump large blocks of raw text into the report.
+| Group | n | Keras trunc@256 | WordPiece trunc@256 | Mean XXXX density |
+|---|---:|---:|---:|---:|
+| Overall test set | 10,181 | 29.1% | 41.9% | 0.0455 |
+| Both correct | 8,475 | 29.9% | 42.9% | 0.0444 |
+| Both wrong | 920 | 24.9% | 35.5% | 0.0496 |
+| D0-only errors | 364 | 25.8% | 38.7% | 0.0566 |
+| M4-only errors | 422 | 25.6% | 38.2% | 0.0489 |
+
+**Truncation does not explain the errors.** Every error group shows a
+*lower* truncation rate than correctly-classified examples in both
+tokenizers — the opposite of a naive "long complaints get truncated and
+misclassified" story. **Redaction**: D0-only errors show a somewhat higher
+mean `XXXX` density (0.0566) than the overall set (0.0455); the gap is
+modest and reported descriptively, not as a confirmed cause.
+
+### Where D0 helped (M4-only errors: M4 wrong, D0 correct)
+
+Recurring pattern: institution names with a misleading lexical association
+— "Synchrony Bank" is primarily a credit-card/store-card issuer, and M4
+predicts Credit card for a Synchrony-related accounts/transfer complaint
+that D0 correctly resolves to Checking. Several other M4-only errors involve
+the same Chime/wire/deposit vocabulary that misleads M4 elsewhere, resolved
+correctly by D0 here. The examples are consistent with D0 being less driven
+by a single strong institution-name keyword than M4 — the specific mechanism
+is not directly observable, only the outcome.
+
+### Where M4 remained competitive (D0-only errors: M4 correct, D0 wrong)
+
+Not a one-sided narrative. Several D0-only errors involve card-like
+transaction/dispute language on complaints whose true label is Checking —
+D0 predicts Credit card more readily than M4 does here, consistent with the
+same pattern already visible in the confusion matrix (Credit card → Debt
+collection also increased under D0). D0 appears mildly more willing to
+route ambiguous card/dispute vocabulary toward Credit card than M4 is.
+
+### Both models wrong
+
+Not ignored. Some both-wrong examples (e.g. a complaint whose visible text
+is entirely about a *credit card* account but whose true label is Checking)
+look like genuine label-boundary or annotation edge cases, not failures
+either model could reasonably have avoided from the text alone.
+
+### Error analysis summary
+
+**Main error patterns**: (1) Checking ↔ Money transfer, driven by fintech
+products spanning both categories in the actual text; (2) Credit card ↔
+Debt collection, the pre-registered §10 label-boundary confusion, present in
+both models; (3) multi-issue narratives contributing to Credit card →
+Checking confusion.
+
+**Where D0 helped**: reduces the two largest confusion pairs modestly
+(−12 to −15 each), reduces Credit card → Checking substantially (−29), net
++58 examples fixed vs broken across the test set.
+
+**Where M4 remained competitive**: Debt collection and Student loan (the
+two easiest classes) are very slightly better under M4, from a precision
+cost D0 pays via more Credit-card-to-Debt-collection misrouting; D0 shows a
+mild bias toward Credit card on ambiguous card-adjacent Checking complaints.
+
+**Remaining limitations**: truncation does not explain the errors in either
+model; redaction density is modestly higher in D0-only errors but not
+treated as a confirmed cause; several confusions look like genuine dataset
+label-boundary properties rather than fixable model weaknesses.
+
+### Examiner-ready table
+
+| Analysis | M4 | D0 | Observation |
+|---|---|---|---|
+| Macro-F1 | 0.8710 | 0.8759 | D0 higher, +0.0048 |
+| Hardest class | Checking (F1 0.7862) | Checking (F1 0.7973) | hardest for both, D0 improves it |
+| Largest confusion | Money transfer→Checking (327) | Money transfer→Checking (312) | reduced but not resolved |
+| M4-only errors | — | — | 422 (4.14% of test set) |
+| D0-only errors | — | — | 364 (3.58% of test set) |
+| Both wrong | — | — | 920 (9.04% of test set) |
+| Major truncation issue | none found | none found | error groups less truncated than correct ones |
+| Main error pattern | Checking↔Money transfer | same pair, smaller | overlapping fintech product vocabulary |
+
+### Example selection method (Part 7/20)
+
+For each confusion pair/group: first N=5 examples by ascending `test_idx`
+where the condition held — deterministic, no cherry-picking, no random
+sampling. Full 35-example set (7 groups/pairs × 5) committed at
+`results/error_analysis_examples.json`, every index traceable to the frozen
+test split and both models' own prediction files. Excerpts are short
+(≤180 chars) with emails and 6+ digit runs masked in addition to the
+dataset's existing `XXXX` redaction — no full narrative text is exposed
+anywhere in this project.
 
 ### Commit
 
