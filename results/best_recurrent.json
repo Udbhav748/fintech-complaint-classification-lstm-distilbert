@@ -19,6 +19,14 @@
   "final_model_rationale": "D0 consistently outperformed M4 across all three seeds (min seed 0.8740 > M4 0.8710); asymmetric comparison (D0 n=3, M4 n=1), not a formal significance test.",
   "selection_rule": "best_recurrent: highest test Macro-F1 among M0 (3-seed mean) and M1-M4 (single seed). final_model: D0 if its 3-seed mean exceeds best_recurrent.",
   "dataset_content_sha256": "eb66684f66769cdef277a9bed3fbffdbfb30b9a4e91882273084a6ef31a77df6",
-  "git_commit": "0dbe29f78f1b575129926e493fbf4dfbfe80110e",
-  "created_at_utc": "2026-08-21T02:36:25.877340+00:00"
+  "git_commit": "c19e132f56f4e8db0d258d537da17b833e8ad067",
+  "created_at_utc": "2026-08-21T02:53:06.370704+00:00",
+  "m0_spread": 0.004125488876295158,
+  "d0_spread": 0.003663961967825591,
+  "m1_delta": -0.002317621684802651,
+  "m2_delta": 0.0009644189970533512,
+  "m3_delta": 0.01483468098855345,
+  "m4_delta": 0.020190667574296328,
+  "stability_reference": "M0 3-seed spread (0.0041), pre-registered project_plan.md \u00a79 - not a formal significance test.",
+  "uncertainty_note": "M1-M4 are single-seed (no std). M0 and D0 are the only 3-seed endpoints. D0 vs M4 is an asymmetric comparison (3 seeds vs 1); no formal significance test is claimed anywhere in this project."
 }

@@ -2311,21 +2311,121 @@ add final results
 
 ---
 
-# 14.16 Stage 14 — Statistical/Variance Interpretation
+# 14.16 Stage 14 — Statistical/Variance Interpretation ✅ COMPLETE
 
-Use the three-seed results as a **stability reference**.
+Analysis only — no model trained, tuned, or modified. Full working (seed
+tables, delta classification, three charts) lives in the "Variance
+interpretation" section appended to `notebooks/05_final_results.ipynb`
+(executed top to bottom, 0 errors across all 52 cells). This section is the
+consolidated summary.
 
-Do not present the variance rule as a formal significance test.
+Use the three-seed results as a **stability reference**. The project has no
+formal significance-testing protocol and none is introduced here.
 
-When an intermediate delta is small relative to the observed baseline run-to-run spread, describe it cautiously:
+### M0 / D0 seed variability (independently re-verified)
 
-> no clear evidence of a meaningful improvement
+Every seed-level `macro_f1` re-read directly from
+`results/m0|d0/seed*/test_metrics.json` and cross-checked against
+`results/runs.csv` — zero mismatches (same result as every prior check in
+Tasks 12–14).
 
-rather than:
+| Endpoint | Seed 42 | Seed 123 | Seed 456 | Mean | Std | Min | Max | Spread |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| M0 | 0.8489 | 0.8507 | 0.8530 | 0.8508 | 0.0021 | 0.8489 | 0.8530 | 0.0041 |
+| D0 | 0.8759 | 0.8777 | 0.8740 | 0.8759 | 0.0018 | 0.8740 | 0.8777 | 0.0037 |
 
-> statistically significant improvement
+D0's observed three-seed spread (0.0037) is smaller than M0's (0.0041) —
+stated descriptively, about these three tested seeds, not as a general claim
+that DistilBERT is intrinsically more stable than an LSTM.
 
-Unless a formal statistical test has actually been performed.
+### Single-seed rung limitation (M1–M4)
+
+M1–M4 each have exactly one seed (`EXPERIMENT_CONFIGS["M1"–"M4"]["seeds"]`,
+§3.2's locked budget). **There is no rung-specific standard deviation for
+M1–M4** — their individual run-to-run variance cannot be estimated from this
+project's data, and none is fabricated. Every M1–M4 delta is judged only
+against M0's own three-seed spread (0.0041), the project's one pre-registered
+stability reference (§9) — not a new threshold, not a formal test.
+
+### Delta classification
+
+| Comparison | Delta | Variance Evidence | Interpretation |
+|---|---:|---|---|
+| M1 − M0 | −0.0023 | M0 3-seed spread | within observed baseline variability (0.56×) |
+| M2 − M1 | +0.0033 | M0 stability reference | within observed baseline variability (0.80×) |
+| M3 − M2 | +0.0139 | M0 stability reference | clearly outside observed baseline variability (3.36×) |
+| M4 − M3 | +0.0054 | M0 stability reference | outside, but only modestly (1.30×) — caution |
+| M4 − M0 | +0.0202 | M0 stability reference | clearly outside observed baseline variability (4.90×) |
+| D0 − M4 | +0.0048 | D0 3-seed / M4 single seed | outside, but only modestly (1.17×) — caution, asymmetric |
+| D0 − M0 | +0.0250 | both multi-seed | clearly outside observed baseline variability (6.07×) |
+| M4 − TF-IDF | +0.0003 | TF-IDF single run | effectively negligible observed difference |
+
+**M1** — small negative delta, within M0's spread; not treated as a
+confirmed regression. **M2** — small positive delta, within M0's spread on
+the aggregate number (the train/val curve evidence in §14.10 is a separate,
+non-aggregate line of evidence, not contradicted by this classification).
+**M3** — large positive delta, comfortably outside the spread; the clearest
+resolved recurrent-ladder improvement. **M4** — cumulative delta clearly
+outside the spread; the incremental M4-vs-M3 delta is outside it but only
+modestly (1.30×) — a real but less comfortable margin than M3's, and still a
+single-seed observation.
+
+### D0 vs M4 — asymmetric evidence, stated explicitly
+
+D0 (3 seeds) vs M4 (1 seed) is **not a symmetric uncertainty comparison**.
+All three D0 seeds (0.8740, 0.8759, 0.8777) exceeded M4's single observed
+score (0.8710); D0's own spread is small and does not overlap M4's value.
+M4 has no repeated-seed estimate, so the asymmetry is not resolved by D0's
+tight spread. Correct framing: "D0 consistently exceeded the observed M4
+score across all three seeds." **Not:** "D0 is statistically significantly
+better than M4" — no such test was performed, and one M4 seed cannot be
+turned into a distribution or a pooled standard error.
+
+### TF-IDF variance limitation
+
+TF-IDF is a single reference run — no std, no significance test, no
+uncertainty interval exists or is invented for it. M4 − TF-IDF (+0.0003) is
+an effectively negligible observed difference under the available evidence,
+not "M4 significantly beats TF-IDF." D0 − TF-IDF (+0.0051) is a useful
+descriptive gap; TF-IDF's single-run status is unchanged by D0 having three
+seeds of its own.
+
+### Claims supported by the experiments
+
+* M0 and D0 both show low variation across their three tested seeds.
+* D0's observed seed-to-seed spread is smaller than M0's.
+* M3 produced a clear observed improvement over M2 and M0.
+* M4 produced the strongest recurrent result, well outside M0's spread
+  cumulatively.
+* All three D0 seeds exceeded the single observed M4 score.
+* D0 was the best observed model in the project.
+
+### What we cannot claim
+
+* Formal statistical significance for any M1–M4 delta.
+* A confidence interval for M1, M2, M3, or M4 individually.
+* The true population variance of M1–M4 — only M0 and D0 have a measured
+  sample variance at all.
+* A formal significance test of D0 vs M4 — the comparison is asymmetric (3
+  seeds vs 1) and reported as such.
+* General superiority of D0 beyond this dataset, split, and training setup.
+* That any single M4 component individually caused the observed M4 gain —
+  the bundled-stage limitation (§8/§14.12) still applies.
+
+### Seed-count limitation (project design, not an ideal)
+
+The fixed 10-fit budget (§3.2) allocated repeated seeds only to M0 and D0 —
+`M0×3, M1×1, M2×1, M3×1, M4×1, D0×3` — because those two anchor the baseline
+and the final model-family comparison. This is stated honestly as a
+compute-budget trade-off, not an ideal experimental design: M1–M4 each
+report one run, and their individual run-to-run variance is genuinely
+unknown.
+
+### Machine-readable summary
+
+`results/best_recurrent.json` extended (not duplicated) with `m0_spread`,
+`d0_spread`, `m1_delta`–`m4_delta` (cumulative vs the full-precision M0
+mean), `stability_reference`, and `uncertainty_note`.
 
 ### Commit
 
