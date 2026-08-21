@@ -222,12 +222,18 @@ def generate_comparison_table(
     - Accuracy (formatted mean ± std for multi-seed, or single float)
     - Δ vs Previous (calculated unrounded, formatted with explicit sign)
     - Δ vs M0 (calculated unrounded, formatted with explicit sign)
+    - Best Epoch (single value, or min–max range across seeds for M0/D0 -
+      never averaged into a fractional epoch)
+    - Time (seconds; mean ± std for multi-seed, single value otherwise)
+    - Parameters (identical across seeds for a given experiment - asserted,
+      not assumed)
     - Interpretation (placeholder for documented findings)
     """
     p = Path(runs_csv_path)
     if not p.exists():
         return pd.DataFrame(
-            columns=["Model", "Configuration", "Macro-F1", "Accuracy", "Δ vs Previous", "Δ vs M0", "Interpretation"]
+            columns=["Model", "Configuration", "Macro-F1", "Accuracy", "Δ vs Previous", "Δ vs M0",
+                     "Best Epoch", "Time", "Parameters", "Interpretation"]
         )
 
     validate_runs_csv(p, check_seed_completeness=False, raise_on_error=True)
@@ -266,6 +272,20 @@ def generate_comparison_table(
         delta_prev_str = format_delta(deltas["delta_vs_previous"])
         delta_m0_str = format_delta(deltas["delta_vs_m0"])
 
+        if len(sub) > 1:
+            best_epoch_str = f"{int(sub['best_epoch'].min())}–{int(sub['best_epoch'].max())}"
+            time_stats = seed_statistics(sub["train_time"].values)
+            time_str = f"{time_stats['mean']:.0f} ± {time_stats['std']:.0f}"
+        else:
+            best_epoch_str = str(int(sub["best_epoch"].iloc[0]))
+            time_str = f"{sub['train_time'].iloc[0]:.0f}"
+
+        if sub["parameter_count"].nunique() != 1:
+            raise ResultsValidationError(
+                f"{exp} has inconsistent parameter_count across seeds: {sub['parameter_count'].unique()}"
+            )
+        params_str = f"{int(sub['parameter_count'].iloc[0]):,}"
+
         rows.append({
             "Model": exp,
             "Configuration": desc,
@@ -273,6 +293,9 @@ def generate_comparison_table(
             "Accuracy": acc_str,
             "Δ vs Previous": delta_prev_str,
             "Δ vs M0": delta_m0_str,
+            "Best Epoch": best_epoch_str,
+            "Time": time_str,
+            "Parameters": params_str,
             "Interpretation": "",
         })
 
