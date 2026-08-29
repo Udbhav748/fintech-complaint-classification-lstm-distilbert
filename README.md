@@ -62,6 +62,8 @@ The goal is not simply to chase a benchmark score, but to isolate the empirical 
 
 ## Results
 
+![Model comparison: Macro-F1 across the ladder](assets/model_comparison.png)
+
 *Results are recorded to `results/runs.csv` during execution; full derivation of the deltas and variance reasoning below lives in `notebooks/05_final_results.ipynb`.*
 
 | Model | Configuration | Macro-F1 | Accuracy | Δ vs Previous | Δ vs M0 | Interpretation |
