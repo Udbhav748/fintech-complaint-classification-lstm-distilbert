@@ -62,22 +62,24 @@ The goal is not simply to chase a benchmark score, but to isolate the empirical 
 
 ## Results
 
-*Results are recorded to `results/runs.csv` during execution and compiled dynamically via `src.results.generate_comparison_table()`.*
+*Results are recorded to `results/runs.csv` during execution; full derivation of the deltas and variance reasoning below lives in `notebooks/05_final_results.ipynb`.*
 
 | Model | Configuration | Macro-F1 | Accuracy | Δ vs Previous | Δ vs M0 | Interpretation |
 |---|---|---|---|---|---|---|
-| **M0** | Unidirectional LSTM baseline, random embeddings | — | — | — | — | Baseline reference |
-| **M1** | Bidirectional LSTM | — | — | — | — | Directionality effect |
-| **M2** | BiLSTM + Spatial Dropout | — | — | — | — | Regularization effect |
-| **M3** | BiLSTM + Pretrained GloVe-100d | — | — | — | — | Pretrained representation |
-| **M4** | BiLSTM + GloVe + LR schedule + EarlyStopping | — | — | — | — | Optimization & length bundle |
-| **D0** | DistilBERT (fine-tuned transformer) | — | — | — | — | Transformer comparison |
+| **M0** | Unidirectional LSTM baseline, random embeddings | 0.8508 ± 0.0021 (3 seeds) | 0.8483 | — | — | Baseline stability reference |
+| **M1** | Bidirectional LSTM | 0.8485 | 0.8455 | −0.0023 | −0.0023 | Within M0's own seed spread — bidirectionality's effect can't be distinguished from run-to-run noise here |
+| **M2** | BiLSTM + Spatial Dropout | 0.8518 | 0.8485 | +0.0033 | +0.0010 | Aggregate delta still within M0's spread, but training curves show clearly reduced train/val overfitting vs M1 |
+| **M3** | BiLSTM + Pretrained GloVe-100d | 0.8657 | 0.8627 | +0.0139 | +0.0148 | Clearly outside M0's observed spread — the first unambiguous improvement in the ladder |
+| **M4** | BiLSTM + GloVe + LR schedule + EarlyStopping + max_len=256 | 0.8710 | 0.8682 | +0.0054 | +0.0202 | Outside M0's spread, though only modestly (~1.3x) — best recurrent model |
+| **D0** | DistilBERT (fine-tuned transformer) | 0.8759 ± 0.0018 (3 seeds) | 0.8737 | +0.0048 | +0.0250 | All three seeds exceeded M4's single observed score — best model overall |
+
+**Reading the table:** M1 and M2 don't clearly beat the baseline on the aggregate number alone — M0's own 3-seed spread is wide enough to swallow both deltas. M3 (GloVe) is the first change that moves the needle unambiguously. M4 stacks LR scheduling, early stopping, and a longer context window on top of GloVe for the best recurrent result. D0 beats M4 consistently across all three seeds it was run at, but M4 itself was only run once, so that comparison is not symmetric — see the notebook for the full caveat.
 
 ---
 
 ## Error Analysis
 
-*(To be populated following final test set evaluation)*
+M4 (best recurrent) vs D0 (final transformer) compared on the same frozen 10,181-row test set, aligned by index (`results/error_analysis_examples.json`, full breakdown in `notebooks/05_final_results.ipynb`). D0 improves per-class F1 in 3 of 5 classes (Checking/savings +0.0111, Credit card +0.0087, Money transfer +0.0085) and is marginally behind M4 in the other two (Debt collection −0.0023, Student loan −0.0015). No class shows a large, one-sided failure mode for either model — the transformer's overall edge is broad rather than concentrated in one category.
 - Hardest class distinctions (e.g. Credit Card vs Checking/Savings dispute narratives).
 - Impact of CFPB `XXXX` redaction tokens on tokenization and classification.
 - Truncation error analysis for long complaints (>256 words).
@@ -123,25 +125,37 @@ python -m unittest discover tests
 ├── data/
 │   ├── combined_complaints.parquet # Master dataset (107,992 rows)
 │   ├── dataset_manifest.json     # Cryptographic & content dataset fingerprint
-│   ├── splits/                   # Frozen train/val/test split indices (.npy)
-│   └── embeddings/               # GloVe pretrained vectors
+│   ├── splits/                   # Frozen train/val/test split indices
+│   └── embeddings/                # GloVe pretrained vectors
 ├── notebooks/
-│   ├── 01_eda.ipynb              # Dataset audit, length, and GloVe coverage analysis
-│   ├── 02_baselines.ipynb        # M0 baseline LSTM training and stability check
-│   ├── 03_ladder.ipynb           # M1–M4 recurrent ladder experiments
-│   └── 04_distilbert.ipynb       # D0 DistilBERT fine-tuning and evaluation
+│   ├── 00_master_pipeline.ipynb  # All five notebooks below, combined and executed in order
+│   ├── 01_eda.ipynb              # Dataset audit: duplicates, leakage, length, GloVe coverage
+│   ├── 02_preprocessing.ipynb    # Text cleaning, tokenization, split building
+│   ├── 03_evaluation.ipynb       # Evaluation library checks (metrics, deltas, seed stats)
+│   ├── 04_tfidf_reference.ipynb  # TF-IDF + logistic regression reference model
+│   └── 05_final_results.ipynb    # Full comparison table, charts, and error analysis
 ├── results/
 │   ├── runs.csv                  # Immutable experiment execution record
-│   └── metadata/                 # Detailed per-run JSON metadata
+│   ├── m0/ ... m4/, d0/          # Per-experiment, per-seed metrics and predictions
+│   ├── tfidf_reference.json      # TF-IDF reference run
+│   └── error_analysis_examples.json # Sampled M4 vs D0 disagreement examples
 ├── src/
 │   ├── data.py                   # Data loading, deduplication, and labels
+│   ├── preprocessing.py          # Text cleaning and normalization
+│   ├── keras_tokenizer.py        # Tokenizer used by the recurrent models
+│   ├── embeddings.py             # GloVe loading and coverage checks
+│   ├── models.py                 # LSTM/BiLSTM model definitions
+│   ├── distilbert.py             # DistilBERT fine-tuning
 │   ├── fingerprint.py            # Dataset & split cryptographic fingerprinting
-│   ├── split.py                  # Stratified splitting and invariant validation
+│   ├── split.py                  # Stratified, near-duplicate-aware splitting
 │   ├── evaluation.py             # Macro-F1, metrics, and delta calculations
 │   ├── checkpoint.py             # Deterministic checkpoints and metric gating
 │   ├── config.py                 # Configuration loader and validator
-│   ├── logging_utils.py          # Structured lightweight logger
 │   ├── reproducibility.py        # Multi-framework seed control and environment capture
 │   └── results.py                # runs.csv schema validation and table generator
+├── scripts/
+│   ├── build_splits.py           # Builds the frozen train/val/test split
+│   ├── run_m0.py ... run_m4.py, run_d0.py # Training entry points for each experiment
+│   └── project_check.py          # Pre-flight guard: structure, config, tests
 └── tests/                        # Focused CPU unit test suite
 ```

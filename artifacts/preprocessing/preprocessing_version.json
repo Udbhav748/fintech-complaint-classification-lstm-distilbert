@@ -22,5 +22,5 @@
   "glove_coverage_pct": 86.68,
   "distilbert_checkpoint": "distilbert-base-uncased",
   "distilbert_max_len": 256,
-  "created_at_utc": "2026-08-20T01:38:15.316276+00:00"
+  "created_at_utc": "2026-08-29T06:19:09.552761+00:00"
 }
