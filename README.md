@@ -101,6 +101,20 @@ I compared M4 (best recurrent) against D0 (final transformer) on the same frozen
 
 ---
 
+## Testing
+
+I ran D0 against a handful of held-out complaints it never saw during training, pulled straight from the frozen test split, to sanity-check the predictions by hand instead of trusting the aggregate metric alone:
+
+![D0 inference on held-out test complaints](assets/inference_demo.png)
+
+The two wrong predictions above show the actual failure mode: both are short complaints (one or two sentences) about app/login problems with no product-specific vocabulary, which is exactly the kind of case the confusion matrices above flag as ambiguous between Credit card, Checking/savings, and Money transfer.
+
+The full automated suite (253 tests covering data loading, preprocessing, splitting, metrics, and checkpoint logic) passes before anything in this repo is treated as final:
+
+![Test suite run: python -m unittest discover tests](assets/test_suite_run.png)
+
+---
+
 ## Limitations
 
 - **M4 Enhancement Bundling:** Learning rate scheduling, early stopping, and extending `max_len` from 128 to 256 are bundled in M4 due to compute budget. The standalone contribution of `max_len` is not isolated.
