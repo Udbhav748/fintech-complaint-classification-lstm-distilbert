@@ -64,6 +64,8 @@ The goal is not simply to chase a benchmark score, but to isolate the empirical 
 
 ![Model comparison: Macro-F1 across the ladder](assets/model_comparison.png)
 
+![Full results table](assets/results_table.png)
+
 *Results are recorded to `results/runs.csv` during execution; full derivation of the deltas and variance reasoning below lives in `notebooks/05_final_results.ipynb`.*
 
 | Model | Configuration | Macro-F1 | Accuracy | Δ vs Previous | Δ vs M0 | Interpretation |
@@ -81,7 +83,11 @@ The goal is not simply to chase a benchmark score, but to isolate the empirical 
 
 ## Error Analysis
 
-M4 (best recurrent) vs D0 (final transformer) compared on the same frozen 10,181-row test set, aligned by index (`results/error_analysis_examples.json`, full breakdown in `notebooks/05_final_results.ipynb`). D0 improves per-class F1 in 3 of 5 classes (Checking/savings +0.0111, Credit card +0.0087, Money transfer +0.0085) and is marginally behind M4 in the other two (Debt collection −0.0023, Student loan −0.0015). No class shows a large, one-sided failure mode for either model — the transformer's overall edge is broad rather than concentrated in one category.
+![Per-class F1 across the model ladder](assets/per_class_f1.png)
+
+![Confusion matrices: M4 vs D0](assets/confusion_matrices.png)
+
+M4 (best recurrent) vs D0 (final transformer) compared on the same frozen 10,181-row test set, aligned by index (`results/error_analysis_examples.json`, full breakdown in `notebooks/05_final_results.ipynb`). D0 improves per-class F1 in 3 of 5 classes (Checking/savings +0.0111, Credit card +0.0087, Money transfer +0.0085) and is marginally behind M4 in the other two (Debt collection −0.0023, Student loan −0.0015). No class shows a large, one-sided failure mode for either model — the transformer's overall edge is broad rather than concentrated in one category. The confusion matrices above show the dominant error mode for both models is the same: Checking/savings and Money transfer complaints get confused with each other far more than with any other class, likely reflecting real overlap in how consumers describe account and transfer disputes.
 - Hardest class distinctions (e.g. Credit Card vs Checking/Savings dispute narratives).
 - Impact of CFPB `XXXX` redaction tokens on tokenization and classification.
 - Truncation error analysis for long complaints (>256 words).
