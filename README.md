@@ -1,6 +1,6 @@
 # CFPB Complaint Classification
 
-5-class financial complaint text classification comparing a recurrent model ladder (LSTM variants) against a fine-tuned transformer (DistilBERT).
+I built this project to classify CFPB financial complaints into 5 categories, comparing a recurrent model ladder (LSTM variants) against a fine-tuned transformer (DistilBERT).
 
 ---
 
@@ -13,7 +13,7 @@ Consumers submit unstructured complaint narratives to the Consumer Financial Pro
 4. **Money transfer, virtual currency, or money service**
 5. **Student loan**
 
-The goal is not simply to chase a benchmark score, but to isolate the empirical contribution of each architectural, representation, and optimization enhancement across a disciplined ladder.
+My goal wasn't to chase a benchmark score. I wanted to isolate the actual contribution of each architectural, representation, and optimization change across a disciplined ladder.
 
 ---
 
@@ -71,13 +71,17 @@ The goal is not simply to chase a benchmark score, but to isolate the empirical 
 | Model | Configuration | Macro-F1 | Accuracy | Δ vs Previous | Δ vs M0 | Interpretation |
 |---|---|---|---|---|---|---|
 | **M0** | Unidirectional LSTM baseline, random embeddings | 0.8508 ± 0.0021 (3 seeds) | 0.8483 | — | — | Baseline stability reference |
-| **M1** | Bidirectional LSTM | 0.8485 | 0.8455 | −0.0023 | −0.0023 | Within M0's own seed spread — bidirectionality's effect can't be distinguished from run-to-run noise here |
+| **M1** | Bidirectional LSTM | 0.8485 | 0.8455 | −0.0023 | −0.0023 | Within M0's own seed spread, bidirectionality's effect can't be distinguished from run-to-run noise here |
 | **M2** | BiLSTM + Spatial Dropout | 0.8518 | 0.8485 | +0.0033 | +0.0010 | Aggregate delta still within M0's spread, but training curves show clearly reduced train/val overfitting vs M1 |
-| **M3** | BiLSTM + Pretrained GloVe-100d | 0.8657 | 0.8627 | +0.0139 | +0.0148 | Clearly outside M0's observed spread — the first unambiguous improvement in the ladder |
-| **M4** | BiLSTM + GloVe + LR schedule + EarlyStopping + max_len=256 | 0.8710 | 0.8682 | +0.0054 | +0.0202 | Outside M0's spread, though only modestly (~1.3x) — best recurrent model |
-| **D0** | DistilBERT (fine-tuned transformer) | 0.8759 ± 0.0018 (3 seeds) | 0.8737 | +0.0048 | +0.0250 | All three seeds exceeded M4's single observed score — best model overall |
+| **M3** | BiLSTM + Pretrained GloVe-100d | 0.8657 | 0.8627 | +0.0139 | +0.0148 | Clearly outside M0's observed spread, the first unambiguous improvement in the ladder |
+| **M4** | BiLSTM + GloVe + LR schedule + EarlyStopping + max_len=256 | 0.8710 | 0.8682 | +0.0054 | +0.0202 | Outside M0's spread, though only modestly (~1.3x), best recurrent model |
+| **D0** | DistilBERT (fine-tuned transformer) | 0.8759 ± 0.0018 (3 seeds) | 0.8737 | +0.0048 | +0.0250 | All three seeds exceeded M4's single observed score, best model overall |
 
-**Reading the table:** M1 and M2 don't clearly beat the baseline on the aggregate number alone — M0's own 3-seed spread is wide enough to swallow both deltas. M3 (GloVe) is the first change that moves the needle unambiguously. M4 stacks LR scheduling, early stopping, and a longer context window on top of GloVe for the best recurrent result. D0 beats M4 consistently across all three seeds it was run at, but M4 itself was only run once, so that comparison is not symmetric — see the notebook for the full caveat.
+**Reading the table:**
+1. M1 and M2 don't clearly beat the baseline on the aggregate number alone. M0's own 3-seed spread is wide enough to swallow both deltas.
+2. M3 (GloVe) is the first change that moves the needle unambiguously.
+3. M4 stacks LR scheduling, early stopping, and a longer context window on top of GloVe for the best recurrent result.
+4. D0 beats M4 consistently across all three seeds it was run at. M4 itself was only run once, so that comparison isn't symmetric, see the notebook for the full caveat.
 
 ---
 
@@ -87,10 +91,13 @@ The goal is not simply to chase a benchmark score, but to isolate the empirical 
 
 ![Confusion matrices: M4 vs D0](assets/confusion_matrices.png)
 
-M4 (best recurrent) vs D0 (final transformer) compared on the same frozen 10,181-row test set, aligned by index (`results/error_analysis_examples.json`, full breakdown in `notebooks/05_final_results.ipynb`). D0 improves per-class F1 in 3 of 5 classes (Checking/savings +0.0111, Credit card +0.0087, Money transfer +0.0085) and is marginally behind M4 in the other two (Debt collection −0.0023, Student loan −0.0015). No class shows a large, one-sided failure mode for either model — the transformer's overall edge is broad rather than concentrated in one category. The confusion matrices above show the dominant error mode for both models is the same: Checking/savings and Money transfer complaints get confused with each other far more than with any other class, likely reflecting real overlap in how consumers describe account and transfer disputes.
-- Hardest class distinctions (e.g. Credit Card vs Checking/Savings dispute narratives).
-- Impact of CFPB `XXXX` redaction tokens on tokenization and classification.
-- Truncation error analysis for long complaints (>256 words).
+I compared M4 (best recurrent) against D0 (final transformer) on the same frozen 10,181-row test set, aligned by index (`results/error_analysis_examples.json`, full breakdown in `notebooks/05_final_results.ipynb`).
+
+1. D0 improves per-class F1 in 3 of 5 classes (Checking/savings +0.0111, Credit card +0.0087, Money transfer +0.0085) and is marginally behind M4 on the other two (Debt collection −0.0023, Student loan −0.0015).
+2. Neither model shows a large, one-sided failure mode. D0's overall edge is broad rather than concentrated in one category.
+3. Both confusion matrices show the same dominant error: Checking/savings and Money transfer complaints get confused with each other far more than with any other class, likely reflecting real overlap in how consumers describe account and transfer disputes.
+4. Credit Card vs Checking/Savings dispute narratives are the hardest class distinction for both models.
+5. CFPB's `XXXX` redaction tokens and truncation on long complaints (>256 words) are areas I'd want to dig into further with more compute.
 
 ---
 
