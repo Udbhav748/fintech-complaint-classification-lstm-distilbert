@@ -22,7 +22,7 @@ A bank or financial company receives thousands of complaints a day, and someone 
 1. Source: CFPB Consumer Complaint Database.
 2. Raw size: 107,992 complaints across the 5 categories.
 3. After I removed exact duplicate complaints: 101,802 complaints remain.
-4. Class sizes are fairly close to each other: Debt collection 24,007, Checking or savings 21,547, Money transfer 21,437, Credit card 20,890, Student loan 20,111. That's roughly a 1.15 to 1 ratio between the biggest and smallest class, mild imbalance, not a serious one.
+4. Class sizes are fairly close to each other: Checking or savings 21,524, Money transfer 20,940, Credit card 20,684, Student loan 19,985, Debt collection 18,669. That's roughly a 1.15 to 1 ratio between the biggest and smallest class, mild imbalance, not a serious one.
 5. I split the data 80% train, 10% validation, 10% test, and froze that split (saved to disk) so every model gets tested on the exact same data.
 
 ## 4. How I organized the project, stage by stage

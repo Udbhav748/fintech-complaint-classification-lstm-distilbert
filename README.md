@@ -22,9 +22,11 @@ My goal wasn't to chase a benchmark score. I wanted to isolate the actual contri
 - **Source:** CFPB Consumer Complaint Database (`data/combined_complaints.parquet`).
 - **Raw Extract:** 107,992 complaints across the 5 target categories.
 - **Deduplication:** Exact duplicate narratives (6,190 boilerplate submissions across 848 distinct texts) are removed prior to splitting, leaving **101,802** unique complaints.
-- **Class Balance:** Approximately 1.15:1 ratio post-deduplication (Debt collection: 24,007; Checking/savings: 21,547; Money transfer: 21,437; Credit card: 20,890; Student loan: 20,111).
+- **Class Balance:** Approximately 1.15:1 ratio post-deduplication (Checking/savings: 21,524; Money transfer: 20,940; Credit card: 20,684; Student loan: 19,985; Debt collection: 18,669).
 - **Split:** Stratified 80% train (81,441), 10% validation (10,180), 10% test (10,181), frozen on disk in `data/splits/`.
 - **Integrity:** Verified with cryptographic and content SHA-256 hashes (`data/dataset_manifest.json` and `data/splits/split_manifest.json`).
+
+![Class distribution after deduplication](assets/class_distribution.png)
 
 ---
 
@@ -82,6 +84,14 @@ My goal wasn't to chase a benchmark score. I wanted to isolate the actual contri
 2. M3 (GloVe) is the first change that moves the needle unambiguously.
 3. M4 stacks LR scheduling, early stopping, and a longer context window on top of GloVe for the best recurrent result.
 4. D0 beats M4 consistently across all three seeds it was run at. M4 itself was only run once, so that comparison isn't symmetric, see the notebook for the full caveat.
+
+![Training dynamics: validation Macro-F1 and loss by epoch for M0, M4, and D0](assets/training_curves.png)
+
+D0 hits its best validation score by epoch 4 and M4 by epoch 5, but M4 keeps training for 3 more epochs before early stopping kicks in, well after the LR schedule's one drop at epoch 7. That confirms what I found in the notebook: early stopping is what actually protects M4 from overfitting further, not the learning rate schedule, which fires too late to get credit for it. M0's validation curve is also visibly noisier early on (the epoch-2 dip) than M4 or D0, which is consistent with it having the widest seed-to-seed spread of any model here.
+
+![Seed-to-seed spread for M0 and D0](assets/seed_stability.png)
+
+M0 and D0 are the only two models run across 3 seeds, and their spreads don't overlap: D0's worst seed (0.8740) still beats M0's best seed (0.8530) by a wide margin. That's what makes the D0 vs M0 gap a real, reproducible effect rather than a lucky draw, unlike M1 vs M0 where the whole delta sits inside a single model's own natural noise.
 
 ---
 
