@@ -115,6 +115,22 @@ The full automated suite (253 tests covering data loading, preprocessing, splitt
 
 ---
 
+## Demo
+
+I built a small Streamlit app (`app.py`) to try the model on complaints I type in myself, not just the frozen test set:
+
+![Demo UI: empty state](assets/ui_demo_empty.png)
+
+![Demo UI: classified result](assets/ui_demo_result.png)
+
+The demo runs M4, not D0. D0's saved checkpoint bakes in its AdamW optimizer state, and tf_keras's H5 loader can't reconcile that against a freshly built model in a separate process, a confirmed limitation I hit and documented in `scripts/run_d0.py`. M4's checkpoint has no such optimizer group and reloads cleanly, so it's what powers this demo.
+
+```bash
+streamlit run app.py
+```
+
+---
+
 ## Limitations
 
 - **M4 Enhancement Bundling:** Learning rate scheduling, early stopping, and extending `max_len` from 128 to 256 are bundled in M4 due to compute budget. The standalone contribution of `max_len` is not isolated.
