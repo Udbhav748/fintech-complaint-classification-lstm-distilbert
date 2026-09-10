@@ -32,7 +32,7 @@ My goal wasn't to chase a benchmark score. I wanted to isolate the actual contri
 
 ## Exploratory Data Analysis
 
-Before touching any model, I audited the raw data for problems that could quietly wreck the results later.
+Before touching any model, I audited the raw data for problems that could quietly wreck the results later. Every chart below (class distribution, length distribution, truncation rates, near-duplicate leakage) is generated directly by running `notebooks/01_eda.ipynb` end to end, reusing the same variables the audit itself computed, not a separate script.
 
 ![Complaint length distribution](assets/length_distribution.png)
 
@@ -101,7 +101,7 @@ I measured this directly with a TF-IDF probe before fixing the split: 0.922 Macr
 
 ![Full results table](assets/results_table.png)
 
-*Results are recorded to `results/runs.csv` during execution; full derivation of the deltas and variance reasoning below lives in `notebooks/05_final_results.ipynb`.*
+*Results are recorded to `results/runs.csv` during execution. Every chart in this section (model comparison, results table, per-class F1, confusion matrices, training curves, seed stability) is generated directly by running `notebooks/05_final_results.ipynb` end to end, not by a separate script, so the full derivation is one `nbconvert --execute` away.*
 
 | Model | Configuration | Macro-F1 | Accuracy | Δ vs Previous | Δ vs M0 | Interpretation |
 |---|---|---|---|---|---|---|
@@ -118,7 +118,7 @@ I measured this directly with a TF-IDF probe before fixing the split: 0.922 Macr
 3. M4 stacks LR scheduling, early stopping, and a longer context window on top of GloVe for the best recurrent result.
 4. D0 beats M4 consistently across all three seeds it was run at. M4 itself was only run once, so that comparison isn't symmetric, see the notebook for the full caveat.
 
-![Training dynamics: validation Macro-F1 and loss by epoch for M0, M4, and D0](assets/training_curves.png)
+![Validation Macro-F1 by epoch, all six models](assets/training_curves.png)
 
 D0 hits its best validation score by epoch 4 and M4 by epoch 5, but M4 keeps training for 3 more epochs before early stopping kicks in, well after the LR schedule's one drop at epoch 7. That confirms what I found in the notebook: early stopping is what actually protects M4 from overfitting further, not the learning rate schedule, which fires too late to get credit for it. M0's validation curve is also visibly noisier early on (the epoch-2 dip) than M4 or D0, which is consistent with it having the widest seed-to-seed spread of any model here.
 
