@@ -30,6 +30,25 @@ My goal wasn't to chase a benchmark score. I wanted to isolate the actual contri
 
 ---
 
+## Exploratory Data Analysis
+
+Before touching any model, I audited the raw data for problems that could quietly wreck the results later.
+
+![Complaint length distribution](assets/length_distribution.png)
+
+1. Median complaint length is 178 words, but the distribution has a long tail out to 5,699 words. Cutting text at 128 words was a real limitation since the model only reads about half the text on average. That's the direct reason M4 tests a longer 256-word limit.
+2. DistilBERT's WordPiece tokenizer breaks words into more, smaller pieces than the Keras tokenizer, so it truncates a larger share of complaints at the same word-length limit.
+
+![Truncation rate by tokenizer and length limit](assets/truncation_rates.png)
+
+The near-duplicate check was the most important thing this audit caught. Exact duplicate removal alone isn't enough, since 7.8% of complaints still have a near-identical twin (same template, different name or amount) that a byte-for-byte check would miss entirely:
+
+![Near-duplicate leakage evidence](assets/near_duplicate_leakage.png)
+
+I measured this directly with a TF-IDF probe before fixing the split: 0.922 Macro-F1 on test documents that had a near-duplicate twin in train or validation, versus 0.858 on everything else, a gap large enough to meaningfully inflate the reported score. That's why the frozen split keeps near-duplicate clusters (TF-IDF cosine similarity ≥ 0.7) entirely inside one split instead of letting copies leak across train, validation, and test.
+
+---
+
 ## Experimental Design
 
 - **Single Controlled Variable:** Each step in the ladder introduces one isolated change (representation, directionality, regularization, or optimization).
