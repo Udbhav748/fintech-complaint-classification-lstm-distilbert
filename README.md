@@ -64,10 +64,24 @@ I measured this directly with a TF-IDF probe before fixing the split: 0.922 Macr
 |---|---|---|---|
 | **M0** | Unidirectional LSTM | Random embeddings, `max_len=128`, hidden dim 128 | Baseline stability reference across 3 seeds |
 | **M1** | Bidirectional LSTM | Bidirectional recurrent layer | Captures backward context (modest gain expected) |
-| **M2** | BiLSTM + Spatial Dropout | Spatial Dropout (0.2) + Dropout (0.3) | Regularization to reduce train/val gap |
+| **M2** | BiLSTM + Spatial Dropout | Spatial Dropout (0.2) + Dropout (0.3) + Recurrent Dropout (0.2) | Regularization to reduce train/val gap |
 | **M3** | BiLSTM + Pretrained GloVe | GloVe-100d pretrained vectors | Accelerates convergence via pretrained semantics |
 | **M4** | BiLSTM + GloVe + Optimized | LR schedule + EarlyStopping + `max_len=256` | Efficiency and extended sequence length |
 | **D0** | DistilBERT | Fine-tuned `distilbert-base-uncased` | Pretrained contextual transformer benchmark |
+
+**Enhancement coverage:**
+
+| Enhancement | Where it's applied | Status |
+|---|---|---|
+| Bidirectional LSTM | M1 | Applied |
+| Dropout & recurrent dropout | M2 (Dropout 0.3, Spatial Dropout 0.2, Recurrent Dropout 0.2) | Applied |
+| Pretrained GloVe embeddings vs random init | M3 (GloVe-100d vs M0-M2's random init) | Applied |
+| Learning-rate scheduling | M4 (`ReduceLROnPlateau`) | Applied |
+| Early stopping | M4 (patience 3) | Applied |
+| Longer max_length | M4 (128 to 256) | Applied |
+| Swap LSTM to DistilBERT fine-tune | D0 | Applied |
+| Stacked LSTM layers | Not run | Skipped: the 10-run compute budget was spent on the ladder above instead |
+| Class weights | Not run | Skipped: class imbalance is mild (1.15:1), so weighting would rescale the loss by at most ~15%, not enough to meaningfully move the result on ~20k examples per class |
 
 ---
 
