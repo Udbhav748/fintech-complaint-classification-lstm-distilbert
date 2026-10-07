@@ -245,7 +245,7 @@ python -m unittest discover tests
 │   └── 05_final_results.ipynb    # Full comparison table, charts, and error analysis
 ├── results/
 │   ├── runs.csv                  # Immutable experiment execution record
-│   ├── m0/ ... m4/, d0/          # Per-experiment, per-seed metrics and predictions
+│   ├── m0/ ... m6/, d0/          # Per-experiment, per-seed metrics and predictions
 │   ├── tfidf_reference.json      # TF-IDF reference run
 │   └── error_analysis_examples.json # Sampled M4 vs D0 disagreement examples
 ├── src/
@@ -264,7 +264,7 @@ python -m unittest discover tests
 │   └── results.py                # runs.csv schema validation and table generator
 ├── scripts/
 │   ├── build_splits.py           # Builds the frozen train/val/test split
-│   ├── run_m0.py ... run_m4.py, run_d0.py # Training entry points for each experiment
+│   ├── run_m0.py ... run_m6.py, run_d0.py # Training entry points for each experiment
 │   └── project_check.py          # Pre-flight guard: structure, config, tests
 └── tests/                        # Focused CPU unit test suite
 ```
