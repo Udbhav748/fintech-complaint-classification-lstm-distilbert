@@ -71,6 +71,8 @@ I measured this directly with a TF-IDF probe before fixing the split: 0.922 Macr
 
 **Enhancement coverage:**
 
+M0-M4 and D0 are the main experimental ladder. M5 and M6 are additional extension experiments, run after the ladder to explicitly cover the two remaining items from the enhancement menu below, not further required ladder rungs.
+
 | Enhancement | Where it's applied | Status |
 |---|---|---|
 | Bidirectional LSTM | M1 | Applied |
@@ -80,8 +82,10 @@ I measured this directly with a TF-IDF probe before fixing the split: 0.922 Macr
 | Early stopping | M4 (patience 3) | Applied |
 | Longer max_length | M4 (128 to 256) | Applied |
 | Swap LSTM to DistilBERT fine-tune | D0 | Applied |
-| Stacked LSTM layers | Not run | Skipped: the 10-run compute budget was spent on the ladder above instead |
-| Class weights | Not run | Skipped: class imbalance is mild (1.15:1), so weighting would rescale the loss by at most ~15%, not enough to meaningfully move the result on ~20k examples per class |
+| Stacked LSTM layers | M5 (M4 + 2 stacked BiLSTM layers) | Applied — extension |
+| Class weights | M6 (M4 + balanced class weights) | Applied — extension |
+
+See [Extensions beyond M4](#extensions-beyond-m4) below for M5/M6 results.
 
 ---
 
