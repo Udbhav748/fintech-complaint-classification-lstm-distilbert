@@ -23,7 +23,7 @@ import tensorflow as tf
 from src.config import get_experiment_config
 from src.data import LABELS
 
-RECURRENT_EXPERIMENTS = ["M0", "M1", "M2", "M3", "M4"]
+RECURRENT_EXPERIMENTS = ["M0", "M1", "M2", "M3", "M4", "M5", "M6"]
 
 
 class ModelConfigError(ValueError):
@@ -64,6 +64,8 @@ class RecurrentModelConfig:
     early_stopping: bool = False
     early_stopping_patience: Optional[int] = None
     early_stopping_restore_best_weights: bool = True
+    num_layers: int = 1
+    class_weights: bool = False
 
     def __post_init__(self) -> None:
         errors = []
@@ -86,6 +88,8 @@ class RecurrentModelConfig:
             errors.append(f"embedding_type must be 'random' or 'glove', got '{self.embedding_type}'")
         if self.learning_rate <= 0:
             errors.append(f"learning_rate must be > 0, got {self.learning_rate}")
+        if not (1 <= self.num_layers <= 3):
+            errors.append(f"num_layers must be in [1, 3], got {self.num_layers}")
         for name, val in [("dropout", self.dropout), ("recurrent_dropout", self.recurrent_dropout),
                           ("spatial_dropout", self.spatial_dropout)]:
             if not (0.0 <= val < 1.0):
@@ -125,6 +129,8 @@ class RecurrentModelConfig:
             early_stopping=cfg.get("early_stopping", False),
             early_stopping_patience=cfg.get("early_stopping_patience"),
             early_stopping_restore_best_weights=cfg.get("early_stopping_restore_best_weights", True),
+            num_layers=cfg.get("num_layers", 1),
+            class_weights=cfg.get("class_weights", False),
         )
 
 
@@ -193,6 +199,9 @@ def build_recurrent_model(
     supposed to be, and M3 cannot silently change anything besides the
     embedding.
 
+    M5+ extensions: `num_layers` stacks LSTM layers (return_sequences=True for
+    intermediate layers). `class_weights` is handled at fit time, not model build.
+
     No masking (`mask_zero`) is used. `src.keras_tokenizer.pad_sequences`'
     `padding="pre"` default was chosen on the explicit assumption of an
     *unmasked* LSTM - see that module's docstring. Adding masking here would
@@ -228,13 +237,21 @@ def build_recurrent_model(
     if config.spatial_dropout > 0:
         x = keras.layers.SpatialDropout1D(config.spatial_dropout, name="spatial_dropout")(x)
 
-    lstm = keras.layers.LSTM(
-        config.lstm_units,
-        dropout=config.dropout,
-        recurrent_dropout=config.recurrent_dropout,
-        name="lstm",
-    )
-    x = keras.layers.Bidirectional(lstm, name="bidirectional_lstm")(x) if config.bidirectional else lstm(x)
+    # Stacked LSTM layers
+    for i in range(config.num_layers):
+        is_last = (i == config.num_layers - 1)
+        layer_name = "lstm" if config.num_layers == 1 else f"lstm_{i+1}"
+        lstm = keras.layers.LSTM(
+            config.lstm_units,
+            dropout=config.dropout,
+            recurrent_dropout=config.recurrent_dropout,
+            return_sequences=not is_last,
+            name=layer_name,
+        )
+        if config.bidirectional:
+            x = keras.layers.Bidirectional(lstm, name=f"bidirectional_{layer_name}")(x)
+        else:
+            x = lstm(x)
 
     outputs = keras.layers.Dense(config.output_classes, activation="softmax", name="output")(x)
     model = keras.Model(inputs=inputs, outputs=outputs, name=f"{config.experiment_id}_recurrent")

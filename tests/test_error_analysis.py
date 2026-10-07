@@ -156,9 +156,9 @@ class TestSelectedExamplesTraceability(unittest.TestCase):
 class TestNoResultsModified(unittest.TestCase):
     """Part 24: this task must not have changed any experiment result."""
 
-    def test_runs_csv_still_has_ten_rows(self):
+    def test_runs_csv_still_has_twelve_rows(self):
         df = pd.read_csv("results/runs.csv")
-        self.assertEqual(len(df), 10)  # M0x3 + M1 + M2 + M3 + M4 + D0x3
+        self.assertEqual(len(df), 12)  # M0x3 + M1 + M2 + M3 + M4 + M5 + M6 + D0x3
 
     def test_m4_and_d0_macro_f1_unchanged(self):
         df = pd.read_csv("results/runs.csv")

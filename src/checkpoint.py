@@ -15,7 +15,7 @@ from typing import Any, Optional, Union
 
 import numpy as np
 
-VALID_EXPERIMENTS = ["M0", "M1", "M2", "M3", "M4", "D0"]
+VALID_EXPERIMENTS = ["M0", "M1", "M2", "M3", "M4", "M5", "M6", "D0"]
 MONITORED_METRIC = "val_macro_f1"
 
 

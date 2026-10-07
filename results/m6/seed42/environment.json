@@ -1,0 +1,26 @@
+{
+  "python_version": "3.13.15",
+  "os_platform": "Linux 6.18.48+",
+  "git_commit": "unknown",
+  "git_branch": "unknown",
+  "git_dirty": false,
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "tensorflow": "2.20.0",
+    "transformers": "5.16.1",
+    "scikit-learn": "1.6.1",
+    "pandas": "2.3.3",
+    "numpy": "2.1.3",
+    "scipy": "1.16.3",
+    "accelerate": "1.14.0",
+    "tokenizers": "0.23.1",
+    "pyarrow": "23.0.1"
+  },
+  "device": {
+    "device_type": "cuda",
+    "device_name": "Tesla T4",
+    "device_count": 2,
+    "cuda_available": true,
+    "cuda_version": "12.8"
+  }
+}

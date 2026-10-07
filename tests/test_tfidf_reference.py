@@ -134,7 +134,7 @@ class TestResultRecord(unittest.TestCase):
         self.assertNotIn(self.result.label, VALID_EXPERIMENTS)
 
     def test_official_experiment_ids_untouched(self):
-        self.assertEqual(VALID_EXPERIMENTS, ["M0", "M1", "M2", "M3", "M4", "D0"])
+        self.assertEqual(VALID_EXPERIMENTS, ["M0", "M1", "M2", "M3", "M4", "M5", "M6", "D0"])
 
     def test_save_and_load_round_trip(self):
         tmp = Path(tempfile.mkdtemp()) / "tfidf_reference.json"

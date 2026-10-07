@@ -152,6 +152,23 @@ I ran D0 against a handful of held-out complaints it never saw during training, 
 
 The two wrong predictions above show the actual failure mode: both are short complaints (one or two sentences) about app/login problems with no product-specific vocabulary, which is exactly the kind of case the confusion matrices above flag as ambiguous between Credit card, Checking/savings, and Money transfer.
 
+---
+
+## Extensions beyond M4
+
+M4 is the ladder winner, so these two extension experiments are each measured against M4 directly rather than chained onto one another or onto each other. Same frozen data, split, tokenizer, and GloVe matrix as M4, only the architecture (M5) or the loss weighting (M6) changes.
+
+![M4 vs extensions: stacked layers and class weights](assets/extensions_comparison.png)
+
+![M4 and extensions results table](assets/extensions_table.png)
+
+| Model | Configuration | Macro-F1 | Δ vs M4 | Δ vs M0 |
+|---|---|---:|---:|---:|
+| M5 | M4 + 2 stacked BiLSTM layers | 0.8715 | +0.0004 | +0.0206 |
+| M6 | M4 + class weights | 0.8693 | −0.0017 | +0.0185 |
+
+Both deltas land inside M0's own three-seed spread (0.004125), so neither extension clears the bar for a resolved effect over M4. The second stacked LSTM layer in M5 costs roughly 2.7x M4's training time for a gain that rounds to noise, and M6's class weights trade a little precision on some classes for a little recall on others without moving the aggregate number. M4 stays the best recurrent model.
+
 The full automated suite (253 tests covering data loading, preprocessing, splitting, metrics, and checkpoint logic) passes before anything in this repo is treated as final:
 
 ![Test suite run: python -m unittest discover tests](assets/test_suite_run.png)

@@ -95,7 +95,7 @@ def check_split_manifest() -> bool:
 
 def check_experiment_ids() -> bool:
     """Verifies that project_plan.md and configs use the exact canonical identifiers."""
-    expected_ids = {"M0", "M1", "M2", "M3", "M4", "D0"}
+    expected_ids = {"M0", "M1", "M2", "M3", "M4", "M5", "M6", "D0"}
     if set(VALID_EXPERIMENTS) != expected_ids:
         print(f"[FAIL] experiment IDs — Mismatch: {set(VALID_EXPERIMENTS)} != {expected_ids}")
         return False
